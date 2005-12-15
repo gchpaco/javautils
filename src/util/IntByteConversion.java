@@ -57,6 +57,6 @@ public class IntByteConversion {
 
 	private static int fetchInt (byte[] array, int index) {
 		if (array[index] < 0) return 256 + array[index];
-		else return array[index];
+        return array[index];
 	}
 }

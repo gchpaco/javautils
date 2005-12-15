@@ -88,8 +88,7 @@ public class Relation<T> extends HashMap<T, Set<T>> implements Cloneable {
 	public Set<T> get (Object key) {
 		if (containsKey (key))
 			return super.get (key);
-		else
-			return Collections.emptySet ();
+        return Collections.emptySet ();
 	}
 
 	private HashSet<T> duplicate (final Set<T> set) {

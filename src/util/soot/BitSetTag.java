@@ -42,7 +42,8 @@ public abstract class BitSetTag implements Tag {
 		return tags;
 	}
 
-	public abstract BitSetTag clone ();
+	@Override
+    public abstract BitSetTag clone ();
 
 	public void mergeInto (Tag tag) {
 		assert tag instanceof BitSetTag;
