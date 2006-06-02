@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project default="test" name="Java utilities">
+<project default="dist" name="Java utilities">
   <property name="build" location="build" />
   <path id="build.base">
     <fileset dir="lib" includes="*.jar" />
@@ -33,5 +33,11 @@
     <testng classpathref="run" haltOnFailure="true">
       <xmlfileset dir="." includes="testng.xml" />
     </testng>
+  </target>
+
+  <target name="dist" depends="compile">
+    <jar destfile="${build}/javautils.jar">
+      <fileset dir="${build}"/>
+    </jar>
   </target>
 </project>
