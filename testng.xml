@@ -4,6 +4,7 @@
   <test name="Utility tests">
     <packages>
       <package name="util"/>
+      <package name="util.lazy"/>
       <package name="util.soot"/>
     </packages>
   </test>
