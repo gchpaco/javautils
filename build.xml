@@ -37,7 +37,10 @@
 
   <target name="dist" depends="compile">
     <jar destfile="${build}/javautils.jar">
-      <fileset dir="${build}"/>
+      <fileset dir="${build}">
+	<exclude name="**/*Test*"/>
+	<exclude name="**/javautils.jar"/>
+      </fileset>
     </jar>
   </target>
 </project>
