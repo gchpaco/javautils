@@ -9,7 +9,7 @@
     <path refid="build.base" />
     <pathelement location="${build}" />
   </path>
-  <taskdef resource="testngtasks" classpath="lib/testng-5.1-jdk15.jar" />
+  <taskdef resource="testngtasks" classpath="lib/testng-2.5.5-jdk15.jar" />
 
   <target name="init">
     <mkdir dir="${build}" />
