@@ -4,8 +4,24 @@
   <test name="Utility tests">
     <packages>
       <package name="util"/>
-      <package name="util.lazy"/>
+    </packages>
+  </test>
+
+  <test name="Soot utilities">
+    <packages>
       <package name="util.soot"/>
+    </packages>
+  </test>
+
+  <test name="Lazy evaluation">
+    <packages>
+      <package name="util.lazy"/>
+    </packages>
+  </test>
+
+  <test name="Pure functional data structures">
+    <packages>
+      <package name="util.purefun"/>
     </packages>
   </test>
 </suite>
