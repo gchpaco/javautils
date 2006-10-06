@@ -7,7 +7,7 @@ import static org.testng.AssertJUnit.*;
 
 import java.util.Iterator;
 
-import org.testng.annotations.Configuration;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import util.Pair;
@@ -17,7 +17,7 @@ import static util.Path.*;
 public class PathTest {
 	private Path<Integer> p;
 
-	@Configuration (beforeTestMethod = true)
+	@BeforeTest
 	private void setUp () {
 		p = null;
 		p = cons (1, p);

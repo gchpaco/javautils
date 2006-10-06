@@ -7,7 +7,7 @@ import static org.testng.AssertJUnit.*;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.testng.annotations.Configuration;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import soot.EquivTo;
@@ -53,7 +53,7 @@ public class EquivWrapperTest {
 		assertFalse (i.hashCode () == j.hashCode ());
 	}
 
-	@Configuration(beforeTestMethod=true)
+	@BeforeTest
 	private void setUp () {
 		i = new StupidEquivTo (4);
 		j = new StupidEquivTo (4);
