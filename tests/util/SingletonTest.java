@@ -3,6 +3,7 @@ package util;
 import static org.testng.AssertJUnit.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,5 +37,12 @@ public class SingletonTest {
         } catch (IllegalArgumentException e) {
             assertEquals("No instance of util.Pair registered", e.getMessage());
         }
+    }
+    
+    @Test
+    public void constructingSubclasses() {
+        HashMap map = new HashMap();
+        SingletonManager.register(Map.class, map);
+        assertSame(map, SingletonManager.get(Map.class));
     }
 }
