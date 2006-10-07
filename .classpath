@@ -6,6 +6,10 @@
 	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/sootclasses-2.2.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/testng-5.1-jdk15.jar"/>
+	<classpathentry kind="lib" path="lib/testng-5.1-jdk15.jar" sourcepath="/home/graham/lib/testng/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/graham/lib/testng/javadocs/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build"/>
 </classpath>
