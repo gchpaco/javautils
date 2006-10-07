@@ -4,7 +4,6 @@ import util.Pair;
 
 import org.testng.annotations.Test;
 import static org.testng.AssertJUnit.*;
-import static org.testng.Reporter.log;
 
 @Test
 public class StreamTest {
