@@ -25,7 +25,7 @@ public class Triple<T, U, V> {
 		if (this == obj) {
 			return true;
 		}
-		Triple rhs = (Triple) obj;
+		Triple<?,?,?> rhs = (Triple) obj;
 		return new EqualsBuilder ().append (first, rhs.first).append (second,
 				rhs.second).append (third, rhs.third).isEquals ();
 	}

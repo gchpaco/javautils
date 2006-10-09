@@ -12,6 +12,7 @@ public abstract class SplayHeap<T extends Comparable<? super T>> implements
 
     protected static class Empty<T extends Comparable<? super T>> extends
             SplayHeap<T> {
+        @SuppressWarnings("unchecked")
         static protected final Empty empty = new Empty();
 
         public boolean isEmpty() {
@@ -20,7 +21,8 @@ public abstract class SplayHeap<T extends Comparable<? super T>> implements
 
         @SuppressWarnings("unchecked")
         @Override
-        protected Pair<SplayHeap<T>, SplayHeap<T>> partition(T pivot) {
+        protected Pair<SplayHeap<T>, SplayHeap<T>> partition(@SuppressWarnings("unused")
+                                                             T pivot) {
             return make(empty, empty);
         }
 

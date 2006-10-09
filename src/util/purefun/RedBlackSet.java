@@ -8,6 +8,7 @@ public abstract class RedBlackSet<T extends Comparable<? super T>> implements
 
     protected static class Empty<T extends Comparable<? super T>> extends
             RedBlackSet<T> {
+        @SuppressWarnings("unchecked")
         static final protected Empty empty = new Empty();
 
         private Empty() {

@@ -11,6 +11,7 @@ final class Nil<T> extends StreamCell<T> {
     private Nil() {
     }
 
+    @SuppressWarnings("unchecked")
     static Nil nil = new Nil();
 
     @Override
@@ -154,7 +155,7 @@ public class Stream<T> extends Promise<StreamCell<T>> {
         return new Stream<U>(closure);
     }
 
-    private static Stream empt = new Stream<Object>(new Closure<StreamCell<Object>>() {
+    private static Stream<?> empt = new Stream<Object>(new Closure<StreamCell<Object>>() {
         @SuppressWarnings("unchecked")
         public StreamCell<Object> apply() {
             return Nil.nil;
@@ -163,6 +164,6 @@ public class Stream<T> extends Promise<StreamCell<T>> {
 
     @SuppressWarnings("unchecked")
     public static <U> Stream<U> empty() {
-        return empt;
+        return (Stream<U>) empt;
     }
 }

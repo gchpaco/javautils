@@ -5,7 +5,7 @@ import static org.testng.AssertJUnit.*;
 
 @Test
 public class RedBlackTest {
-    public void simplePersistence() throws EmptyException {
+    public void simplePersistence() {
         Set<Integer> set = RedBlackSet.empty();
         Set<Integer> set2 = set.insert(5);
         assertTrue(set2.member(5));

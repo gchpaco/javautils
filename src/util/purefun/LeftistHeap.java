@@ -28,6 +28,7 @@ public abstract class LeftistHeap<T extends Comparable<? super T>> implements
             throw new EmptyException();
         }
 
+        @SuppressWarnings("unchecked")
         static protected final Empty empty = new Empty();
     }
 

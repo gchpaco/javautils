@@ -23,7 +23,7 @@ public class Pair<T, U> {
 		if (this == obj) {
 			return true;
 		}
-		Pair rhs = (Pair) obj;
+		Pair<?,?> rhs = (Pair) obj;
 		return new EqualsBuilder ().append (first, rhs.first).append (second,
 				rhs.second).isEquals ();
 	}

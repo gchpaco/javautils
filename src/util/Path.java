@@ -58,7 +58,7 @@ public class Path<T> implements Iterable<Pair<T, T>> {
         if (this == obj) {
             return true;
         }
-        Path rhs = (Path) obj;
+        Path<?> rhs = (Path) obj;
         return new EqualsBuilder().append(element, rhs.element).append(rest,
                 rhs.rest).isEquals();
     }

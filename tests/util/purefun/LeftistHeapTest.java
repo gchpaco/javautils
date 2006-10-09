@@ -49,7 +49,7 @@ public class LeftistHeapTest {
         }
     }
 
-    public void merging() throws EmptyException {
+    public void merging() {
         Heap<Integer> heap, heap2, heap3;
         int[] testData = { 6, 4, 2, 7, 8 };
         heap = LeftistHeap.empty();

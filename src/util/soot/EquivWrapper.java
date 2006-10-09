@@ -42,7 +42,7 @@ public class EquivWrapper<T extends EquivTo> {
 	public static <U extends EquivTo> EquivWrapper<U> wrap (U u) {
 		return new EquivWrapper<U> (u);
 	}
-	private final static Map<EquivWrapper, EquivTo> values = new HashMap<EquivWrapper, EquivTo> ();
+	private final static Map<EquivWrapper<?>, EquivTo> values = new HashMap<EquivWrapper<?>, EquivTo> ();
 	@SuppressWarnings("unchecked")
 	public static <U extends EquivTo> U intern (U value) {
 		EquivWrapper<U> w = EquivWrapper.wrap (value);

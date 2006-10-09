@@ -39,7 +39,8 @@ public abstract class JimpleValueSwitchImpl implements JimpleValueSwitch {
 		defaultCase (v);
 	}
 
-	public void defaultCase (Object object) {
+	public void defaultCase (@SuppressWarnings("unused")
+	                         Object object) {
 	}
 
 	public void caseAddExpr (AddExpr v) {

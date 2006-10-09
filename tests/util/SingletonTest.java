@@ -23,8 +23,8 @@ public class SingletonTest {
 
     @Test
     public void registrationSame() {
-        HashMap first = new HashMap ();
-        HashMap second = new HashMap ();
+        HashMap<?,?> first = new HashMap<Object, Object> ();
+        HashMap<?,?> second = new HashMap<Object, Object> ();
         assertSame(SingletonManager.register(HashMap.class, first), SingletonManager
                 .register(HashMap.class, second));
     }
@@ -41,7 +41,7 @@ public class SingletonTest {
     
     @Test
     public void constructingSubclasses() {
-        HashMap map = new HashMap();
+        HashMap<?,?> map = new HashMap<Object, Object>();
         SingletonManager.register(Map.class, map);
         assertSame(map, SingletonManager.get(Map.class));
     }

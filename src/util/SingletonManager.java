@@ -4,10 +4,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class SingletonManager {
-    public static ConcurrentMap<Class, Object> singletonMap;
+    public static ConcurrentMap<Class<?>, Object> singletonMap;
     
     static {
-        singletonMap = new ConcurrentHashMap<Class, Object>();
+        singletonMap = new ConcurrentHashMap<Class<?>, Object>();
     }
     
     @SuppressWarnings("unchecked")
