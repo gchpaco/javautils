@@ -2,20 +2,20 @@ package util;
 
 import java.io.*;
 
-public class IndentedWriter implements Closeable, Appendable, Flushable
+public class IndentedWriter extends Writer
   {
-    private PrintStream output;
+    private Writer output;
 
     private String indent, step;
 
-    public IndentedWriter (PrintStream output)
+    public IndentedWriter (Writer output)
       {
         this.output = output;
         this.indent = "";
         this.step = "    ";
       }
 
-    public IndentedWriter (PrintStream output, String indentStep)
+    public IndentedWriter (Writer output, String indentStep)
       {
         this.output = output;
         this.indent = "";
@@ -29,40 +29,31 @@ public class IndentedWriter implements Closeable, Appendable, Flushable
 
     public void dedent ()
       {
-        this.indent = this.indent.substring (4);
+        this.indent = this.indent.substring (this.step.length ());
       }
 
-    public void ln (String line)
+    public void println (String line) throws IOException
       {
-        output.print (indent);
-        output.println (line);
+        output.write (indent);
+        output.write (line);
+        output.write ('\n');
       }
 
-    public void close ()
+    @Override
+    public void close () throws IOException
       {
         output.close ();
       }
 
-    public Appendable append (CharSequence csq)
-      {
-        output.append (csq);
-        return this;
-      }
-
-    public Appendable append (char c)
-      {
-        output.append (c);
-        return this;
-      }
-
-    public Appendable append (CharSequence csq, int start, int end)
-      {
-        output.append (csq, start, end);
-        return this;
-      }
-
-    public void flush ()
+    @Override
+    public void flush () throws IOException
       {
         output.flush ();
+      }
+
+    @Override
+    public void write (char[] cbuf, int off, int len) throws IOException
+      {
+        output.write (cbuf, off, len);
       }
   }
