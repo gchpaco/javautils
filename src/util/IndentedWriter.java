@@ -39,6 +39,18 @@ public class IndentedWriter extends Writer
         output.write ('\n');
       }
 
+    public void openWith (String line) throws IOException
+      {
+        output.write (indent);
+        output.write (line);
+      }
+    
+    public void closeWith (String line) throws IOException
+      {
+        output.write (line);
+        output.write ('\n');
+      }
+
     @Override
     public void close () throws IOException
       {
