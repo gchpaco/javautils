@@ -3,6 +3,7 @@
  */
 package util;
 
-public interface Function<T, U> {
-	public T apply (U arg);
-}
+public interface Function<T, U>
+  {
+    public T apply (U arg);
+  }
