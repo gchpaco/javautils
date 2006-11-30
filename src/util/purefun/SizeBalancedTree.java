@@ -23,7 +23,7 @@ abstract public class SizeBalancedTree<T extends Comparable<? super T>,U> extend
     @SuppressWarnings("unchecked")
     public static <T extends Comparable<? super T>,U> SizeBalancedTree<T, U> singleton (T t, U u)
     {
-      return new Bin<T, U> (1, t, u, (SizeBalancedTree<T,U>)EMPTY, (SizeBalancedTree<T,U>)EMPTY);
+      return new Bin<T, U> (1, t, u, emptySet (), emptySet ());
     }
     
     protected abstract SizeBalancedTree<T,U> trim (Function<Integer, T> low, Function<Integer, T> high);

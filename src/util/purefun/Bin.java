@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import util.*;
 
+@SuppressWarnings("unchecked")
 class Bin<T extends Comparable<? super T>, U> extends SizeBalancedTree<T, U>
   {
     int size;
@@ -102,8 +103,8 @@ class Bin<T extends Comparable<? super T>, U> extends SizeBalancedTree<T, U>
     public Association<T, U> union (Association<T, U> other)
       {
         if (other.isNull ()) return this;
-        return hedgeUnionL (new Function<Integer, T> () { public Integer apply (T t) { return -1; } },
-                            new Function<Integer, T> () { public Integer apply (T t) { return 1; } },
+        return hedgeUnionL (Functions.constant (-1),
+                            Functions.constant (1),
                             this, (SizeBalancedTree<T, U>) other);
       }
 

@@ -2,13 +2,14 @@ package util;
 
 public final class Functions
   {
-    static public <T,U> Function<T,U> constant (final T t)
+    @SuppressWarnings("unchecked")
+    static public Function constant (final Object o)
       {
-        return new Function<T,U> ()
+        return new Function ()
           {
-            public T apply(U arg)
+            public Object apply(Object arg)
               {
-                return t;
+                return o;
               }
           };
       }

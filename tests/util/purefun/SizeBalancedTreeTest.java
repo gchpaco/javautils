@@ -10,6 +10,7 @@ public class SizeBalancedTreeTest
   {
     private SizeBalancedTree<Integer, String> set;
 
+    @SuppressWarnings("unchecked")
     @BeforeTest
     public void setUp ()
       {
