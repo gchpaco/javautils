@@ -6,6 +6,7 @@ import java.util.HashSet;
 import org.testng.annotations.*;
 
 import util.L;
+import util.S;
 import static org.testng.AssertJUnit.*;
 
 @Test
@@ -26,7 +27,7 @@ public class TableTest
     public void testTableCreation ()
       {
         assertNotNull (table);
-        assertEquals (Collections.EMPTY_SET, table.get (NT.A, T.X));
+        assertEquals (S.et (), table.get (NT.A, T.X));
       }
 
     public void testTableFilling ()
