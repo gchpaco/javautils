@@ -4,38 +4,48 @@ import java.util.*;
 
 import util.*;
 
-public class Grammar
+public class Grammar<NT>
   {
     @SuppressWarnings("unchecked")
-    private final Pair<Enum,List<?>>[] symbols;
+    private final Pair<NT,List<?>>[] symbols;
     @SuppressWarnings("unchecked")
-    private Enum eof;
+    private Object eof;
     @SuppressWarnings("unchecked")
-    private Enum epsilon;
+    private Object epsilon;
     @SuppressWarnings("unchecked")
-    private EnumMap map;
+    private Map<NT,List<List<?>>> map;
     @SuppressWarnings("unchecked")
-    private Enum start;
-
-    @SuppressWarnings({ "unchecked", "cast" })
-    public Grammar (Pair... symbols)
-      {
-        this.symbols = symbols;
-        map = new EnumMap ((Class<Enum>) symbols[0].first.getClass ());
-        for (Pair p : symbols)
-          {
-            if (map.containsKey (p.first))
-              ((List) map.get (p.first)).add (p.second);
-            else
-              map.put (p.first, L.ist (p.second));
-          }
-        firstMemoization = new HashMap ();
-      }
-    
+    private Object start;
     @SuppressWarnings("unchecked")
     private Map firstMemoization;
     @SuppressWarnings("unchecked")
     private Map followTable;
+    @SuppressWarnings("unchecked")
+    private EnumSet terminals;
+
+    @SuppressWarnings("unchecked")
+    public Grammar (Pair<NT,List<?>>... symbols)
+      {
+        this.symbols = symbols;
+        Class<? extends Object> ntClass = symbols[0].first.getClass ();
+        map = new EnumMap (ntClass);
+        for (Pair<NT,List<?>> p : symbols)
+          {
+            assert p.first instanceof Enum;
+            if (!map.containsKey (p.first))
+              map.put (p.first, new ArrayList<List<?>> ());
+            map.get (p.first).add (p.second);
+            for (Object o : p.second)
+              if (o instanceof Enum && !ntClass.isInstance (o))
+                {
+                  if (terminals == null)
+                    terminals = EnumSet.of ((Enum)o);
+                  else
+                    terminals.add (o);
+                }
+          }
+        firstMemoization = new HashMap ();
+      }
 
     @SuppressWarnings("unchecked")
     public Set first (Object e)
@@ -46,7 +56,7 @@ public class Grammar
         if (firstMemoization.containsKey (e))
           // already did this.
           return (Set) firstMemoization.get (e);
-        List<List> productions = (List<List>) map.get (e);
+        List<List<?>> productions = map.get (e);
         Set set = S.et ();
         for (List l : productions)
           {
@@ -80,7 +90,7 @@ public class Grammar
       }
 
     @SuppressWarnings("unchecked")
-    public Set follow (Enum e)
+    public Set follow (Object e)
       {
         if (followTable == null)
           initializeFollowTable ();
@@ -92,11 +102,8 @@ public class Grammar
     @SuppressWarnings("unchecked")
     private void initializeFollowTable ()
       {
-        Class<? extends Enum> enumclass = symbols[0].first.getClass ();
-        followTable = new EnumMap (enumclass);
-        Enum[] enumConstants = enumclass.getEnumConstants ();
-        assert enumConstants != null;
-        for (Enum e : enumConstants)
+        followTable = new HashMap ();
+        for (Object e : map.keySet ())
           followTable.put (e, S.et ());
         ((Set) followTable.get (start)).add (eof);
         // this is kind of inefficient.  oh well.
@@ -104,43 +111,68 @@ public class Grammar
         do
           {
             changed = false;
-            for (Pair<Enum, List<?>> p : symbols)
+            Class<? extends Object> ntClass = symbols[0].first.getClass ();
+            for (Pair<NT, List<?>> p : symbols)
               for (int i = 0; i < p.second.size (); i++)
                 {
                   Object o = p.second.get (i);
-                  if (!enumclass.isInstance (o))
-                    continue;
-                  Enum e = (Enum) o;
-                  List l = p.second.subList (i + 1, p.second.size ());
-                  Set first = l.isEmpty () ? S.et (epsilon) : first (l);
-                  Set copy = S.et (first);
-                  if (copy.remove (epsilon)) // epsilon was in first
-                    copy.addAll ((Collection) followTable.get (p.first));
-                  Set<?> oldSet = (Set<?>) followTable.get (e);
-                  if (oldSet.containsAll (copy))
-                    continue;
-                  oldSet.addAll (copy);
-                  changed = true;
+                  if (ntClass.isInstance (o))
+                    {
+                      Enum e = (Enum) o;
+                      List l = p.second.subList (i + 1, p.second.size ());
+                      Set first = l.isEmpty () ? S.et (epsilon) : first (l);
+                      Set copy = new HashSet<Object> (first);
+                      if (copy.remove (epsilon)) // epsilon was in first
+                        copy.addAll ((Collection) followTable.get (p.first));
+                      Set<?> oldSet = (Set<?>) followTable.get (e);
+                      if (oldSet.containsAll (copy))
+                        continue;
+                      oldSet.addAll (copy);
+                      changed = true;
+                    }
                 }
           }
         while (changed);
       }
 
     @SuppressWarnings("unchecked")
-    public void setEOFToken (Enum eof)
+    public void setEOFToken (Object eof)
       {
         this.eof = eof;
       }
 
     @SuppressWarnings("unchecked")
-    public void setEpsilonToken (Enum epsilon)
+    public void setEpsilonToken (Object epsilon)
       {
         this.epsilon = epsilon;
       }
 
     @SuppressWarnings("unchecked")
-    public void setStartSymbol (Enum s)
+    public void setStartSymbol (Object s)
       {
         this.start = s;
+      }
+
+    @SuppressWarnings("unchecked")
+    public Object getEpsilonToken ()
+      {
+        return epsilon;
+      }
+
+    public Set<NT> getNonTerminals ()
+      {
+        return map.keySet ();
+      }
+    
+    @SuppressWarnings({ "unchecked", "cast" })
+    public Collection<List<?>> rulesFor (Object nt)
+      {
+        return (Collection<List<?>>) map.get (nt);
+      }
+
+    @SuppressWarnings("unchecked")
+    public Set<Enum> getTerminals ()
+      {
+        return terminals;
       }
   }

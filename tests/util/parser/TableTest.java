@@ -1,7 +1,6 @@
 package util.parser;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 
 import org.testng.annotations.*;
 
@@ -12,7 +11,8 @@ import static org.testng.AssertJUnit.*;
 @Test
 public class TableTest
   {
-    private Table<NT, T, Object> table;
+    @SuppressWarnings("unchecked")
+    private Table<NT, T, List<?>> table;
 
     static enum NT
       {
@@ -30,10 +30,11 @@ public class TableTest
         assertEquals (S.et (), table.get (NT.A, T.X));
       }
 
+    @SuppressWarnings("unchecked")
     public void testTableFilling ()
       {
-        Object a = new Object ();
-        Object b = new Object ();
+        List a = L.ist (1);
+        List b = L.ist (2);
         table.put (NT.A, T.X, a);
         assertEquals (new HashSet<Object> (L.ist (a)), table.get (NT.A, T.X));
         emptyExceptFor (NT.A, T.X);
@@ -42,11 +43,11 @@ public class TableTest
         emptyExceptFor (NT.A, T.X);
       }
     
+    @SuppressWarnings("unchecked")
     public void testMultipleFills ()
       {
-
-        Object a = new Object ();
-        Object b = new Object ();
+        List a = L.ist (1);
+        List b = L.ist (2);
         table.put (NT.A, T.X, a);
         table.put (NT.A, T.X, b);
         table.put (NT.A, T.X, b);
@@ -63,9 +64,10 @@ public class TableTest
               assertEquals (Collections.EMPTY_SET, table.get (nt, t));
       }
 
+    @SuppressWarnings("unchecked")
     @BeforeMethod
     public void setUp ()
       {
-        table = new Table<NT, T, Object> ();
+        table = new Table<NT, T, List<?>> ();
       }
   }

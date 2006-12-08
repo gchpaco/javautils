@@ -24,4 +24,10 @@
       <package name="util.purefun"/>
     </packages>
   </test>
+
+  <test name="LL(1) parser">
+    <packages>
+      <package name="util.parser"/>
+    </packages>
+  </test>
 </suite>

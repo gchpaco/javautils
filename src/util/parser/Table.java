@@ -2,7 +2,9 @@ package util.parser;
 
 import java.util.*;
 
-public class Table<NT,T,V>
+import util.S;
+
+public class Table<NT,T,V extends List<?>>
 {
   Map<NT, Map<T, HashSet<V>>> table;
   
@@ -10,6 +12,24 @@ public class Table<NT,T,V>
   public Table ()
     {
       table = new HashMap<NT,Map<T,HashSet<V>>> ();
+    }
+
+  @SuppressWarnings("unchecked")
+  public Table (Grammar<NT> grammar)
+    {
+      table = new HashMap<NT,Map<T,HashSet<V>>> ();
+      for (NT nt : grammar.getNonTerminals ())
+        for (V v : (Collection<V>) grammar.rulesFor (nt))
+          {
+            Set first = v.isEmpty () ? S.et (grammar.getEpsilonToken ()) : grammar.first (v);
+            Set follow = grammar.follow (nt);
+            for (T t : (Set<T>) grammar.getTerminals ())
+              if (first.contains (t))
+                put (nt, t, v);
+              else if (first.contains (grammar.getEpsilonToken ()) &&
+                  follow.contains (t))
+                put (nt, t, v);
+          }
     }
 
   @SuppressWarnings("unchecked")
