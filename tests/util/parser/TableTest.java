@@ -66,6 +66,6 @@ public class TableTest
     @BeforeMethod
     public void setUp ()
       {
-        table = new Table<NT, T, Object> (NT.A, T.EOF);
+        table = new Table<NT, T, Object> ();
       }
   }
