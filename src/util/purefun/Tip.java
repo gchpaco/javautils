@@ -8,6 +8,7 @@ import java.util.Iterator;
 import util.Function;
 import util.Triple;
 
+@SuppressWarnings("unchecked")
 class Tip<T extends Comparable<? super T>, U> extends SizeBalancedTree<T, U>
   {
 

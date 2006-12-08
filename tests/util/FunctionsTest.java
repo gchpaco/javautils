@@ -6,6 +6,7 @@ import static org.testng.AssertJUnit.*;
 @Test
 public class FunctionsTest
   {
+    @SuppressWarnings("unchecked")
     public void constant () {
       Object o = new Object ();
       assertSame (o, Functions.constant (o).apply (3));
