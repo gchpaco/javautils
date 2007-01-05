@@ -30,4 +30,10 @@
       <package name="util.parser"/>
     </packages>
   </test>
+
+  <test name="Annotation utilities">
+    <packages>
+      <package name="util.annotations"/>
+    </packages>
+  </test>
 </suite>
