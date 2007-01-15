@@ -24,12 +24,19 @@ public class Table<NT,T,V extends List<?>>
             Set first = v.isEmpty () ? S.et (grammar.getEpsilonToken ()) : grammar.first (v);
             Set follow = grammar.follow (nt);
             for (T t : (Set<T>) grammar.getTerminals ())
-              if (first.contains (t))
-                put (nt, t, v);
-              else if (first.contains (grammar.getEpsilonToken ()) &&
-                  follow.contains (t))
-                put (nt, t, v);
+              add (grammar, nt, v, first, follow, t);
+            add (grammar, nt, v, first, follow, (T) grammar.getEOFToken ());
           }
+    }
+
+  @SuppressWarnings("unchecked")
+  private void add (Grammar<NT> grammar, NT nt, V v, Set first, Set follow, T t)
+    {
+      if (first.contains (t))
+        put (nt, t, v);
+      else if (first.contains (grammar.getEpsilonToken ()) &&
+          follow.contains (t))
+        put (nt, t, v);
     }
 
   @SuppressWarnings("unchecked")

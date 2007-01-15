@@ -15,7 +15,7 @@ public class Grammar<NT>
     @SuppressWarnings("unchecked")
     private Map<NT,List<List<?>>> map;
     @SuppressWarnings("unchecked")
-    private Object start;
+    private NT start;
     @SuppressWarnings("unchecked")
     private Map firstMemoization;
     @SuppressWarnings("unchecked")
@@ -142,21 +142,33 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
+    public Object getEOFToken ()
+      {
+        return eof;
+      }
+
+    @SuppressWarnings("unchecked")
     public void setEpsilonToken (Object epsilon)
       {
         this.epsilon = epsilon;
       }
 
     @SuppressWarnings("unchecked")
-    public void setStartSymbol (Object s)
+    public Object getEpsilonToken ()
+      {
+        return epsilon;
+      }
+
+    @SuppressWarnings("unchecked")
+    public void setStartSymbol (NT s)
       {
         this.start = s;
       }
 
     @SuppressWarnings("unchecked")
-    public Object getEpsilonToken ()
+    public NT getStartSymbol ()
       {
-        return epsilon;
+        return this.start;
       }
 
     public Set<NT> getNonTerminals ()
