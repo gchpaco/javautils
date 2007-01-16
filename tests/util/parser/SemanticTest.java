@@ -61,7 +61,6 @@ public class SemanticTest
       }
 
     @SuppressWarnings ("unchecked")
-    @Test(enabled=false)
     public void semanticPredicate ()
       {
         final int i[] = { 0 };
@@ -72,7 +71,7 @@ public class SemanticTest
                 return i[0] > 0;
               }
           };
-        SemanticPredicate inverted = Grammar.converse (sem);
+        SemanticPredicate inv = Grammar.converse (sem);
         Closure act = new Closure<Object> ()
           {
             public Object apply ()
@@ -82,8 +81,8 @@ public class SemanticTest
               }
           };
         Grammar g = new Grammar (make (NT.E, L.ist (NT.T, NT.Ep)),
-                                 make (NT.Ep, L.ist (sem, T.PLUS, NT.T, NT.Ep)),
-                                 make (NT.Ep, L.ist (inverted, act)),
+                                 make (NT.Ep, L.ist (inv, T.PLUS, act, NT.T, NT.Ep)),
+                                 make (NT.Ep, L.ist (sem)),
                                  make (NT.T, L.ist (NT.F, NT.Tp)),
                                  make (NT.Tp, L.ist (T.STAR, NT.F, NT.Tp)),
                                  make (NT.Tp, L.ist ()), make (NT.F,
@@ -95,16 +94,23 @@ public class SemanticTest
         g.setEpsilonToken (T.EPSILON);
         g.setStartSymbol (NT.E);
         assertEquals (S.et (new SemanticTag (sem, T.EPSILON)), g.first (sem));
-        assertEquals (S.et (new SemanticTag (sem, T.PLUS)), g.first (L.ist (sem, T.PLUS, NT.T, NT.Ep)));
-        assertEquals (S.et (new SemanticTag (sem, T.PLUS), new SemanticTag (inverted, T.EPSILON)), g.first (NT.Ep));
-        assertEquals (S.et (T.EOF, T.RPAREN), g.follow (NT.Ep));
+        assertEquals (S.et (new SemanticTag (inv, T.PLUS)), g.first (L.ist (inv, T.PLUS, act, NT.T, NT.Ep)));
+        assertEquals (S.et (new SemanticTag (inv, T.PLUS), new SemanticTag (sem, T.EPSILON)), g.first (NT.Ep));
+        assertEquals (S.et (TokenTag.make (T.EOF), TokenTag.make (T.RPAREN)), g.follow (NT.Ep));
         Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (g);
-        assertEquals (S.et (L.ist (inverted, act)), table.get (NT.Ep, T.RPAREN));
-        assertEquals (S.et (L.ist (sem, T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));
+        assertEquals (S.et (L.ist (sem)), table.get (NT.Ep, T.RPAREN));
+        assertEquals (S.et (L.ist (inv, T.PLUS, act, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));
         Parser<NT, T> parser = new Parser<NT, T> (g);
-        fail ("Not done yet");
-        assertEquals (0, i[0]);
+        i[0] = 0;
         parser.witness (T.ID, T.PLUS, T.ID, T.EOF);
-        assertEquals (2, i[0]);
+        assertEquals (1, i[0]);
+        i[0] = 0;
+        parser.reset ();
+        try
+          {
+            parser.witness (T.ID, T.EOF);
+            fail ("Semantic predicate passed when it shouldn't have!");
+          }
+        catch (Parser.ParseException e) {}
       }
   }

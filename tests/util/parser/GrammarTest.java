@@ -115,7 +115,7 @@ public class GrammarTest
             parser.witness (T.PLUS);
             fail ("Shouldn't be able to witness two plusses in a row!");
           }
-        catch (Exception e) {}
+        catch (Parser.ParseException e) {}
       }
 
     @SuppressWarnings ("unchecked")
@@ -142,6 +142,6 @@ public class GrammarTest
             parser.witness (T.PLUS);
             fail ("Shouldn't choose between two indistinguishable rules!");
           }
-        catch (Exception e) {}
+        catch (Parser.ParseException e) {}
       }
   }
