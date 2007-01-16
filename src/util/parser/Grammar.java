@@ -2,10 +2,88 @@ package util.parser;
 
 import java.util.*;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import util.*;
 
 public class Grammar<NT>
   {
+    static public class ConversePredicate implements SemanticPredicate
+    {
+      SemanticPredicate pred;
+
+      public ConversePredicate (SemanticPredicate sem)
+        {
+          pred = sem;
+        }
+
+      public Boolean apply ()
+        {
+          return ! pred.apply ();
+        }
+      
+      @Override
+      public int hashCode ()
+        {
+          return new HashCodeBuilder (337, 113).append (pred).toHashCode ();
+        }
+      
+      @Override
+      public boolean equals (Object obj)
+        {                
+          if (obj instanceof ConversePredicate == false)
+              return false;
+          if (this == obj)
+            return true;
+          ConversePredicate rhs = (ConversePredicate) obj;
+          return new EqualsBuilder ().append (pred, rhs.pred).isEquals ();
+        }
+      
+      @Override
+      public String toString ()
+        {
+          return "\u00AC" + pred.toString ();
+        }
+    }
+    static public class ConjunctionPredicate implements SemanticPredicate
+    {
+      SemanticPredicate a, b;
+
+      public ConjunctionPredicate (SemanticPredicate a, SemanticPredicate b)
+        {
+          this.a = a; this.b = b;
+        }
+
+      public Boolean apply ()
+        {
+          return a.apply () && b.apply ();
+        }
+      
+      @Override
+      public int hashCode ()
+        {
+          return new HashCodeBuilder (373, 113).append (a).append (b).toHashCode ();
+        }
+      
+      @Override
+      public boolean equals (Object obj)
+        {                
+          if (obj instanceof ConjunctionPredicate == false)
+              return false;
+          if (this == obj)
+            return true;
+          ConjunctionPredicate rhs = (ConjunctionPredicate) obj;
+          return new EqualsBuilder ().append (a, rhs.a).append (b, rhs.b).isEquals ();
+        }
+      
+      @Override
+      public String toString ()
+        {
+          return a.toString () + "\u2227" + b.toString ();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private final Pair<NT,List<?>>[] symbols;
     @SuppressWarnings("unchecked")
@@ -46,7 +124,7 @@ public class Grammar<NT>
           }
       }
 
-    public Set<Object> first (Object e)
+    public Set<?> first (Object e)
       {
         if (firstTable == null)
           initializeFirstTable ();
@@ -54,20 +132,20 @@ public class Grammar<NT>
           return firstTable.get (e);
         if (e instanceof Closure)
           return S.et (getEpsilonToken ());
-        System.out.println ("Saw an " + e);
         return S.et (e);
       }
 
+    @SuppressWarnings("unchecked")
     private void initializeFirstTable ()
       {
         firstTable = new HashMap<Object, Set<Object>> ();
         for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
           {
-            firstTable.put (entry.getKey (), S.et ());
+            firstTable.put (entry.getKey (), new HashSet<Object> ());
             for (List<?> rule : entry.getValue ())
-                firstTable.put (rule, S.et ());
+                firstTable.put (rule, new HashSet<Object> ());
           }
-        firstTable.put (L.ist (), S.et (getEpsilonToken ()));
+        firstTable.put (L.ist (), S.et (make (getEpsilonToken ())));
         boolean changed;
         do
           {
@@ -78,18 +156,28 @@ public class Grammar<NT>
                     if (rule.isEmpty ())
                       continue;
                     Set<Object> s = firstTable.get (rule);
+                    SemanticPredicate currentPredicate = null;
                     boolean done = false;
                     for (Object o : rule)
                       {
-                        if (o instanceof Closure)
+                        if (o instanceof SemanticPredicate)
+                          {
+                            SemanticPredicate p = (SemanticPredicate) o;
+                            if (currentPredicate == null)
+                              currentPredicate = p;
+                            else
+                              currentPredicate = conjunction (currentPredicate, p);
+                            continue;
+                          }
+                        else if (o instanceof Closure)
                           continue;
                         else if (map.containsKey (o))
                           {
                             Set<Object> target = firstTable.get (o);
-                            if (target.contains (getEpsilonToken ()))
+                            if (target.contains (make (getEpsilonToken ())))
                               {
                                 Set<Object> putative = new HashSet<Object> (target);
-                                putative.remove (getEpsilonToken());
+                                putative.remove (make (getEpsilonToken()));
                                 if (s.equals (putative))
                                   continue;
                                 changed = true;
@@ -110,17 +198,21 @@ public class Grammar<NT>
                           }
                         else
                           {
-                            if (!s.contains (o))
+                            if (!s.contains (make (o)))
                               {
                                 s.clear ();
-                                s.add (o);
+                                s.add (make (o));
                                 changed = true;
                               }
                             done = true;
                             break;
                           }
                       }
-                    if (!done) s.add (getEpsilonToken ());
+                    if (!done)
+                      {
+                        boolean diff = s.add (make (getEpsilonToken ()));
+                        if (diff) changed = true;
+                      }
                   }
             for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
                 for (List<?> rule : entry.getValue ())
@@ -130,6 +222,11 @@ public class Grammar<NT>
                   }
           }
         while (changed);
+      }
+
+    private Object make (Object o)
+      {
+        return o;
       }
 
     @SuppressWarnings("unchecked")
@@ -178,6 +275,7 @@ public class Grammar<NT>
         while (changed);
       }
 
+    @SuppressWarnings("unchecked")
     private Set<Object> firstOf (List<Object> l)
       {
         if (firstTable == null)
@@ -193,20 +291,20 @@ public class Grammar<NT>
             {
               s.clear ();
               s.addAll (firstTable.get (o));
-              if (!s.contains (getEpsilonToken ()))
+              if (!s.contains (make (getEpsilonToken ())))
                 {
                   done = true;
                   break;
                 }
-              s.remove (getEpsilonToken ());
+              s.remove (make (getEpsilonToken ()));
             }
           else
             {
-              s.add (o);
+              s.add (make (o));
               done = true;
               break;
             }
-        if (!done) s.add (getEpsilonToken ());
+        if (!done) s.add (make (getEpsilonToken ()));
         return s;
       }
 
@@ -261,5 +359,15 @@ public class Grammar<NT>
     public Set<Enum> getTerminals ()
       {
         return terminals;
+      }
+
+    public static SemanticPredicate converse (SemanticPredicate sem)
+      {
+        return new ConversePredicate (sem);
+      }
+
+    public static SemanticPredicate conjunction (SemanticPredicate a, SemanticPredicate b)
+      {
+        return new ConjunctionPredicate (a, b);
       }
   }
