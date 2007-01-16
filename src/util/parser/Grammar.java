@@ -7,6 +7,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import util.*;
 
+import static util.parser.TokenTag.make;
+
 public class Grammar<NT>
   {
     static public class ConversePredicate implements SemanticPredicate
@@ -95,7 +97,7 @@ public class Grammar<NT>
     @SuppressWarnings("unchecked")
     private NT start;
     @SuppressWarnings("unchecked")
-    private Map<Object,Set<Object>> firstTable;
+    private Map<Object,Set<TokenTag<Object>>> firstTable;
     @SuppressWarnings("unchecked")
     private Map followTable;
     @SuppressWarnings("unchecked")
@@ -124,7 +126,8 @@ public class Grammar<NT>
           }
       }
 
-    public Set<?> first (Object e)
+    @SuppressWarnings("unchecked")
+    public Set<TokenTag<Object>> first (Object e)
       {
         if (firstTable == null)
           initializeFirstTable ();
@@ -132,20 +135,20 @@ public class Grammar<NT>
           return firstTable.get (e);
         if (e instanceof Closure)
           return S.et (getEpsilonToken ());
-        return S.et (e);
+        return S.et (make (e));
       }
 
     @SuppressWarnings("unchecked")
     private void initializeFirstTable ()
       {
-        firstTable = new HashMap<Object, Set<Object>> ();
+        firstTable = new HashMap<Object, Set<TokenTag<Object>>> ();
         for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
           {
-            firstTable.put (entry.getKey (), new HashSet<Object> ());
+            firstTable.put (entry.getKey (), new HashSet<TokenTag<Object>> ());
             for (List<?> rule : entry.getValue ())
-                firstTable.put (rule, new HashSet<Object> ());
+                firstTable.put (rule, new HashSet<TokenTag<Object>> ());
           }
-        firstTable.put (L.ist (), S.et (make (getEpsilonToken ())));
+        firstTable.put (L.ist (), S.et (getEpsilonToken ()));
         boolean changed;
         do
           {
@@ -155,7 +158,7 @@ public class Grammar<NT>
                   {
                     if (rule.isEmpty ())
                       continue;
-                    Set<Object> s = firstTable.get (rule);
+                    Set<TokenTag<Object>> s = firstTable.get (rule);
                     SemanticPredicate currentPredicate = null;
                     boolean done = false;
                     for (Object o : rule)
@@ -173,11 +176,11 @@ public class Grammar<NT>
                           continue;
                         else if (map.containsKey (o))
                           {
-                            Set<Object> target = firstTable.get (o);
-                            if (target.contains (make (getEpsilonToken ())))
+                            Set<TokenTag<Object>> target = firstTable.get (o);
+                            if (target.contains (getEpsilonToken ()))
                               {
-                                Set<Object> putative = new HashSet<Object> (target);
-                                putative.remove (make (getEpsilonToken()));
+                                Set<TokenTag<Object>> putative = new HashSet<TokenTag<Object>> (target);
+                                putative.remove (getEpsilonToken ());
                                 if (s.equals (putative))
                                   continue;
                                 changed = true;
@@ -210,7 +213,7 @@ public class Grammar<NT>
                       }
                     if (!done)
                       {
-                        boolean diff = s.add (make (getEpsilonToken ()));
+                        boolean diff = s.add (getEpsilonToken ());
                         if (diff) changed = true;
                       }
                   }
@@ -224,13 +227,8 @@ public class Grammar<NT>
         while (changed);
       }
 
-    private Object make (Object o)
-      {
-        return o;
-      }
-
     @SuppressWarnings("unchecked")
-    public Set follow (Object e)
+    public Set<TokenTag<Object>> follow (Object e)
       {
         if (followTable == null)
           initializeFollowTable ();
@@ -245,7 +243,7 @@ public class Grammar<NT>
         followTable = new HashMap ();
         for (Object e : map.keySet ())
           followTable.put (e, S.et ());
-        ((Set) followTable.get (start)).add (eof);
+        ((Set) followTable.get (start)).add (getEOFToken ());
         // this is kind of inefficient.  oh well.
         boolean changed;
         do
@@ -260,9 +258,9 @@ public class Grammar<NT>
                     {
                       Enum e = (Enum) o;
                       List l = p.second.subList (i + 1, p.second.size ());
-                      Set first = l.isEmpty () ? S.et (epsilon) : firstOf (l);
+                      Set first = l.isEmpty () ? S.et (getEpsilonToken ()) : firstOf (l);
                       Set copy = new HashSet<Object> (first);
-                      if (copy.remove (epsilon)) // epsilon was in first
+                      if (copy.remove (getEpsilonToken ())) // epsilon was in first
                         copy.addAll ((Collection) followTable.get (p.first));
                       Set<?> oldSet = (Set<?>) followTable.get (e);
                       if (oldSet.containsAll (copy))
@@ -276,13 +274,13 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
-    private Set<Object> firstOf (List<Object> l)
+    private Set<TokenTag<Object>> firstOf (List<Object> l)
       {
         if (firstTable == null)
           initializeFirstTable ();
         if (firstTable.containsKey (l))
           return firstTable.get (l);
-        Set<Object> s = new HashSet<Object> ();
+        Set<TokenTag<Object>> s = new HashSet<TokenTag<Object>> ();
         boolean done = false;
         for (Object o : l)
           if (o instanceof Closure)
@@ -291,12 +289,12 @@ public class Grammar<NT>
             {
               s.clear ();
               s.addAll (firstTable.get (o));
-              if (!s.contains (make (getEpsilonToken ())))
+              if (!s.contains (getEpsilonToken ()))
                 {
                   done = true;
                   break;
                 }
-              s.remove (make (getEpsilonToken ()));
+              s.remove (getEpsilonToken ());
             }
           else
             {
@@ -304,7 +302,7 @@ public class Grammar<NT>
               done = true;
               break;
             }
-        if (!done) s.add (make (getEpsilonToken ()));
+        if (!done) s.add (getEpsilonToken ());
         return s;
       }
 
@@ -315,9 +313,9 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
-    public Object getEOFToken ()
+    public TokenTag<Object> getEOFToken ()
       {
-        return eof;
+        return make (eof);
       }
 
     @SuppressWarnings("unchecked")
@@ -327,9 +325,9 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
-    public Object getEpsilonToken ()
+    public TokenTag<Object> getEpsilonToken ()
       {
-        return epsilon;
+        return make (epsilon);
       }
 
     @SuppressWarnings("unchecked")

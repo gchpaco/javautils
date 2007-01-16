@@ -3,7 +3,7 @@ package util.parser;
 import static org.testng.AssertJUnit.*;
 import static util.Pair.make;
 
-import java.util.List;
+import java.util.*;
 
 import org.testng.annotations.*;
 
@@ -14,6 +14,14 @@ import util.parser.GrammarTest.T;
 @Test
 public class SemanticTest
   {
+    private static <U> Set<TokenTag<U>> makeSet (U... tokens)
+      {
+        Set<TokenTag<U>> set = new HashSet<TokenTag<U>> ();
+        for (U token : tokens)
+          set.add (TokenTag.make (token));
+        return set;
+      }
+    
     @SuppressWarnings ("unchecked")
     public void semanticAction ()
       {
@@ -39,10 +47,10 @@ public class SemanticTest
         g.setEOFToken (T.EOF);
         g.setEpsilonToken (T.EPSILON);
         g.setStartSymbol (NT.E);
-        assertEquals (S.et (T.EPSILON), g.first (sem));
-        assertEquals (S.et (T.PLUS), g.first (L.ist (sem, T.PLUS, NT.T, NT.Ep)));
-        assertEquals (S.et (T.PLUS, T.EPSILON), g.first (NT.Ep));
-        assertEquals (S.et (T.EOF, T.RPAREN), g.follow (NT.Ep));
+        assertEquals (makeSet (T.EPSILON), g.first (sem));
+        assertEquals (makeSet (T.PLUS), g.first (L.ist (sem, T.PLUS, NT.T, NT.Ep)));
+        assertEquals (makeSet (T.PLUS, T.EPSILON), g.first (NT.Ep));
+        assertEquals (makeSet (T.EOF, T.RPAREN), g.follow (NT.Ep));
         Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (g);
         assertEquals (S.et (L.ist (sem)), table.get (NT.Ep, T.RPAREN));
         assertEquals (S.et (L.ist (sem, T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));

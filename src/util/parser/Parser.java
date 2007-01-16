@@ -19,7 +19,7 @@ public class Parser<NT, T>
         this.table = new Table<NT,T,List<?>> (grammar);
         this.stack = new LinkedList<Object> ();
         stack.addLast (grammar.getStartSymbol ());
-        stack.addLast (grammar.getEOFToken ());
+        stack.addLast (grammar.getEOFToken ().getToken ());
         nonTerminals = grammar.getNonTerminals ();
         terminals = (Set<T>) grammar.getTerminals ();
       }
@@ -27,7 +27,8 @@ public class Parser<NT, T>
     @SuppressWarnings("unchecked")
     public void witness (T token)
       {
-        assert terminals.contains (token) || token.equals (grammar.getEOFToken ());
+        System.out.println ("token = " + token);
+        assert terminals.contains (token) || token.equals (grammar.getEOFToken ().getToken ());
         while (true)
           {
             if (stack.peek ().equals (token))
@@ -39,13 +40,14 @@ public class Parser<NT, T>
               throw new RuntimeException ("Saw a " + token + " when was expecting a " + stack.peek ());
             else
               {
-                NT top = (NT) stack.removeFirst ();
-                if (top instanceof Closure)
+                Object obj = stack.removeFirst ();
+                if (obj instanceof Closure)
                   {
-                    Closure cls = (Closure) top;
+                    Closure cls = (Closure) obj;
                     cls.apply ();
                     continue;
                   }
+                NT top = (NT) obj;
                 assert nonTerminals.contains (top);
                 Collection<List<?>> possibilities = table.get (top, token);
                 if (possibilities.isEmpty ())

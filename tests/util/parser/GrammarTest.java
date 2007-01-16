@@ -3,7 +3,7 @@ package util.parser;
 import static org.testng.AssertJUnit.*;
 import static util.Pair.make;
 
-import java.util.List;
+import java.util.*;
 
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -24,20 +24,28 @@ public class GrammarTest
       {
         PLUS, STAR, LPAREN, RPAREN, ID, EOF, EPSILON;
       }
+    
+    private static <U> Set<TokenTag<U>> makeSet (U... tokens)
+      {
+        Set<TokenTag<U>> set = new HashSet<TokenTag<U>> ();
+        for (U token : tokens)
+          set.add (TokenTag.make (token));
+        return set;
+      }
 
     public void example ()
       {
-        assertEquals (S.et (T.LPAREN, T.ID), grammar.first (NT.E));
-        assertEquals (S.et (T.PLUS, T.EPSILON), grammar.first (NT.Ep));
-        assertEquals (S.et (T.LPAREN, T.ID), grammar.first (NT.T));
-        assertEquals (S.et (T.STAR, T.EPSILON), grammar.first (NT.Tp));
-        assertEquals (S.et (T.LPAREN, T.ID), grammar.first (NT.F));
+        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.E));
+        assertEquals (makeSet (T.PLUS, T.EPSILON), grammar.first (NT.Ep));
+        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.T));
+        assertEquals (makeSet (T.STAR, T.EPSILON), grammar.first (NT.Tp));
+        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.F));
 
-        assertEquals (S.et (T.EOF, T.RPAREN), grammar.follow (NT.E));
-        assertEquals (S.et (T.EOF, T.RPAREN), grammar.follow (NT.Ep));
-        assertEquals (S.et (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.T));
-        assertEquals (S.et (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.Tp));
-        assertEquals (S.et (T.STAR, T.PLUS, T.EOF, T.RPAREN),
+        assertEquals (makeSet (T.EOF, T.RPAREN), grammar.follow (NT.E));
+        assertEquals (makeSet (T.EOF, T.RPAREN), grammar.follow (NT.Ep));
+        assertEquals (makeSet (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.T));
+        assertEquals (makeSet (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.Tp));
+        assertEquals (makeSet (T.STAR, T.PLUS, T.EOF, T.RPAREN),
                       grammar.follow (NT.F));
       }
 
@@ -63,7 +71,7 @@ public class GrammarTest
     @SuppressWarnings("unchecked")
     public void tableFormation ()
       {
-        Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (grammar);
+        Table<NT, T, List<TokenTag<?>>> table = new Table<NT, T, List<TokenTag<?>>> (grammar);
         assertEquals (S.et (L.ist ()), table.get (NT.Ep, T.RPAREN));
         assertEquals (S.et (L.ist (T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep,
                                                                      T.PLUS));

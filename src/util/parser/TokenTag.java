@@ -33,11 +33,16 @@ public class TokenTag<T>
     @Override
     public String toString ()
       {
-        return token.toString ();
+        return "tag" + token;
       }
 
     public static <T> TokenTag<T> make (T object)
       {
         return new TokenTag<T> (object);
+      }
+
+    public T getToken ()
+      {
+        return token;
       }
   }
