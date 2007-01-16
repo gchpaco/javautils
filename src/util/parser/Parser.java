@@ -2,6 +2,8 @@ package util.parser;
 
 import java.util.*;
 
+import util.Closure;
+
 public class Parser<NT, T>
   {
     Grammar<NT> grammar;
@@ -38,6 +40,12 @@ public class Parser<NT, T>
             else
               {
                 NT top = (NT) stack.removeFirst ();
+                if (top instanceof Closure)
+                  {
+                    Closure cls = (Closure) top;
+                    cls.apply ();
+                    continue;
+                  }
                 assert nonTerminals.contains (top);
                 Collection<List<?>> possibilities = table.get (top, token);
                 if (possibilities.isEmpty ())
@@ -47,6 +55,12 @@ public class Parser<NT, T>
                 stack.addAll (0, possibilities.iterator ().next ());
               }
           }
+      }
+    
+    public void witness (T... tokens)
+      {
+        for (T token : tokens)
+          witness (token);
       }
 
     public List<Object> getStack ()

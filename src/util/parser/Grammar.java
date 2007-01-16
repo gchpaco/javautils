@@ -17,7 +17,7 @@ public class Grammar<NT>
     @SuppressWarnings("unchecked")
     private NT start;
     @SuppressWarnings("unchecked")
-    private Map firstMemoization;
+    private Map<Object,Set<Object>> firstTable;
     @SuppressWarnings("unchecked")
     private Map followTable;
     @SuppressWarnings("unchecked")
@@ -44,49 +44,92 @@ public class Grammar<NT>
                     terminals.add (o);
                 }
           }
-        firstMemoization = new HashMap ();
       }
 
-    @SuppressWarnings("unchecked")
-    public Set first (Object e)
+    public Set<Object> first (Object e)
       {
-        if (!map.containsKey (e))
-          // e is a terminal!
-          return Collections.singleton (e);
-        if (firstMemoization.containsKey (e))
-          // already did this.
-          return (Set) firstMemoization.get (e);
-        List<List<?>> productions = map.get (e);
-        Set set = S.et ();
-        for (List l : productions)
-          {
-            if (l.isEmpty ())
-              set.add (epsilon);
-            else
-              {
-                set.addAll (first (l));
-              }
-          }
-        firstMemoization.put (e, set);
-        return set;
+        if (firstTable == null)
+          initializeFirstTable ();
+        if (firstTable.containsKey (e))
+          return firstTable.get (e);
+        if (e instanceof Closure)
+          return S.et (getEpsilonToken ());
+        System.out.println ("Saw an " + e);
+        return S.et (e);
       }
-    
-    @SuppressWarnings("unchecked")
-    public Set first (List l)
+
+    private void initializeFirstTable ()
       {
-        if (firstMemoization.containsKey (l))
-          // already did this.
-          return (Set) firstMemoization.get (l);
-        assert ! l.isEmpty () : "Got asked for the first of an empty production!";
-        Set set = S.et ();
-        for (int i = 0; i < l.size (); i++)
+        firstTable = new HashMap<Object, Set<Object>> ();
+        for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
           {
-            set.addAll (first (l.get (i)));
-            if (! set.contains (epsilon))
-              break;
+            firstTable.put (entry.getKey (), S.et ());
+            for (List<?> rule : entry.getValue ())
+                firstTable.put (rule, S.et ());
           }
-        firstMemoization.put (l, set);
-        return set;
+        firstTable.put (L.ist (), S.et (getEpsilonToken ()));
+        boolean changed;
+        do
+          {
+            changed = false;
+            for (List<List<?>> rules : map.values ())
+                for (List<?> rule : rules)
+                  {
+                    if (rule.isEmpty ())
+                      continue;
+                    Set<Object> s = firstTable.get (rule);
+                    boolean done = false;
+                    for (Object o : rule)
+                      {
+                        if (o instanceof Closure)
+                          continue;
+                        else if (map.containsKey (o))
+                          {
+                            Set<Object> target = firstTable.get (o);
+                            if (target.contains (getEpsilonToken ()))
+                              {
+                                Set<Object> putative = new HashSet<Object> (target);
+                                putative.remove (getEpsilonToken());
+                                if (s.equals (putative))
+                                  continue;
+                                changed = true;
+                                s.clear ();
+                                s.addAll (putative);
+                              }
+                            else
+                              {
+                                if (!s.equals (target))
+                                  {
+                                    changed = true;
+                                    s.clear ();
+                                    s.addAll (target);
+                                  }
+                                done = true;
+                                break;
+                              }
+                          }
+                        else
+                          {
+                            if (!s.contains (o))
+                              {
+                                s.clear ();
+                                s.add (o);
+                                changed = true;
+                              }
+                            done = true;
+                            break;
+                          }
+                      }
+                    if (!done) s.add (getEpsilonToken ());
+                  }
+            for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
+                for (List<?> rule : entry.getValue ())
+                  {
+                    boolean diff = firstTable.get (entry.getKey ()).addAll (firstTable.get (rule));
+                    if (diff) changed = true;
+                  }
+          }
+        while (changed);
       }
 
     @SuppressWarnings("unchecked")
@@ -120,7 +163,7 @@ public class Grammar<NT>
                     {
                       Enum e = (Enum) o;
                       List l = p.second.subList (i + 1, p.second.size ());
-                      Set first = l.isEmpty () ? S.et (epsilon) : first (l);
+                      Set first = l.isEmpty () ? S.et (epsilon) : firstOf (l);
                       Set copy = new HashSet<Object> (first);
                       if (copy.remove (epsilon)) // epsilon was in first
                         copy.addAll ((Collection) followTable.get (p.first));
@@ -133,6 +176,38 @@ public class Grammar<NT>
                 }
           }
         while (changed);
+      }
+
+    private Set<Object> firstOf (List<Object> l)
+      {
+        if (firstTable == null)
+          initializeFirstTable ();
+        if (firstTable.containsKey (l))
+          return firstTable.get (l);
+        Set<Object> s = new HashSet<Object> ();
+        boolean done = false;
+        for (Object o : l)
+          if (o instanceof Closure)
+            continue;
+          else if (map.containsKey (o))
+            {
+              s.clear ();
+              s.addAll (firstTable.get (o));
+              if (!s.contains (getEpsilonToken ()))
+                {
+                  done = true;
+                  break;
+                }
+              s.remove (getEpsilonToken ());
+            }
+          else
+            {
+              s.add (o);
+              done = true;
+              break;
+            }
+        if (!done) s.add (getEpsilonToken ());
+        return s;
       }
 
     @SuppressWarnings("unchecked")

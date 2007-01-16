@@ -8,8 +8,7 @@ import java.util.List;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import util.L;
-import util.S;
+import util.*;
 
 @Test
 public class GrammarTest
@@ -102,9 +101,7 @@ public class GrammarTest
     public void badToken ()
       {
         Parser<NT, T> parser = new Parser<NT, T> (grammar);
-        parser.witness (T.LPAREN);
-        parser.witness (T.ID);
-        parser.witness (T.PLUS);
+        parser.witness (T.LPAREN, T.ID, T.PLUS);
         try
           {
             parser.witness (T.PLUS);
@@ -138,5 +135,43 @@ public class GrammarTest
             fail ("Shouldn't choose between two indistinguishable rules!");
           }
         catch (Exception e) {}
+      }
+
+    @SuppressWarnings ("unchecked")
+    public void semanticAction ()
+      {
+        final int i[] = { 0 };
+        Closure sem = new Closure<Object> ()
+          {
+            public Object apply ()
+              {
+                i[0]++;
+                return null;
+              }
+          };
+        Grammar g = new Grammar (make (NT.E, L.ist (NT.T, NT.Ep)),
+                                 make (NT.Ep, L.ist (sem, T.PLUS, NT.T, NT.Ep)),
+                                 make (NT.Ep, L.ist (sem)),
+                                 make (NT.T, L.ist (NT.F, NT.Tp)),
+                                 make (NT.Tp, L.ist (T.STAR, NT.F, NT.Tp)),
+                                 make (NT.Tp, L.ist ()), make (NT.F,
+                                                               L.ist (T.LPAREN,
+                                                                      NT.E,
+                                                                      T.RPAREN)),
+                                                                      make (NT.F, L.ist (T.ID)));
+        g.setEOFToken (T.EOF);
+        g.setEpsilonToken (T.EPSILON);
+        g.setStartSymbol (NT.E);
+        assertEquals (S.et (T.EPSILON), g.first (sem));
+        assertEquals (S.et (T.PLUS), g.first (L.ist (sem, T.PLUS, NT.T, NT.Ep)));
+        assertEquals (S.et (T.PLUS, T.EPSILON), g.first (NT.Ep));
+        assertEquals (S.et (T.EOF, T.RPAREN), grammar.follow (NT.Ep));
+        Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (g);
+        assertEquals (S.et (L.ist (sem)), table.get (NT.Ep, T.RPAREN));
+        assertEquals (S.et (L.ist (sem, T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));
+        Parser<NT, T> parser = new Parser<NT, T> (g);
+        assertEquals (0, i[0]);
+        parser.witness (T.ID, T.PLUS, T.ID, T.EOF);
+        assertEquals (2, i[0]);
       }
   }
