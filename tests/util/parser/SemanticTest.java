@@ -14,11 +14,11 @@ import util.parser.GrammarTest.T;
 @Test
 public class SemanticTest
   {
-    private static <U> Set<TokenTag<U>> makeSet (U... tokens)
+    private static <U> Set<Pair<Closure<Boolean>,U>> makeSet (U... tokens)
       {
-        Set<TokenTag<U>> set = new HashSet<TokenTag<U>> ();
+        Set<Pair<Closure<Boolean>,U>> set = new HashSet<Pair<Closure<Boolean>,U>> ();
         for (U token : tokens)
-          set.add (TokenTag.make (token));
+          set.add (Pair.make ((Closure<Boolean>) null, token));
         return set;
       }
     
@@ -52,8 +52,8 @@ public class SemanticTest
         assertEquals (makeSet (T.PLUS, T.EPSILON), g.first (NT.Ep));
         assertEquals (makeSet (T.EOF, T.RPAREN), g.follow (NT.Ep));
         Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (g);
-        assertEquals (S.et (L.ist (sem)), table.get (NT.Ep, T.RPAREN));
-        assertEquals (S.et (L.ist (sem, T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));
+        assertEquals (makeSet (L.ist (sem)), table.get (NT.Ep, T.RPAREN));
+        assertEquals (makeSet (L.ist (sem, T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));
         Parser<NT, T> parser = new Parser<NT, T> (g);
         assertEquals (0, i[0]);
         parser.witness (T.ID, T.PLUS, T.ID, T.EOF);
@@ -93,13 +93,13 @@ public class SemanticTest
         g.setEOFToken (T.EOF);
         g.setEpsilonToken (T.EPSILON);
         g.setStartSymbol (NT.E);
-        assertEquals (S.et (new SemanticTag (sem, T.EPSILON)), g.first (sem));
-        assertEquals (S.et (new SemanticTag (inv, T.PLUS)), g.first (L.ist (inv, T.PLUS, act, NT.T, NT.Ep)));
-        assertEquals (S.et (new SemanticTag (inv, T.PLUS), new SemanticTag (sem, T.EPSILON)), g.first (NT.Ep));
-        assertEquals (S.et (TokenTag.make (T.EOF), TokenTag.make (T.RPAREN)), g.follow (NT.Ep));
+        assertEquals (S.et (Pair.make (sem, T.EPSILON)), g.first (sem));
+        assertEquals (S.et (Pair.make (inv, T.PLUS)), g.first (L.ist (inv, T.PLUS, act, NT.T, NT.Ep)));
+        assertEquals (S.et (Pair.make (inv, T.PLUS), Pair.make (sem, T.EPSILON)), g.first (NT.Ep));
+        assertEquals (S.et (Pair.make (null, T.EOF), Pair.make (null, T.RPAREN)), g.follow (NT.Ep));
         Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (g);
-        assertEquals (S.et (L.ist (sem)), table.get (NT.Ep, T.RPAREN));
-        assertEquals (S.et (L.ist (inv, T.PLUS, act, NT.T, NT.Ep)), table.get (NT.Ep, T.PLUS));
+        assertEquals (S.et (Pair.make (sem, L.ist (sem))), table.get (NT.Ep, T.RPAREN));
+        assertEquals (S.et (Pair.make (inv, L.ist (inv, T.PLUS, act, NT.T, NT.Ep))), table.get (NT.Ep, T.PLUS));
         Parser<NT, T> parser = new Parser<NT, T> (g);
         i[0] = 0;
         parser.witness (T.ID, T.PLUS, T.ID, T.EOF);

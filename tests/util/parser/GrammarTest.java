@@ -13,7 +13,7 @@ import util.*;
 @Test
 public class GrammarTest
   {
-    private Grammar<NT> grammar;
+    private Grammar<NT, T> grammar;
 
     static enum NT
       {
@@ -25,30 +25,6 @@ public class GrammarTest
         PLUS, STAR, LPAREN, RPAREN, ID, EOF, EPSILON;
       }
     
-    private static <U> Set<TokenTag<U>> makeSet (U... tokens)
-      {
-        Set<TokenTag<U>> set = new HashSet<TokenTag<U>> ();
-        for (U token : tokens)
-          set.add (TokenTag.make (token));
-        return set;
-      }
-
-    public void example ()
-      {
-        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.E));
-        assertEquals (makeSet (T.PLUS, T.EPSILON), grammar.first (NT.Ep));
-        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.T));
-        assertEquals (makeSet (T.STAR, T.EPSILON), grammar.first (NT.Tp));
-        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.F));
-
-        assertEquals (makeSet (T.EOF, T.RPAREN), grammar.follow (NT.E));
-        assertEquals (makeSet (T.EOF, T.RPAREN), grammar.follow (NT.Ep));
-        assertEquals (makeSet (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.T));
-        assertEquals (makeSet (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.Tp));
-        assertEquals (makeSet (T.STAR, T.PLUS, T.EOF, T.RPAREN),
-                      grammar.follow (NT.F));
-      }
-
     @SuppressWarnings ("unchecked")
     @BeforeTest
     protected void setUp ()
@@ -68,16 +44,40 @@ public class GrammarTest
         grammar.setStartSymbol (NT.E);
       }
 
+    private static <U> Set<Pair<Closure<Boolean>,U>> makeSet (U... tokens)
+      {
+        Set<Pair<Closure<Boolean>,U>> set = new HashSet<Pair<Closure<Boolean>,U>> ();
+        for (U token : tokens)
+          set.add (Pair.make ((Closure<Boolean>) null, token));
+        return set;
+      }
+
+    public void example ()
+      {
+        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.E));
+        assertEquals (makeSet (T.PLUS, T.EPSILON), grammar.first (NT.Ep));
+        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.T));
+        assertEquals (makeSet (T.STAR, T.EPSILON), grammar.first (NT.Tp));
+        assertEquals (makeSet (T.LPAREN, T.ID), grammar.first (NT.F));
+
+        assertEquals (makeSet (T.EOF, T.RPAREN), grammar.follow (NT.E));
+        assertEquals (makeSet (T.EOF, T.RPAREN), grammar.follow (NT.Ep));
+        assertEquals (makeSet (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.T));
+        assertEquals (makeSet (T.PLUS, T.EOF, T.RPAREN), grammar.follow (NT.Tp));
+        assertEquals (makeSet (T.STAR, T.PLUS, T.EOF, T.RPAREN),
+                      grammar.follow (NT.F));
+      }
+
     @SuppressWarnings("unchecked")
     public void tableFormation ()
       {
-        Table<NT, T, List<TokenTag<?>>> table = new Table<NT, T, List<TokenTag<?>>> (grammar);
-        assertEquals (S.et (L.ist ()), table.get (NT.Ep, T.RPAREN));
-        assertEquals (S.et (L.ist (T.PLUS, NT.T, NT.Ep)), table.get (NT.Ep,
-                                                                     T.PLUS));
+        Table<NT, T, List<?>> table = new Table<NT, T, List<?>> (grammar);
+        assertEquals (S.et (Pair.make (null, L.ist ())), table.get (NT.Ep, T.RPAREN));
+        assertEquals (S.et (Pair.make (null, L.ist (T.PLUS, NT.T, NT.Ep))),
+                      table.get (NT.Ep, T.PLUS));
         assertEquals (S.et (), table.get (NT.Ep, T.LPAREN));
         assertEquals (S.et (), table.get (NT.T, T.EOF));
-        assertEquals (S.et (L.ist ()), table.get (NT.Ep, T.EOF));
+        assertEquals (S.et (Pair.make (null, L.ist ())), table.get (NT.Ep, T.EOF));
       }
     
     public void parserAutomaton ()

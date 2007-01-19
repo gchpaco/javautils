@@ -4,8 +4,7 @@ import java.util.*;
 
 import org.testng.annotations.*;
 
-import util.L;
-import util.S;
+import util.*;
 import static org.testng.AssertJUnit.*;
 
 @Test
@@ -35,11 +34,11 @@ public class TableTest
       {
         List a = L.ist (1);
         List b = L.ist (2);
-        table.put (NT.A, T.X, a);
-        assertEquals (new HashSet<Object> (L.ist (a)), table.get (NT.A, T.X));
+        table.put (NT.A, T.X, null, a);
+        assertEquals (S.et (Pair.make (null, a)), table.get (NT.A, T.X));
         emptyExceptFor (NT.A, T.X);
-        table.put (NT.A, T.X, b);
-        assertEquals (new HashSet<Object> (L.ist (a, b)), table.get (NT.A, T.X));
+        table.put (NT.A, T.X, null, b);
+        assertEquals (S.et (Pair.make (null, a), Pair.make (null, b)), table.get (NT.A, T.X));
         emptyExceptFor (NT.A, T.X);
       }
     
@@ -48,11 +47,30 @@ public class TableTest
       {
         List a = L.ist (1);
         List b = L.ist (2);
-        table.put (NT.A, T.X, a);
-        table.put (NT.A, T.X, b);
-        table.put (NT.A, T.X, b);
+        table.put (NT.A, T.X, null, a);
+        table.put (NT.A, T.X, null, b);
+        table.put (NT.A, T.X, null, b);
         assertFalse (table.get (NT.A, T.X).isEmpty ());
-        assertEquals (new HashSet<Object> (L.ist (a, b)), table.get (NT.A, T.X));
+        assertEquals (S.et (Pair.make (null, a), Pair.make (null, b)), table.get (NT.A, T.X));
+        emptyExceptFor (NT.A, T.X);
+      }
+    
+    @SuppressWarnings("unchecked")
+    public void testMultipleSemanticPredicates ()
+      {
+        SemanticPredicate a1 = new SemanticPredicate () {
+          public Boolean apply ()
+          {
+            return false;
+          }
+        };
+        List a = L.ist (1);
+        List b = L.ist (2);
+        table.put (NT.A, T.X, null, a);
+        table.put (NT.A, T.X, a1, b);
+        table.put (NT.A, T.X, null, b);
+        assertFalse (table.get (NT.A, T.X).isEmpty ());
+        assertEquals (S.et (Pair.make (null, a), Pair.make (a1, b), Pair.make (null, b)), table.get (NT.A, T.X));
         emptyExceptFor (NT.A, T.X);
       }
 

@@ -7,9 +7,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import util.*;
 
-import static util.parser.TokenTag.make;
+import static util.Pair.make;
+import static java.util.Collections.singleton;
 
-public class Grammar<NT>
+public class Grammar<NT, T>
   {
     static public class ConversePredicate implements SemanticPredicate
     {
@@ -89,17 +90,17 @@ public class Grammar<NT>
     @SuppressWarnings("unchecked")
     private final Pair<NT,List<?>>[] symbols;
     @SuppressWarnings("unchecked")
-    private Object eof;
+    private T eof;
     @SuppressWarnings("unchecked")
-    private Object epsilon;
+    private T epsilon;
     @SuppressWarnings("unchecked")
     private Map<NT,List<List<?>>> map;
     @SuppressWarnings("unchecked")
     private NT start;
     @SuppressWarnings("unchecked")
-    private Map<Object,Set<TokenTag<Object>>> firstTable;
+    private Map<Object,Set<Pair<SemanticPredicate,T>>> firstTable;
     @SuppressWarnings("unchecked")
-    private Map followTable;
+    private Map<Object,Set<Pair<SemanticPredicate,T>>> followTable;
     @SuppressWarnings("unchecked")
     private EnumSet terminals;
 
@@ -127,28 +128,30 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
-    public Set<TokenTag<Object>> first (Object e)
+    public Set<Pair<SemanticPredicate,T>> first (Object e)
       {
         if (firstTable == null)
           initializeFirstTable ();
         if (firstTable.containsKey (e))
           return firstTable.get (e);
+        if (e instanceof SemanticPredicate)
+          return singleton (make ((SemanticPredicate)e, getEpsilonToken ()));
         if (e instanceof Closure)
-          return S.et (getEpsilonToken ());
-        return S.et (make (e));
+          return singleton (make ((SemanticPredicate)null, getEpsilonToken ()));
+        return singleton (make ((SemanticPredicate)null, (T) e));
       }
 
     @SuppressWarnings("unchecked")
     private void initializeFirstTable ()
       {
-        firstTable = new HashMap<Object, Set<TokenTag<Object>>> ();
+        firstTable = new HashMap<Object, Set<Pair<SemanticPredicate,T>>> ();
         for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
           {
-            firstTable.put (entry.getKey (), new HashSet<TokenTag<Object>> ());
+            firstTable.put (entry.getKey (), new HashSet<Pair<SemanticPredicate,T>> ());
             for (List<?> rule : entry.getValue ())
-                firstTable.put (rule, new HashSet<TokenTag<Object>> ());
+                firstTable.put (rule, new HashSet<Pair<SemanticPredicate,T>> ());
           }
-        firstTable.put (L.ist (), S.et (getEpsilonToken ()));
+        firstTable.put (L.ist (), singleton (make ((SemanticPredicate)null, getEpsilonToken ())));
         boolean changed;
         do
           {
@@ -158,64 +161,9 @@ public class Grammar<NT>
                   {
                     if (rule.isEmpty ())
                       continue;
-                    Set<TokenTag<Object>> s = firstTable.get (rule);
-                    SemanticPredicate currentPredicate = null;
-                    boolean done = false;
-                    for (Object o : rule)
-                      {
-                        if (o instanceof SemanticPredicate)
-                          {
-                            SemanticPredicate p = (SemanticPredicate) o;
-                            if (currentPredicate == null)
-                              currentPredicate = p;
-                            else
-                              currentPredicate = conjunction (currentPredicate, p);
-                            continue;
-                          }
-                        else if (o instanceof Closure)
-                          continue;
-                        else if (map.containsKey (o))
-                          {
-                            Set<TokenTag<Object>> target = firstTable.get (o);
-                            if (target.contains (getEpsilonToken ()))
-                              {
-                                Set<TokenTag<Object>> putative = new HashSet<TokenTag<Object>> (target);
-                                putative.remove (getEpsilonToken ());
-                                if (s.equals (putative))
-                                  continue;
-                                changed = true;
-                                s.clear ();
-                                s.addAll (putative);
-                              }
-                            else
-                              {
-                                if (!s.equals (target))
-                                  {
-                                    changed = true;
-                                    s.clear ();
-                                    s.addAll (target);
-                                  }
-                                done = true;
-                                break;
-                              }
-                          }
-                        else
-                          {
-                            if (!s.contains (make (o)))
-                              {
-                                s.clear ();
-                                s.add (make (o));
-                                changed = true;
-                              }
-                            done = true;
-                            break;
-                          }
-                      }
-                    if (!done)
-                      {
-                        boolean diff = s.add (getEpsilonToken ());
-                        if (diff) changed = true;
-                      }
+                    Set<Pair<SemanticPredicate, T>> s = firstTable.get (rule);
+                    boolean diff = firstOfList (rule, s);
+                    if (diff) changed = true;
                   }
             for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
                 for (List<?> rule : entry.getValue ())
@@ -228,45 +176,134 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
-    public Set<TokenTag<Object>> follow (Object e)
+    private boolean firstOfList (List<?> rule, Set<Pair<SemanticPredicate, T>> set)
+      {
+        boolean changed = false;
+        SemanticPredicate currentPredicate = null;
+        boolean done = false;
+        for (Object o : rule)
+          {
+            if (o instanceof SemanticPredicate)
+              {
+                SemanticPredicate p = (SemanticPredicate) o;
+                if (currentPredicate == null)
+                  currentPredicate = p;
+                else
+                  currentPredicate = conjunction (currentPredicate, p);
+                continue;
+              }
+            else if (o instanceof Closure)
+              continue;
+            else if (map.containsKey (o))
+              {
+                Set<Pair<SemanticPredicate, T>> target = firstTable.get (o);
+                if (hasToken (target, getEpsilonToken ()))
+                  {
+                    Set<Pair<SemanticPredicate, T>> putative = 
+                      new HashSet<Pair<SemanticPredicate, T>> (target);
+                    removeToken (putative, getEpsilonToken ());
+                    if (set.equals (putative))
+                      continue;
+                    changed = true;
+                    set.clear ();
+                    set.addAll (putative);
+                  }
+                else
+                  {
+                    if (!set.equals (target))
+                      {
+                        changed = true;
+                        set.clear ();
+                        set.addAll (target);
+                      }
+                    done = true;
+                    break;
+                  }
+              }
+            else
+              {
+                if (!hasToken (set, (T) o))
+                  {
+                    set.clear ();
+                    set.add (make (currentPredicate, (T) o));
+                    changed = true;
+                  }
+                done = true;
+                break;
+              }
+          }
+        if (!done)
+          {
+            boolean diff = set.add (make (currentPredicate, getEpsilonToken ()));
+            if (diff) changed = true;
+          }
+        return changed;
+      }
+
+    private <U> boolean removeToken (Set<Pair<SemanticPredicate, U>> set, U token)
+      {
+        boolean changed = false;
+        for (Iterator<Pair<SemanticPredicate, U>> iter = set.iterator (); iter.hasNext ();)
+          {
+            Pair<SemanticPredicate, U> element = iter.next ();
+            if (element.second.equals (token))
+              {
+                iter.remove ();
+                changed = true;
+              }
+          }
+        return changed;
+      }
+
+    private <U> boolean hasToken (Set<Pair<SemanticPredicate, U>> set, U token)
+      {
+        for (Iterator<Pair<SemanticPredicate, U>> iter = set.iterator (); iter.hasNext ();)
+          {
+            Pair<SemanticPredicate, U> element = iter.next ();
+            if (element.second.equals (token))
+              return true;
+          }
+        return false;
+      }
+
+    @SuppressWarnings("unchecked")
+    public Set<Pair<SemanticPredicate,T>> follow (Object e)
       {
         if (followTable == null)
           initializeFollowTable ();
         if (followTable.containsKey (e))
-          return (Set) followTable.get (e);
+          return followTable.get (e);
         return null;
       }
 
     @SuppressWarnings("unchecked")
     private void initializeFollowTable ()
       {
-        followTable = new HashMap ();
+        followTable = new HashMap<Object,Set<Pair<SemanticPredicate,T>>> ();
         for (Object e : map.keySet ())
-          followTable.put (e, S.et ());
-        ((Set) followTable.get (start)).add (getEOFToken ());
+          followTable.put (e, new HashSet<Pair<SemanticPredicate,T>> ());
+        followTable.get (start).add (make ((SemanticPredicate) null, getEOFToken ()));
         // this is kind of inefficient.  oh well.
         boolean changed;
         do
           {
             changed = false;
-            Class<? extends Object> ntClass = symbols[0].first.getClass ();
             for (Pair<NT, List<?>> p : symbols)
               for (int i = 0; i < p.second.size (); i++)
                 {
                   Object o = p.second.get (i);
-                  if (ntClass.isInstance (o))
+                  if (map.containsKey (o))
                     {
-                      Enum e = (Enum) o;
                       List l = p.second.subList (i + 1, p.second.size ());
-                      Set first = l.isEmpty () ? S.et (getEpsilonToken ()) : firstOf (l);
-                      Set copy = new HashSet<Object> (first);
-                      if (copy.remove (getEpsilonToken ())) // epsilon was in first
-                        copy.addAll ((Collection) followTable.get (p.first));
-                      Set<?> oldSet = (Set<?>) followTable.get (e);
-                      if (oldSet.containsAll (copy))
-                        continue;
-                      oldSet.addAll (copy);
-                      changed = true;
+                      Set<Pair<SemanticPredicate,T>> first = l.isEmpty () 
+                        ? S.et (make ((SemanticPredicate) null, getEpsilonToken ()))
+                        : firstOf (l);
+                      Set<Pair<SemanticPredicate,T>> copy = new HashSet<Pair<SemanticPredicate,T>> (first);
+                      if (removeToken (copy, getEpsilonToken ())) // epsilon was in first
+                        copy.addAll (followTable.get (p.first));
+                      Set<Pair<SemanticPredicate,T>> oldSet = followTable.get (o);
+                      if (oldSet.addAll (copy))
+                        changed = true;
                     }
                 }
           }
@@ -274,60 +311,39 @@ public class Grammar<NT>
       }
 
     @SuppressWarnings("unchecked")
-    private Set<TokenTag<Object>> firstOf (List<Object> l)
+    private Set<Pair<SemanticPredicate,T>> firstOf (List<Object> l)
       {
         if (firstTable == null)
           initializeFirstTable ();
         if (firstTable.containsKey (l))
           return firstTable.get (l);
-        Set<TokenTag<Object>> s = new HashSet<TokenTag<Object>> ();
-        boolean done = false;
-        for (Object o : l)
-          if (o instanceof Closure)
-            continue;
-          else if (map.containsKey (o))
-            {
-              s.clear ();
-              s.addAll (firstTable.get (o));
-              if (!s.contains (getEpsilonToken ()))
-                {
-                  done = true;
-                  break;
-                }
-              s.remove (getEpsilonToken ());
-            }
-          else
-            {
-              s.add (make (o));
-              done = true;
-              break;
-            }
-        if (!done) s.add (getEpsilonToken ());
+        Set<Pair<SemanticPredicate,T>> s = new HashSet<Pair<SemanticPredicate,T>> ();
+        firstOfList (l, s);
         return s;
       }
 
     @SuppressWarnings("unchecked")
-    public void setEOFToken (Object eof)
+    public void setEOFToken (T eof)
       {
         this.eof = eof;
       }
 
     @SuppressWarnings("unchecked")
-    public TokenTag<Object> getEOFToken ()
+    public T getEOFToken ()
       {
-        return make (eof);
+        return eof;
       }
 
     @SuppressWarnings("unchecked")
-    public void setEpsilonToken (Object epsilon)
+    public void setEpsilonToken (T epsilon)
       {
         this.epsilon = epsilon;
       }
 
     @SuppressWarnings("unchecked")
-    public TokenTag<Object> getEpsilonToken ()
+    public T getEpsilonToken ()
       {
-        return make (epsilon);
+        return epsilon;
       }
 
     @SuppressWarnings("unchecked")
@@ -361,11 +377,14 @@ public class Grammar<NT>
 
     public static SemanticPredicate converse (SemanticPredicate sem)
       {
+        // XXX: won't work if sem == null
         return new ConversePredicate (sem);
       }
 
     public static SemanticPredicate conjunction (SemanticPredicate a, SemanticPredicate b)
       {
+        if (a == null) return b;
+        if (b == null) return a;
         return new ConjunctionPredicate (a, b);
       }
   }

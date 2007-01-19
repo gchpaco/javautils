@@ -3,6 +3,7 @@ package util.parser;
 import java.util.*;
 
 import util.Closure;
+import util.Pair;
 
 public class Parser<NT, T>
   {
@@ -30,14 +31,14 @@ public class Parser<NT, T>
           } 
       }
     
-    Grammar<NT> grammar;
+    Grammar<NT, T> grammar;
     Table<NT, T, List<?>> table;
     LinkedList<Object> stack;
     private Set<NT> nonTerminals;
     private Set<T> terminals;
 
     @SuppressWarnings("unchecked")
-    public Parser (Grammar<NT> grammar)
+    public Parser (Grammar<NT, T> grammar)
       {
         this.grammar = grammar;
         this.table = new Table<NT,T,List<?>> (grammar);
@@ -50,13 +51,13 @@ public class Parser<NT, T>
       {
         this.stack = new LinkedList<Object> ();
         stack.addLast (grammar.getStartSymbol ());
-        stack.addLast (grammar.getEOFToken ().getToken ());
+        stack.addLast (grammar.getEOFToken ());
       }
     
     @SuppressWarnings("unchecked")
     public void witness (T token)
       {
-        assert terminals.contains (token) || token.equals (grammar.getEOFToken ().getToken ());
+        assert terminals.contains (token) || token.equals (grammar.getEOFToken ());
         while (true)
           {
             if (stack.peek ().equals (token))
@@ -69,7 +70,15 @@ public class Parser<NT, T>
             else
               {
                 Object obj = stack.removeFirst ();
-                if (obj instanceof Closure)
+                if (obj instanceof SemanticPredicate)
+                  {
+                    // real belt-and-suspenders stuff here, in theory this should already have been checked, but can't hurt to be sure
+                    SemanticPredicate pred = (SemanticPredicate) obj;
+                    if (pred.apply ())
+                      continue;
+                    throw new ParseException ("Semantic predicate " + pred + " failed during execution");
+                  }
+                else if (obj instanceof Closure)
                   {
                     Closure cls = (Closure) obj;
                     cls.apply ();
@@ -77,25 +86,15 @@ public class Parser<NT, T>
                   }
                 NT top = (NT) obj;
                 assert nonTerminals.contains (top);
-                Collection<List<?>> possibilities = table.get (top, token);
+                Collection<Pair<SemanticPredicate, List<?>>> possibilities = table.get (top, token);
                 List<?> candidate = null;
-                for (List<?> possibility : possibilities)
+                for (Pair<SemanticPredicate, List<?>> possibility : possibilities)
                   {
-                    if (!possibility.isEmpty () && possibility.get (0) instanceof SemanticPredicate)
-                      {
-                        SemanticPredicate p = (SemanticPredicate) possibility.get (0);
-                        if (p.apply ())
-                          {
-                            if (candidate != null)
-                              throw new ParseException ("Ambiguous parse for " + token + " in state " + top);
-                            candidate = possibility;                            
-                          }
-                      }
-                    else
+                    if (possibility.first == null || possibility.first.apply ())
                       {
                         if (candidate != null)
                           throw new ParseException ("Ambiguous parse for " + token + " in state " + top);
-                        candidate = possibility;
+                        candidate = possibility.second;
                       }
                   }
                 if (candidate == null)
