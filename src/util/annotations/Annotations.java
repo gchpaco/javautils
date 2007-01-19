@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 
 public class Annotations
 {
-    public static Method getAnnotatedMethod (Class target,
+    public static Method getAnnotatedMethod (Class<?> target,
 					     Class<? extends Annotation>
 					     annotation)
     {
@@ -13,7 +13,7 @@ public class Annotations
 		return m;
 	return null;
     }
-    public static Field getAnnotatedField (Class target,
+    public static Field getAnnotatedField (Class<?> target,
 					   Class<? extends Annotation>
 					   annotation)
     {
