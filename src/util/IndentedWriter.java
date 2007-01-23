@@ -1,6 +1,7 @@
 package util;
 
 import java.io.*;
+import java.util.Collection;
 
 public class IndentedWriter extends Writer
   {
@@ -67,5 +68,24 @@ public class IndentedWriter extends Writer
     public void write (char[] cbuf, int off, int len) throws IOException
       {
         output.write (cbuf, off, len);
+      }
+    
+    public void writeAll (Collection<? extends Writeable> items) throws IOException
+      {
+        for (Writeable w : items)
+          w.writeTo (this);
+      }
+    
+    public void writeAllSep (Collection<? extends Writeable> items, String separator) throws IOException
+      {
+        boolean first = true;
+        for (Writeable w : items)
+          {
+            if (first)
+              first = false;
+            else
+              write (separator);
+            w.writeTo (this);
+          }
       }
   }
