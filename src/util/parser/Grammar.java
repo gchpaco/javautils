@@ -1,14 +1,14 @@
 package util.parser;
 
+import static java.util.Collections.singleton;
+import static util.Pair.make;
+
 import java.util.*;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import util.*;
-
-import static util.Pair.make;
-import static java.util.Collections.singleton;
 
 public class Grammar<NT, T>
   {
@@ -88,8 +88,6 @@ public class Grammar<NT, T>
     }
 
     @SuppressWarnings("unchecked")
-    private final Pair<NT,List<?>>[] symbols;
-    @SuppressWarnings("unchecked")
     private T eof;
     @SuppressWarnings("unchecked")
     private T epsilon;
@@ -102,25 +100,43 @@ public class Grammar<NT, T>
     @SuppressWarnings("unchecked")
     private Map<Object,Set<Pair<SemanticPredicate,T>>> followTable;
     @SuppressWarnings("unchecked")
-    private EnumSet terminals;
+    private Set terminals;
+
+    @SuppressWarnings("unchecked")
+    public Grammar (Map<NT, List<List<?>>> rules)
+      {
+        map = rules;
+        for (List<List<?>> lists : map.values ())
+          for (List<?> list : lists)
+            for (Object o : list)
+              if (!map.containsKey (o))
+                if (terminals == null)
+                  terminals = S.et (o);
+                else
+                  terminals.add (o);
+      }
+    
+    @SuppressWarnings("unchecked")
+    public static Grammar makeFrom (Map rules)
+      {
+        return new Grammar (rules);
+      }
 
     @SuppressWarnings("unchecked")
     public Grammar (Pair<NT,List<?>>... symbols)
       {
-        this.symbols = symbols;
-        Class<? extends Object> ntClass = symbols[0].first.getClass ();
-        map = new EnumMap (ntClass);
+        map = new HashMap<NT,List<List<?>>> ();
+        for (Pair<NT,List<?>> p : symbols)
+          if (!map.containsKey (p.first))
+            map.put (p.first, new ArrayList<List<?>> ());
         for (Pair<NT,List<?>> p : symbols)
           {
-            assert p.first instanceof Enum;
-            if (!map.containsKey (p.first))
-              map.put (p.first, new ArrayList<List<?>> ());
             map.get (p.first).add (p.second);
             for (Object o : p.second)
-              if (o instanceof Enum && !ntClass.isInstance (o))
+              if (!map.containsKey (o))
                 {
                   if (terminals == null)
-                    terminals = EnumSet.of ((Enum)o);
+                    terminals = S.et (o);
                   else
                     terminals.add (o);
                 }
@@ -202,7 +218,7 @@ public class Grammar<NT, T>
                     Set<Pair<SemanticPredicate, T>> putative = 
                       new HashSet<Pair<SemanticPredicate, T>> (target);
                     removeToken (putative, getEpsilonToken ());
-                    if (set.equals (putative))
+                    if (set.equals (putative) || set.equals (target))
                       continue;
                     changed = true;
                     set.clear ();
@@ -288,30 +304,31 @@ public class Grammar<NT, T>
         do
           {
             changed = false;
-            for (Pair<NT, List<?>> p : symbols)
-              for (int i = 0; i < p.second.size (); i++)
-                {
-                  Object o = p.second.get (i);
-                  if (map.containsKey (o))
-                    {
-                      List l = p.second.subList (i + 1, p.second.size ());
-                      Set<Pair<SemanticPredicate,T>> first = l.isEmpty () 
+            for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
+              for (List<?> list : entry.getValue ())
+                for (int i = 0; i < list.size (); i++)
+                  {
+                    Object o = list.get (i);
+                    if (map.containsKey (o))
+                      {
+                        List<?> l = list.subList (i + 1, list.size ());
+                        Set<Pair<SemanticPredicate,T>> first = l.isEmpty () 
                         ? S.et (make ((SemanticPredicate) null, getEpsilonToken ()))
                         : firstOf (l);
-                      Set<Pair<SemanticPredicate,T>> copy = new HashSet<Pair<SemanticPredicate,T>> (first);
-                      if (removeToken (copy, getEpsilonToken ())) // epsilon was in first
-                        copy.addAll (followTable.get (p.first));
-                      Set<Pair<SemanticPredicate,T>> oldSet = followTable.get (o);
-                      if (oldSet.addAll (copy))
-                        changed = true;
-                    }
-                }
+                        Set<Pair<SemanticPredicate,T>> copy = new HashSet<Pair<SemanticPredicate,T>> (first);
+                        if (removeToken (copy, getEpsilonToken ())) // epsilon was in first
+                          copy.addAll (followTable.get (entry.getKey ()));
+                        Set<Pair<SemanticPredicate,T>> oldSet = followTable.get (o);
+                        if (oldSet.addAll (copy))
+                          changed = true;
+                      }
+                  }
           }
         while (changed);
       }
 
     @SuppressWarnings("unchecked")
-    private Set<Pair<SemanticPredicate,T>> firstOf (List<Object> l)
+    private Set<Pair<SemanticPredicate,T>> firstOf (List<?> l)
       {
         if (firstTable == null)
           initializeFirstTable ();
@@ -349,6 +366,8 @@ public class Grammar<NT, T>
     @SuppressWarnings("unchecked")
     public void setStartSymbol (NT s)
       {
+        if (!map.containsKey (s))
+          throw new IllegalArgumentException (s + " is not a legal nonterminal!");
         this.start = s;
       }
 
@@ -366,7 +385,7 @@ public class Grammar<NT, T>
     @SuppressWarnings({ "unchecked", "cast" })
     public Collection<List<?>> rulesFor (Object nt)
       {
-        return (Collection<List<?>>) map.get (nt);
+        return map.get (nt);
       }
 
     @SuppressWarnings("unchecked")
@@ -386,5 +405,10 @@ public class Grammar<NT, T>
         if (a == null) return b;
         if (b == null) return a;
         return new ConjunctionPredicate (a, b);
+      }
+
+    public Table<NT,T,?> toTable ()
+      {
+        return new Table<NT,T,List<?>> (this);
       }
   }
