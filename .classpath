@@ -11,5 +11,6 @@
 			<attribute name="javadoc_location" value="file:/home/graham/lib/testng/javadocs/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/stringtemplate-3.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
