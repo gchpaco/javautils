@@ -42,5 +42,8 @@
 	<exclude name="**/javautils.jar"/>
       </fileset>
     </jar>
+    <copy todir="${build}">
+      <fileset dir="lib" includes="*.jar" />
+    </copy>
   </target>
 </project>
