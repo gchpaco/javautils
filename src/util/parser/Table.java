@@ -81,6 +81,7 @@ public class Table<NT,T,V extends List<?>> implements Iterable<Triple<NT, T, Pai
   
   public Table (Triple<NT, T, Pair<SemanticPredicate,V>>... rules)
     {
+      table = new HashMap<NT, Map<T, Set<Pair<SemanticPredicate, V>>>> ();
       for (Triple<NT, T, Pair<SemanticPredicate, V>> rule : rules)
         put (rule.first, rule.second, rule.third.first, rule.third.second);
     }
