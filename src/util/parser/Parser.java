@@ -58,6 +58,13 @@ public class Parser<NT, T>
         stack.addLast (start);
         stack.addLast (eof);
       }
+
+    public void tossUntil (T token)
+      {
+        while (!stack.isEmpty () && !stack.peek ().equals (token))
+	  stack.removeFirst ();
+	if (!stack.isEmpty ()) stack.removeFirst ();
+      }
     
     @SuppressWarnings("unchecked")
     public void witness (T token)
