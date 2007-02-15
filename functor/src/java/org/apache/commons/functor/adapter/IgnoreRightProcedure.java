@@ -37,12 +37,12 @@ import org.apache.commons.functor.UnaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IgnoreRightProcedure implements BinaryProcedure, Serializable {
-    public IgnoreRightProcedure(UnaryProcedure procedure) {
+public final class IgnoreRightProcedure<T,U> implements BinaryProcedure<T,U>, Serializable {
+    public IgnoreRightProcedure(UnaryProcedure<T> procedure) {
         this.procedure = procedure;
     }
  
-    public void run(Object left, Object right) {
+    public void run(T left, U right) {
         procedure.run(left);
     }   
 
@@ -70,10 +70,10 @@ public final class IgnoreRightProcedure implements BinaryProcedure, Serializable
         return "IgnoreRightProcedure<" + procedure + ">";
     }
 
-    public static IgnoreRightProcedure adapt(UnaryProcedure procedure) {
-        return null == procedure ? null : new IgnoreRightProcedure(procedure);
+    public static <T,U> IgnoreRightProcedure<T,U> adapt(UnaryProcedure<T> procedure) {
+        return null == procedure ? null : new IgnoreRightProcedure<T,U>(procedure);
     }
 
     /** The {@link UnaryProcedure UnaryProcedure} I'm wrapping. */
-    private UnaryProcedure procedure = null;
+    private UnaryProcedure<T> procedure = null;
 }

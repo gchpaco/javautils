@@ -37,12 +37,12 @@ import org.apache.commons.functor.UnaryFunction;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IgnoreLeftFunction implements BinaryFunction, Serializable {
-    public IgnoreLeftFunction(UnaryFunction function) {
+public final class IgnoreLeftFunction<T,U,V> implements BinaryFunction<T,U,V>, Serializable {
+    public IgnoreLeftFunction(UnaryFunction<U,V> function) {
         this.function = function;
     }
  
-    public Object evaluate(Object left, Object right) {
+    public V evaluate(T left, U right) {
         return function.evaluate(right);
     }   
 
@@ -70,10 +70,10 @@ public final class IgnoreLeftFunction implements BinaryFunction, Serializable {
         return "IgnoreLeftFunction<" + function + ">";
     }
 
-    public static BinaryFunction adapt(UnaryFunction function) {
-        return null == function ? null : new IgnoreLeftFunction(function);
+    public static <T,U,V> BinaryFunction<T,U,V> adapt(UnaryFunction<U,V> function) {
+        return null == function ? null : new IgnoreLeftFunction<T,U,V>(function);
     }
 
     /** The {@link UnaryFunction UnaryFunction} I'm wrapping. */
-    private UnaryFunction function = null;
+    private UnaryFunction<U,V> function = null;
 }

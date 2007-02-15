@@ -37,12 +37,12 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IgnoreLeftPredicate implements BinaryPredicate, Serializable {
-    public IgnoreLeftPredicate(UnaryPredicate predicate) {
+public final class IgnoreLeftPredicate<T,U> implements BinaryPredicate<T,U>, Serializable {
+    public IgnoreLeftPredicate(UnaryPredicate<U> predicate) {
         this.predicate = predicate;
     }
  
-    public boolean test(Object left, Object right) {
+    public boolean test(T left, U right) {
         return predicate.test(right);
     }   
 
@@ -70,10 +70,10 @@ public final class IgnoreLeftPredicate implements BinaryPredicate, Serializable 
         return "IgnoreLeftPredicate<" + predicate + ">";
     }
 
-    public static IgnoreLeftPredicate adapt(UnaryPredicate predicate) {
-        return null == predicate ? null : new IgnoreLeftPredicate(predicate);
+    public static <T,U> IgnoreLeftPredicate<T,U> adapt(UnaryPredicate<U> predicate) {
+        return null == predicate ? null : new IgnoreLeftPredicate<T,U>(predicate);
     }
 
     /** The {@link UnaryPredicate UnaryPredicate} I'm wrapping. */
-    private UnaryPredicate predicate = null;
+    private UnaryPredicate<U> predicate = null;
 }

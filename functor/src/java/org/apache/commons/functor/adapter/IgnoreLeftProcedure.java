@@ -37,13 +37,13 @@ import org.apache.commons.functor.UnaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IgnoreLeftProcedure implements BinaryProcedure, Serializable {
-    public IgnoreLeftProcedure(UnaryProcedure procedure) {
+public final class IgnoreLeftProcedure<T,U> implements BinaryProcedure<T,U>, Serializable {
+    public IgnoreLeftProcedure(UnaryProcedure<U> procedure) {
         this.procedure = procedure;
     }
  
-    public void run(Object left, Object right) {
-        procedure.run(left);
+    public void run(T left, U right) {
+        procedure.run(right);
     }   
 
     public boolean equals(Object that) {
@@ -70,10 +70,10 @@ public final class IgnoreLeftProcedure implements BinaryProcedure, Serializable 
         return "IgnoreLeftProcedure<" + procedure + ">";
     }
 
-    public static IgnoreLeftProcedure adapt(UnaryProcedure procedure) {
-        return null == procedure ? null : new IgnoreLeftProcedure(procedure);
+    public static <T,U> IgnoreLeftProcedure<T,U> adapt(UnaryProcedure<U> procedure) {
+        return null == procedure ? null : new IgnoreLeftProcedure<T,U>(procedure);
     }
 
     /** The {@link UnaryProcedure UnaryProcedure} I'm wrapping. */
-    private UnaryProcedure procedure = null;
+    private UnaryProcedure<U> procedure = null;
 }
