@@ -36,8 +36,8 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BinaryPredicateBinaryFunction implements BinaryFunction, Serializable {
-    public BinaryPredicateBinaryFunction(BinaryPredicate predicate) {
+public final class BinaryPredicateBinaryFunction<T,U> implements BinaryFunction<T,U,Boolean>, Serializable {
+    public BinaryPredicateBinaryFunction(BinaryPredicate<T,U> predicate) {
         this.predicate = predicate;
     }
 
@@ -48,7 +48,7 @@ public final class BinaryPredicateBinaryFunction implements BinaryFunction, Seri
      * 
      * @return a non-<code>null</code> <code>Boolean</code> instance
      */
-    public Object evaluate(Object left, Object right) {
+    public Boolean evaluate(T left, U right) {
         return predicate.test(left,right) ? Boolean.TRUE : Boolean.FALSE;
     }   
 
@@ -90,10 +90,10 @@ public final class BinaryPredicateBinaryFunction implements BinaryFunction, Seri
      *         {@link BinaryPredicate BinaryPredicate}, or <code>null</code>
      *         if the given <code>BinaryPredicate</code> is <code>null</code>
      */
-    public static BinaryPredicateBinaryFunction adapt(BinaryPredicate predicate) {
-        return null == predicate ? null : new BinaryPredicateBinaryFunction(predicate);
+    public static <T,U> BinaryPredicateBinaryFunction<T,U> adapt(BinaryPredicate<T,U> predicate) {
+        return null == predicate ? null : new BinaryPredicateBinaryFunction<T,U>(predicate);
     }
 
     /** The {@link BinaryPredicate BinaryPredicate} I'm wrapping. */
-    private BinaryPredicate predicate = null;
+    private BinaryPredicate<T,U> predicate = null;
 }

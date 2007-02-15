@@ -36,7 +36,7 @@ import org.apache.commons.functor.Predicate;
  * @author Rodney Waldhoff
  */
 public final class FunctionPredicate implements Predicate, Serializable {
-    public FunctionPredicate(Function function) {
+    public FunctionPredicate(Function<Boolean> function) {
         this.function = function;
     }
  
@@ -49,7 +49,7 @@ public final class FunctionPredicate implements Predicate, Serializable {
      * @throws ClassCastException if my underlying function returns a non-<code>Boolean</code>
      */
     public boolean test() {
-        return ((Boolean)(function.evaluate())).booleanValue();
+        return function.evaluate().booleanValue();
     }   
 
     public boolean equals(Object that) {
@@ -76,10 +76,10 @@ public final class FunctionPredicate implements Predicate, Serializable {
         return "FunctionPredicate<" + function + ">";
     }
 
-    public static FunctionPredicate adapt(Function function) {
+    public static FunctionPredicate adapt(Function<Boolean> function) {
         return null == function ? null : new FunctionPredicate(function);
     }
 
     /** The {@link Function Function} I'm wrapping. */
-    private Function function = null;
+    private Function<Boolean> function = null;
 }

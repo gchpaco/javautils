@@ -37,12 +37,12 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BoundPredicate implements Predicate, Serializable {
+public final class BoundPredicate<T> implements Predicate, Serializable {
     /**
      * @param predicate the predicate to adapt
      * @param arg the constant argument to use
      */
-    public BoundPredicate(UnaryPredicate predicate, Object arg) {
+    public BoundPredicate(UnaryPredicate<T> predicate, T arg) {
         this.predicate = predicate;
         this.param = arg;
     }
@@ -100,12 +100,12 @@ public final class BoundPredicate implements Predicate, Serializable {
      *         {@link UnaryPredicate UnaryPredicate}, or <code>null</code>
      *         if the given <code>UnaryPredicate</code> is <code>null</code>
      */
-    public static BoundPredicate bind(UnaryPredicate predicate, Object arg) {
-        return null == predicate ? null : new BoundPredicate(predicate,arg);
+    public static <T> BoundPredicate<T> bind(UnaryPredicate<T> predicate, T arg) {
+        return null == predicate ? null : new BoundPredicate<T>(predicate,arg);
     }
 
     /** The {@link UnaryPredicate UnaryPredicate} I'm wrapping. */
-    private UnaryPredicate predicate = null;
+    private UnaryPredicate<T> predicate = null;
     /** The parameter to pass to that predicate. */
-    private Object param = null;
+    private T param = null;
 }

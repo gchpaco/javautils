@@ -36,13 +36,13 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BinaryFunctionBinaryPredicate implements BinaryPredicate, Serializable {
+public final class BinaryFunctionBinaryPredicate<T,U> implements BinaryPredicate<T,U>, Serializable {
     /**
      * Create an {@link BinaryPredicate BinaryPredicate} wrapping
      * the given {@link BinaryFunction BinaryFunction}.
      * @param function the {@link BinaryFunction BinaryFunction} to wrap
      */
-    public BinaryFunctionBinaryPredicate(BinaryFunction function) {
+    public BinaryFunctionBinaryPredicate(BinaryFunction<T,U,Boolean> function) {
         this.function = function;
     }
  
@@ -54,8 +54,8 @@ public final class BinaryFunctionBinaryPredicate implements BinaryPredicate, Ser
      * @throws NullPointerException if my underlying function returns <code>null</code>
      * @throws ClassCastException if my underlying function returns a non-<code>Boolean</code>
      */
-    public boolean test(Object left, Object right) {
-        return ((Boolean)(function.evaluate(left,right))).booleanValue();
+    public boolean test(T left, U right) {
+        return function.evaluate(left,right).booleanValue();
     }   
 
     public boolean equals(Object that) {
@@ -95,10 +95,10 @@ public final class BinaryFunctionBinaryPredicate implements BinaryPredicate, Ser
      *         {@link BinaryFunction BinaryFunction}, or <code>null</code>
      *         if the given <code>BinaryFunction</code> is <code>null</code>
      */
-    public static BinaryFunctionBinaryPredicate adapt(BinaryFunction function) {
-        return null == function ? null : new BinaryFunctionBinaryPredicate(function);
+    public static <T,U> BinaryFunctionBinaryPredicate<T,U> adapt(BinaryFunction<T,U,Boolean> function) {
+        return null == function ? null : new BinaryFunctionBinaryPredicate<T,U>(function);
     }
 
     /** The {@link BinaryFunction BinaryFunction} I'm wrapping. */
-    private BinaryFunction function = null;
+    private BinaryFunction<T,U,Boolean> function = null;
 }

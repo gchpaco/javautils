@@ -36,13 +36,13 @@ import org.apache.commons.functor.BinaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BinaryFunctionBinaryProcedure implements BinaryProcedure, Serializable {
+public final class BinaryFunctionBinaryProcedure<T,U> implements BinaryProcedure<T,U>, Serializable {
     /**
      * Create an {@link BinaryProcedure BinaryProcedure} wrapping
      * the given {@link BinaryFunction BinaryFunction}.
      * @param function the {@link BinaryFunction BinaryFunction} to wrap
      */
-    public BinaryFunctionBinaryProcedure(BinaryFunction function) {
+    public BinaryFunctionBinaryProcedure(BinaryFunction<T,U,?> function) {
         this.function = function;
     }
  
@@ -50,7 +50,7 @@ public final class BinaryFunctionBinaryProcedure implements BinaryProcedure, Ser
      * {@link BinaryFunction#evaluate Evaluate} my function, but 
      * ignore its returned value.
      */
-    public void run(Object left, Object right) {
+    public void run(T left, U right) {
         function.evaluate(left,right);
     }   
 
@@ -91,10 +91,10 @@ public final class BinaryFunctionBinaryProcedure implements BinaryProcedure, Ser
      *         {@link BinaryFunction BinaryFunction}, or <code>null</code>
      *         if the given <code>BinaryFunction</code> is <code>null</code>
      */
-    public static BinaryFunctionBinaryProcedure adapt(BinaryFunction function) {
-        return null == function ? null : new BinaryFunctionBinaryProcedure(function);
+    public static <T,U> BinaryFunctionBinaryProcedure<T,U> adapt(BinaryFunction<T,U,?> function) {
+        return null == function ? null : new BinaryFunctionBinaryProcedure<T,U>(function);
     }
 
     /** The {@link BinaryFunction BinaryFunction} I'm wrapping. */
-    private BinaryFunction function = null;
+    private BinaryFunction<T,U,?> function = null;
 }

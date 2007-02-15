@@ -37,12 +37,12 @@ import org.apache.commons.functor.UnaryFunction;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class FunctionUnaryFunction implements UnaryFunction, Serializable {
-    public FunctionUnaryFunction(Function function) {
+public final class FunctionUnaryFunction<T,U> implements UnaryFunction<T,U>, Serializable {
+    public FunctionUnaryFunction(Function<U> function) {
         this.function = function;
     }
  
-    public Object evaluate(Object obj) {
+    public U evaluate(T obj) {
         return function.evaluate();
     }   
 
@@ -70,10 +70,10 @@ public final class FunctionUnaryFunction implements UnaryFunction, Serializable 
         return "FunctionUnaryFunction<" + function + ">";
     }
 
-    public static FunctionUnaryFunction adapt(Function function) {
-        return null == function ? null : new FunctionUnaryFunction(function);
+    public static <T,U> FunctionUnaryFunction<T,U> adapt(Function<U> function) {
+        return null == function ? null : new FunctionUnaryFunction<T,U> (function);
     }
 
     /** The {@link Function Function} I'm wrapping. */
-    private Function function = null;
+    private Function<U> function = null;
 }

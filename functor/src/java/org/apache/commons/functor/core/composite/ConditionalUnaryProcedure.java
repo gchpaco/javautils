@@ -39,12 +39,12 @@ import org.apache.commons.functor.UnaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class ConditionalUnaryProcedure implements UnaryProcedure, Serializable {
+public final class ConditionalUnaryProcedure<T> implements UnaryProcedure<T>, Serializable {
 
     // constructor
     // ------------------------------------------------------------------------
 
-    public ConditionalUnaryProcedure(UnaryPredicate ifPred, UnaryProcedure thenPred, UnaryProcedure elsePred) {
+    public ConditionalUnaryProcedure(UnaryPredicate<T> ifPred, UnaryProcedure<T> thenPred, UnaryProcedure<T> elsePred) {
         this.ifPred = ifPred;
         this.thenProc = thenPred;
         this.elseProc = elsePred;
@@ -52,7 +52,7 @@ public final class ConditionalUnaryProcedure implements UnaryProcedure, Serializ
     
     // predicate interface
     // ------------------------------------------------------------------------
-    public void run(Object obj) {
+    public void run(T obj) {
         if(ifPred.test(obj)) {
             thenProc.run(obj);
         } else {
@@ -98,7 +98,7 @@ public final class ConditionalUnaryProcedure implements UnaryProcedure, Serializ
 
     // attributes
     // ------------------------------------------------------------------------
-    private UnaryPredicate ifPred = null;
-    private UnaryProcedure thenProc = null;
-    private UnaryProcedure elseProc = null;
+    private UnaryPredicate<T> ifPred = null;
+    private UnaryProcedure<T> thenProc = null;
+    private UnaryProcedure<T> elseProc = null;
 }

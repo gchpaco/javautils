@@ -26,14 +26,14 @@ package org.apache.commons.functor;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public interface UnaryPredicate {
+public interface UnaryPredicate<T> {
     /** 
      * Evaluate this predicate. 
      * 
      * @param obj the object to test
      * @return the result of this test
      */
-    boolean test(Object obj);
+    boolean test(T obj);
     
     /**
      * Returns a human readable description of this functor.

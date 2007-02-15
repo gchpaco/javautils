@@ -37,17 +37,17 @@ import org.apache.commons.functor.UnaryFunction;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BoundFunction implements Function, Serializable {
+public final class BoundFunction<T,U> implements Function<U>, Serializable {
     /**
      * @param function the function to adapt
      * @param arg the constant argument to use
      */
-    public BoundFunction(UnaryFunction function, Object arg) {
+    public BoundFunction(UnaryFunction<T,U> function, T arg) {
         this.function = function;
         this.param = arg;
     }
  
-    public Object evaluate() {
+    public U evaluate() {
         return function.evaluate(param);
     }   
 
@@ -100,12 +100,12 @@ public final class BoundFunction implements Function, Serializable {
      *         {@link UnaryFunction UnaryFunction}, or <code>null</code>
      *         if the given <code>UnaryFunction</code> is <code>null</code>
      */
-    public static BoundFunction bind(UnaryFunction function, Object arg) {
-        return null == function ? null : new BoundFunction(function,arg);
+    public static <T,U> BoundFunction<T,U> bind(UnaryFunction<T,U> function, T arg) {
+        return null == function ? null : new BoundFunction<T,U>(function,arg);
     }
 
     /** The {@link UnaryFunction UnaryFunction} I'm wrapping. */
-    private UnaryFunction function = null;
+    private UnaryFunction<T,U> function = null;
     /** The parameter to pass to that function. */
-    private Object param = null;
+    private T param = null;
 }

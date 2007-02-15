@@ -26,14 +26,14 @@ package org.apache.commons.functor;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public interface UnaryFunction {
+public interface UnaryFunction<T,U> {
     /** 
      * Evaluate this function.
      * 
      * @param obj the object to evaluate
      * @return the result of this evaluation
      */
-    Object evaluate(Object obj);
+    U evaluate(T obj);
     
     /**
      * Returns a human readable description of this functor.

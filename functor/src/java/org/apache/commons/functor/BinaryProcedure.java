@@ -26,14 +26,14 @@ package org.apache.commons.functor;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public interface BinaryProcedure {
+public interface BinaryProcedure<T,U> {
     /** 
      * Execute this procedure. 
      * 
      * @param left the first element of the ordered pair of arguments
      * @param right the second element of the ordered pair of arguments
      */
-    void run(Object left, Object right);
+    void run(T left, U right);
     
     /**
      * Returns a human readable description of this functor.

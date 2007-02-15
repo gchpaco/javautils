@@ -37,12 +37,12 @@ import org.apache.commons.functor.UnaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BoundProcedure implements Procedure, Serializable {
+public final class BoundProcedure<T> implements Procedure, Serializable {
     /**
      * @param procedure the procedure to adapt
      * @param arg the constant argument to use
      */
-    public BoundProcedure(UnaryProcedure procedure, Object arg) {
+    public BoundProcedure(UnaryProcedure<T> procedure, T arg) {
         this.procedure = procedure;
         this.param = arg;
     }
@@ -100,12 +100,12 @@ public final class BoundProcedure implements Procedure, Serializable {
      *         {@link UnaryProcedure UnaryProcedure}, or <code>null</code>
      *         if the given <code>UnaryProcedure</code> is <code>null</code>
      */
-    public static BoundProcedure bind(UnaryProcedure procedure, Object arg) {
-        return null == procedure ? null : new BoundProcedure(procedure,arg);
+    public static <T> BoundProcedure<T> bind(UnaryProcedure<T> procedure, T arg) {
+        return null == procedure ? null : new BoundProcedure<T>(procedure,arg);
     }
 
     /** The {@link UnaryProcedure UnaryProcedure} I'm wrapping. */
-    private UnaryProcedure procedure = null;
+    private UnaryProcedure<T> procedure = null;
     /** The parameter to pass to that procedure. */
-    private Object param = null;
+    private T param = null;
 }

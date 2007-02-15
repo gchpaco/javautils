@@ -28,12 +28,12 @@ import java.util.Iterator;
  * @author Jason Horman (jason@jhorman.org)
  * @author Rodney Waldhoff
  */
-public final class IteratorToGeneratorAdapter extends BaseGenerator {
+public final class IteratorToGeneratorAdapter<T> extends BaseGenerator<T> {
 
     // constructors
     //-----------------------------------------------------
 
-    public IteratorToGeneratorAdapter(Iterator iter) {
+    public IteratorToGeneratorAdapter(Iterator<T> iter) {
         if(null == iter) {
             throw new NullPointerException();
         } else {
@@ -44,7 +44,7 @@ public final class IteratorToGeneratorAdapter extends BaseGenerator {
     // instance methods
     //-----------------------------------------------------
 
-    public void run(UnaryProcedure proc) {
+    public void run(UnaryProcedure<T> proc) {
         while(iter.hasNext()) {
             proc.run(iter.next());
             if (isStopped()) { break; } 
@@ -75,12 +75,12 @@ public final class IteratorToGeneratorAdapter extends BaseGenerator {
     // class methods
     //-----------------------------------------------------
 
-    public static IteratorToGeneratorAdapter adapt(Iterator iter) {
-        return null == iter ? null : new IteratorToGeneratorAdapter(iter);
+    public static <T> IteratorToGeneratorAdapter<T> adapt(Iterator<T> iter) {
+        return null == iter ? null : new IteratorToGeneratorAdapter<T>(iter);
     }
     
     // instance variables
     //-----------------------------------------------------
 
-    private Iterator iter = null;
+    private Iterator<T> iter = null;
 }

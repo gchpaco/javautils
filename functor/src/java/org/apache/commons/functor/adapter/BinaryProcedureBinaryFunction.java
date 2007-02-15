@@ -37,12 +37,12 @@ import org.apache.commons.functor.BinaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BinaryProcedureBinaryFunction implements BinaryFunction, Serializable {
-    public BinaryProcedureBinaryFunction(BinaryProcedure procedure) {
+public final class BinaryProcedureBinaryFunction<T,U,V> implements BinaryFunction<T,U,V>, Serializable {
+    public BinaryProcedureBinaryFunction(BinaryProcedure<T,U> procedure) {
         this.procedure = procedure;
     }
  
-    public Object evaluate(Object left, Object right) {
+    public V evaluate(T left, U right) {
         procedure.run(left,right);
         return null;
     }   
@@ -84,10 +84,10 @@ public final class BinaryProcedureBinaryFunction implements BinaryFunction, Seri
      *         {@link BinaryFunction BinaryFunction}, or <code>null</code>
      *         if the given <code>BinaryFunction</code> is <code>null</code>
      */
-    public static BinaryProcedureBinaryFunction adapt(BinaryProcedure procedure) {
-        return null == procedure ? null : new BinaryProcedureBinaryFunction(procedure);
+    public static <T,U,V> BinaryProcedureBinaryFunction<T,U,V> adapt(BinaryProcedure<T,U> procedure) {
+        return null == procedure ? null : new BinaryProcedureBinaryFunction<T,U,V>(procedure);
     }
 
     /** The {@link BinaryProcedure BinaryProcedure} I'm wrapping. */
-    private BinaryProcedure procedure = null;
+    private BinaryProcedure<T,U> procedure = null;
 }

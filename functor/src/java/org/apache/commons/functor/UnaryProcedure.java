@@ -26,12 +26,12 @@ package org.apache.commons.functor;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public interface UnaryProcedure {
+public interface UnaryProcedure<T> {
     /**
      * Execute this procedure.
      * @param obj a parameter to this execution
      */
-    void run(Object obj);
+    void run(T obj);
     
     /**
      * Returns a human readable description of this functor.

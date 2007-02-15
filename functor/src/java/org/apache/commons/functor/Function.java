@@ -26,12 +26,12 @@ package org.apache.commons.functor;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public interface Function {
+public interface Function<T> {
     /** 
      * Evaluate this function. 
      * @return the result of this evaluation
      */
-    Object evaluate();
+    T evaluate();
     
     /**
      * Returns a human readable description of this functor.

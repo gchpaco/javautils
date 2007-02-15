@@ -25,7 +25,7 @@ package org.apache.commons.functor;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public interface BinaryFunction {
+public interface BinaryFunction<T,U,V> {
     /** 
      * Evaluate this function. 
      * 
@@ -33,7 +33,7 @@ public interface BinaryFunction {
      * @param right the second element of the ordered pair of arguments
      * @return the result of this function for the given arguments
      */
-    Object evaluate(Object left, Object right);
+    V evaluate(T left, U right);
     
     /**
      * Returns a human readable description of this functor.
