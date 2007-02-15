@@ -16,10 +16,19 @@
   </target>
 
   <target name="clean">
+    <ant antfile="build.xml" dir="functor" target="clean"/>
+    <delete file="functor/dist/commons-functor.jar" />
     <delete dir="${build}" />
   </target>
 
-  <target name="compile" depends="init">
+  <target name="functor">
+    <ant antfile="build.xml" dir="functor" target="dist">
+      <property name="junit.jar" location="lib/junit-3.8.1.jar"/>
+    </ant>
+    <copy file="functor/dist/commons-functor.jar" todir="lib" />
+  </target>
+
+  <target name="compile" depends="init,functor">
     <javac destdir="${build}"
            classpathref="build.base"
            debug="true"

@@ -1,0 +1,56 @@
+Commons Functor Status
+$Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
+http://jakarta.apache.org/commons/sandbox/functor/
+
+Summary:
+
+  Commons Functor is developing a common set of functor interfaces
+  and related utilities in Java under an ASF licence.
+
+  Commons Functor is a component developed by Jakarta Commons, 
+  a subproject of the Apache Jakarta project.
+
+  Commons Functor is a currently a "sandboxed" project.  It has
+  not yet been accepted as an offical part of of the Jakarta Commons
+  project.
+  
+Releases:
+
+  Stable:
+    Currently none.
+
+  Development:
+    1.0-dev 
+      CVS Tag: HEAD
+      Binaries: http://cvs.apache.org/builds/jakarta-commons/nightly/commons-functor/
+      Source: http://cvs.apache.org/builds/jakarta-commons/nightly/commons-functor/
+
+Assets:
+
+  Web site:         http://jakarta.apache.org/commons/sandbox/functor
+
+  Mailing lists:    commons-dev@jakarta.apache.org  (developers)
+                    commons-user@jakarta.apache.org (users)
+
+  Repositories:     jakarta/commons/sandbox/functor
+
+Committers:
+
+  Rodney Waldhoff (rwaldhoff AT apache DOT org) [PMC]
+    
+Contributors:
+
+  Jason Horman (jason AT jhorman DOT org)
+  Herve Quiroz (herve DOT quiroz AT esil DOT univ-mrs DOT fr)
+
+                
+Pending Issues:
+
+  None.
+
+Resolved Issues:
+
+  None.
+
+
+    
