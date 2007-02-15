@@ -32,7 +32,7 @@ import org.apache.commons.functor.generator.Generator;
  * @author Jason Horman (jason@jhorman.org)
  */
 
-public class CollectionTransformer<T> implements UnaryFunction<Generator<T>,Collection<T>> {
+public class CollectionTransformer<T> implements UnaryFunction<Generator<? extends T>,Collection<T>> {
 
 	// instance methods
 	//---------------------------------------------------
@@ -54,7 +54,7 @@ public class CollectionTransformer<T> implements UnaryFunction<Generator<T>,Coll
 		return evaluate((Generator<T>)obj);
 	}
 
-    public Collection<T> evaluate(Generator<T> generator) {
+    public Collection<T> evaluate(Generator<? extends T> generator) {
         generator.run(new UnaryProcedure<T>() {
             public void run(T obj) {
                 toFill.add(obj);

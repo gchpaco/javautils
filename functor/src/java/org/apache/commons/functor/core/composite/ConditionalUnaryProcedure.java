@@ -44,7 +44,7 @@ public final class ConditionalUnaryProcedure<T> implements UnaryProcedure<T>, Se
     // constructor
     // ------------------------------------------------------------------------
 
-    public ConditionalUnaryProcedure(UnaryPredicate<T> ifPred, UnaryProcedure<T> thenPred, UnaryProcedure<T> elsePred) {
+    public ConditionalUnaryProcedure(UnaryPredicate<? super T> ifPred, UnaryProcedure<? super T> thenPred, UnaryProcedure<? super T> elsePred) {
         this.ifPred = ifPred;
         this.thenProc = thenPred;
         this.elseProc = elsePred;
@@ -98,7 +98,7 @@ public final class ConditionalUnaryProcedure<T> implements UnaryProcedure<T>, Se
 
     // attributes
     // ------------------------------------------------------------------------
-    private UnaryPredicate<T> ifPred = null;
-    private UnaryProcedure<T> thenProc = null;
-    private UnaryProcedure<T> elseProc = null;
+    private UnaryPredicate<? super T> ifPred = null;
+    private UnaryProcedure<? super T> thenProc = null;
+    private UnaryProcedure<? super T> elseProc = null;
 }

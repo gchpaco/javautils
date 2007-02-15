@@ -29,37 +29,37 @@ import org.apache.commons.functor.UnaryProcedure;
  */
 public interface Generator<T> {
     /** Generators must implement this method. */
-    public abstract void run(UnaryProcedure<T> proc);
+    public abstract void run(UnaryProcedure<? super T> proc);
     /** Stop the generator. Will stop the wrapped generator if one was set. */
     public abstract void stop();
     /** Check if the generator is stopped. */
     public abstract boolean isStopped();
     /*** See {@link org.apache.commons.functor.Algorithms#apply}. */
-    public abstract <U> Generator<U> apply(UnaryFunction<T,U> func);
+    public abstract <U> Generator<U> apply(UnaryFunction<? super T,U> func);
     /** See {@link org.apache.commons.functor.Algorithms#contains}. */
-    public abstract boolean contains(UnaryPredicate<T> pred);
+    public abstract boolean contains(UnaryPredicate<? super T> pred);
     /** See {@link org.apache.commons.functor.Algorithms#detect}. */
-    public abstract T detect(UnaryPredicate<T> pred);
+    public abstract T detect(UnaryPredicate<? super T> pred);
     /** See {@link org.apache.commons.functor.Algorithms#detect}. */
-    public abstract T detect(UnaryPredicate<T> pred, T ifNone);
+    public abstract T detect(UnaryPredicate<? super T> pred, T ifNone);
     /** Synonym for run. */
-    public abstract void foreach(UnaryProcedure<T> proc);
+    public abstract void foreach(UnaryProcedure<? super T> proc);
     /** See {@link org.apache.commons.functor.Algorithms#inject}. */
-    public abstract <U> U inject(U seed, BinaryFunction<U,T,U> func);
+    public abstract <U> U inject(U seed, BinaryFunction<? super U,? super T,? extends U> func);
     /** See {@link org.apache.commons.functor.Algorithms#reject}. */
-    public abstract Generator<T> reject(UnaryPredicate<T> pred);
+    public abstract Generator<T> reject(UnaryPredicate<? super T> pred);
     /** See {@link org.apache.commons.functor.Algorithms#select}. */
-    public abstract Generator<T> select(UnaryPredicate<T> pred);
+    public abstract Generator<T> select(UnaryPredicate<? super T> pred);
     /** See {@link org.apache.commons.functor.Algorithms#select}. */
-    public abstract Generator<T> where(UnaryPredicate<T> pred);
+    public abstract Generator<T> where(UnaryPredicate<? super T> pred);
     /** See {@link org.apache.commons.functor.Algorithms#until}. */
-    public abstract Generator<T> until(UnaryPredicate<T> pred);
+    public abstract Generator<T> until(UnaryPredicate<? super T> pred);
     /**
      * Transforms this generator using the passed in
      * transformer. An example transformer might turn the contents of the
      * generator into a {@link Collection} of elements.
      */
-    public abstract <U> U to(UnaryFunction<Generator<T>,U> transformer);
+    public abstract <U> U to(UnaryFunction<Generator<? extends T>,U> transformer);
     /** Same as to(new CollectionTransformer(collection)). */
     public abstract Collection<T> to(Collection<T> collection);
     /** Same as to(new CollectionTransformer()). */

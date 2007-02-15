@@ -44,7 +44,7 @@ public final class IteratorToGeneratorAdapter<T> extends BaseGenerator<T> {
     // instance methods
     //-----------------------------------------------------
 
-    public void run(UnaryProcedure<T> proc) {
+    public void run(UnaryProcedure<? super T> proc) {
         while(iter.hasNext()) {
             proc.run(iter.next());
             if (isStopped()) { break; } 

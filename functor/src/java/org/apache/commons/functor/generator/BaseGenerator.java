@@ -58,7 +58,7 @@ public abstract class BaseGenerator<T> implements Generator<T> {
     }
 
     /** Generators must implement this method. */
-    public abstract void run(UnaryProcedure<T> proc);
+    public abstract void run(UnaryProcedure<? super T> proc);
 
     /** Stop the generator. Will stop the wrapped generator if one was set. */
     public void stop() {
@@ -75,52 +75,52 @@ public abstract class BaseGenerator<T> implements Generator<T> {
     private boolean stopped = false;
 
     /*** See {@link Algorithms#apply}. */
-    public final <U> Generator<U> apply(UnaryFunction<T,U> func) {
+    public final <U> Generator<U> apply(UnaryFunction<? super T,U> func) {
         return Algorithms.apply(this,func);
     }
     
     /** See {@link Algorithms#contains}. */
-    public final boolean contains(UnaryPredicate<T> pred) {
+    public final boolean contains(UnaryPredicate<? super T> pred) {
         return Algorithms.contains(this, pred);
     }
 
     /** See {@link Algorithms#detect}. */
-    public final T detect(UnaryPredicate<T> pred) {
+    public final T detect(UnaryPredicate<? super T> pred) {
         return Algorithms.detect(this, pred);
     }
 
     /** See {@link Algorithms#detect}. */
-    public final T detect(UnaryPredicate<T> pred, T ifNone) {
+    public final T detect(UnaryPredicate<? super T> pred, T ifNone) {
         return Algorithms.detect(this, pred, ifNone);
     }
 
     /** Synonym for run. */
-    public final void foreach(UnaryProcedure<T> proc) {
+    public final void foreach(UnaryProcedure<? super T> proc) {
         Algorithms.foreach(this, proc);
     }
 
     /** See {@link Algorithms#inject}. */
-    public final <U> U inject(U seed, BinaryFunction<U,T,U> func) {
+    public final <U> U inject(U seed, BinaryFunction<? super U,? super T,? extends U> func) {
         return Algorithms.inject(this, seed, func);
     }
 
     /** See {@link Algorithms#reject}. */
-    public final Generator<T> reject(UnaryPredicate<T> pred) {
+    public final Generator<T> reject(UnaryPredicate<? super T> pred) {
         return Algorithms.reject(this, pred);
     }
 
     /** See {@link Algorithms#select}. */
-    public final Generator<T> select(UnaryPredicate<T> pred) {
+    public final Generator<T> select(UnaryPredicate<? super T> pred) {
         return Algorithms.select(this, pred);
     }
 
     /** See {@link Algorithms#select}. */
-    public final Generator<T> where(UnaryPredicate<T> pred) {
+    public final Generator<T> where(UnaryPredicate<? super T> pred) {
         return Algorithms.select(this, pred);
     }
 
     /** See {@link Algorithms#until}. */
-    public final Generator<T> until(UnaryPredicate<T> pred) {
+    public final Generator<T> until(UnaryPredicate<? super T> pred) {
         return Algorithms.until(this, pred);
     }
 
@@ -129,7 +129,7 @@ public abstract class BaseGenerator<T> implements Generator<T> {
      * transformer. An example transformer might turn the contents of the
      * generator into a {@link Collection} of elements.
      */
-    public final <U> U to(UnaryFunction<Generator<T>,U> transformer) {
+    public final <U> U to(UnaryFunction<Generator<? extends T>,U> transformer) {
         return transformer.evaluate(this);
     }
 

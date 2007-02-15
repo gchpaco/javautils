@@ -63,7 +63,7 @@ public final class Algorithms {
         return collect(iter,new ArrayList<T>());
     }
     
-    public static <T> Collection<T> collect(Iterator<T> iter, Collection<T> col) {
+    public static <T> Collection<T> collect(Iterator<? extends T> iter, Collection<T> col) {
         while(iter.hasNext()) {
             col.add(iter.next());
         }
@@ -77,7 +77,7 @@ public final class Algorithms {
      * given {@link UnaryFunction UnaryFunction} to
      * its original value.
      */
-    public static <T> void transform(ListIterator<T> iter, UnaryFunction<T,T> func) {
+    public static <T> void transform(ListIterator<T> iter, UnaryFunction<? super T,? extends T> func) {
         while(iter.hasNext()) {
             iter.set(func.evaluate(iter.next()));
         }
@@ -91,7 +91,7 @@ public final class Algorithms {
      * 
      * @see #remove(Iterator,UnaryPredicate)
      */
-    public static <T> void retain(Iterator<T> iter, UnaryPredicate<T> pred) {
+    public static <T> void retain(Iterator<T> iter, UnaryPredicate<? super T> pred) {
         while(iter.hasNext()) {
             if(!(pred.test(iter.next()))) {
                 iter.remove();
@@ -107,7 +107,7 @@ public final class Algorithms {
      * 
      * @see #retain(Iterator,UnaryPredicate)
      */
-    public static <T> void remove(Iterator<T> iter, UnaryPredicate<T> pred) {
+    public static <T> void remove(Iterator<T> iter, UnaryPredicate<? super T> pred) {
         while(iter.hasNext()) {
             if(pred.test(iter.next())) {
                 iter.remove();
@@ -119,7 +119,7 @@ public final class Algorithms {
      * Returns an {@link Iterator} that will apply the given {@link UnaryFunction} to each
      * element when accessed.
      */
-    public static final <T,U> Iterator<U> apply(Iterator<T> iter, UnaryFunction<T,U> func) {
+    public static final <T,U> Iterator<U> apply(Iterator<T> iter, UnaryFunction<? super T,U> func) {
         return TransformedIterator.transform(iter,func);
     }
 
@@ -127,9 +127,9 @@ public final class Algorithms {
      * Returns a {@link Generator} that will apply the given {@link UnaryFunction} to each
      * generated element.
      */
-    public static final <T,U> Generator<U> apply(final Generator<T> gen, final UnaryFunction<T,U> func) {
+    public static final <T,U> Generator<U> apply(final Generator<T> gen, final UnaryFunction<? super T,U> func) {
         return new BaseGenerator<U>(gen) {
-	    public void run(final UnaryProcedure<U> proc) {
+	    public void run(final UnaryProcedure<? super U> proc) {
             gen.run(
                 new UnaryProcedure<T>() {
                     public void run(T obj) {
@@ -144,7 +144,7 @@ public final class Algorithms {
      * Equivalent to 
      * <code>{@link #contains(Generator,UnaryPredicate) contains}(new {@link org.apache.commons.functor.generator.IteratorToGeneratorAdapter IteratorToGeneratorAdapter}(iter),pred)</code>.
      */
-    public static final <T> boolean contains(Iterator<T> iter, UnaryPredicate<T> pred) {
+    public static final <T> boolean contains(Iterator<T> iter, UnaryPredicate<? super T> pred) {
         return contains(new IteratorToGeneratorAdapter<T>(iter),pred);
     }
 
@@ -154,7 +154,7 @@ public final class Algorithms {
      *
      * @see #detect(Generator,UnaryPredicate)
      */
-    public static final <T> boolean contains(Generator<T> gen, UnaryPredicate<T> pred) {
+    public static final <T> boolean contains(Generator<T> gen, UnaryPredicate<? super T> pred) {
         FindWithinGenerator<T> finder = new FindWithinGenerator<T>(gen,pred);
         gen.run(finder);
         return finder.wasFound();
@@ -163,14 +163,14 @@ public final class Algorithms {
     /**
      * Equivalent to <code>{@link #detect(Generator,UnaryPredicate) detect}(new {@link org.apache.commons.functor.generator.IteratorToGeneratorAdapter IteratorToGeneratorAdapter}(iter),pred)</code>.
      */
-    public static final <T> T detect(Iterator<T> iter, UnaryPredicate<T> pred) {
+    public static final <T> T detect(Iterator<T> iter, UnaryPredicate<? super T> pred) {
         return detect(new IteratorToGeneratorAdapter<T>(iter), pred);
     }
 
     /**
      * Equivalent to <code>{@link #detect(Generator,UnaryPredicate,Object) detect}(new {@link org.apache.commons.functor.generator.IteratorToGeneratorAdapter IteratorToGeneratorAdapter}(iter),pred,ifNone)</code>.
      */
-    public static final <T> T detect(Iterator<T> iter, UnaryPredicate<T> pred, T ifNone) {
+    public static final <T> T detect(Iterator<T> iter, UnaryPredicate<? super T> pred, T ifNone) {
         return detect(new IteratorToGeneratorAdapter<T>(iter), pred, ifNone);
     }
 
@@ -183,7 +183,7 @@ public final class Algorithms {
      * @see #detect(Generator,UnaryPredicate,Object)
      * @throws NoSuchElementException If no element could be found.
      */
-    public static final <T> T detect(final Generator<T> gen, final UnaryPredicate<T> pred) {
+    public static final <T> T detect(final Generator<T> gen, final UnaryPredicate<? super T> pred) {
         FindWithinGenerator<T> finder = new FindWithinGenerator<T>(gen,pred);
         gen.run(finder);
         if(finder.wasFound()) {
@@ -201,7 +201,7 @@ public final class Algorithms {
      *
      * @see #detect(Generator,UnaryPredicate)
      */
-    public static final <T> T detect(final Generator<T> gen, final UnaryPredicate<T> pred, T ifNone) {
+    public static final <T> T detect(final Generator<T> gen, final UnaryPredicate<? super T> pred, T ifNone) {
         FindWithinGenerator<T> finder = new FindWithinGenerator<T>(gen,pred);
         gen.run(finder);
         return finder.wasFound() ? finder.getFoundObject() : ifNone;
@@ -210,7 +210,7 @@ public final class Algorithms {
     /**
      * Equivalent to <code>{@link #foreach(Generator,UnaryProcedure) foreach}(new {@link org.apache.commons.functor.generator.IteratorToGeneratorAdapter IteratorToGeneratorAdapter}(iter),proc)</code>.
      */
-    public static final <T> void foreach(Iterator<T> iter, UnaryProcedure<T> proc) {
+    public static final <T> void foreach(Iterator<T> iter, UnaryProcedure<? super T> proc) {
         foreach(new IteratorToGeneratorAdapter<T>(iter), proc);
     }
 
@@ -218,7 +218,7 @@ public final class Algorithms {
      * {@link UnaryProcedure#run Apply} the given {@link UnaryProcedure
      * UnaryProcedure} to each element in the given {@link Generator}.
      */
-    public static final <T> void foreach(Generator<T> gen, UnaryProcedure<T> proc) {
+    public static final <T> void foreach(Generator<T> gen, UnaryProcedure<? super T> proc) {
         gen.run(proc);
     }
 
@@ -238,7 +238,7 @@ public final class Algorithms {
      * return seed;
      * </pre>
      */
-    public static final <T,U> U inject(Iterator<T> iter, U seed, BinaryFunction<U,T,U> func) {
+    public static final <T,U> U inject(Iterator<T> iter, U seed, BinaryFunction<? super U,? super T,? extends U> func) {
         while(iter.hasNext()) {
             seed = func.evaluate(seed,iter.next());
         }
@@ -261,7 +261,7 @@ public final class Algorithms {
      * return seed;
      * </pre>
      */
-    public static final <T,U> U inject(Generator<T> gen, final U seed, final BinaryFunction<U,T,U> func) {
+    public static final <T,U> U inject(Generator<T> gen, final U seed, final BinaryFunction<? super U,? super T,? extends U> func) {
         Injector<T,U> injector = new Injector<T,U>(seed,func);
         gen.run(injector);
         return injector.getResult();
@@ -271,7 +271,7 @@ public final class Algorithms {
      * Returns an {@link Iterator} that will only return elements that DO
      * NOT match the given predicate.
      */
-    public static <T> Iterator<T> reject(Iterator<T> iter, UnaryPredicate<T> pred) {
+    public static <T> Iterator<T> reject(Iterator<T> iter, UnaryPredicate<? super T> pred) {
         return FilteredIterator.filter(iter,UnaryNot.not(pred));
     }
 
@@ -279,9 +279,9 @@ public final class Algorithms {
      * Returns a {@link Generator} that will only "generate" elements that DO
      * NOT match the given predicate.
      */
-    public static <T> Generator<T> reject(final Generator<T> gen, final UnaryPredicate<T> pred) {
+    public static <T> Generator<T> reject(final Generator<T> gen, final UnaryPredicate<? super T> pred) {
         return new BaseGenerator<T>(gen) {
-            public void run(final UnaryProcedure<T> proc) {
+            public void run(final UnaryProcedure<? super T> proc) {
                 gen.run(new ConditionalUnaryProcedure<T>(pred,NoOp.instance(),proc));
             }
         };
@@ -291,7 +291,7 @@ public final class Algorithms {
      * Returns an {@link Iterator} that will only return elements that DO
      * match the given predicate.
      */
-    public static final <T> Iterator<T> select(Iterator<T> iter, UnaryPredicate<T> pred) {
+    public static final <T> Iterator<T> select(Iterator<T> iter, UnaryPredicate<? super T> pred) {
         return FilteredIterator.filter(iter,pred);
     }
 
@@ -299,9 +299,9 @@ public final class Algorithms {
      * Returns a {@link Generator} that will only "generate" elements that DO
      * match the given predicate.
      */
-    public static final <T> Generator<T> select(final Generator<T> gen, final UnaryPredicate<T> pred) {
+    public static final <T> Generator<T> select(final Generator<T> gen, final UnaryPredicate<? super T> pred) {
         return new BaseGenerator<T>(gen) {
-            public void run(final UnaryProcedure<T> proc) {
+            public void run(final UnaryProcedure<? super T> proc) {
                 gen.run(new ConditionalUnaryProcedure<T>(pred,proc,NoOp.instance()));
             }
         };
@@ -327,7 +327,7 @@ public final class Algorithms {
      * Equivalent to 
      * <code>{@link #reject(Iterator,UnaryPredicate) reject}(iter,pred)</code>.
      */
-    public static final <T> Iterator<T> until(final Iterator<T> iter, final UnaryPredicate<T> pred) {
+    public static final <T> Iterator<T> until(final Iterator<T> iter, final UnaryPredicate<? super T> pred) {
         return reject(iter,pred);
     }
 
@@ -335,7 +335,7 @@ public final class Algorithms {
      * Equivalent to 
      * <code>{@link #reject(Generator,UnaryPredicate) reject}(gen,pred)</code>.
      */
-    public static final <T> Generator<T> until(final Generator<T> gen, final UnaryPredicate<T> pred) {
+    public static final <T> Generator<T> until(final Generator<T> gen, final UnaryPredicate<? super T> pred) {
         return reject(gen,pred);
     }
 
@@ -368,7 +368,7 @@ public final class Algorithms {
     //---------------------------------------------------------------
     
     private static class FindWithinGenerator<T> implements UnaryProcedure<T> {
-        FindWithinGenerator(Generator<T> gen, UnaryPredicate<T> pred) {
+        FindWithinGenerator(Generator<T> gen, UnaryPredicate<? super T> pred) {
             this.generator = gen;
             this.predicate = pred;
             this.found = false;
@@ -391,14 +391,14 @@ public final class Algorithms {
             return foundObject;
         }
         
-        private UnaryPredicate<T> predicate = null;
+        private UnaryPredicate<? super T> predicate = null;
         private boolean found = false;
         private T foundObject = null;
         private Generator<T> generator = null;
     }
 
     private static class Injector<T,U> implements UnaryProcedure<T> {
-        Injector(U seed, BinaryFunction<U,T,U> function) {
+        Injector(U seed, BinaryFunction<? super U,? super T,? extends U> function) {
             this.seed = seed;
             this.function = function;
         }
@@ -412,7 +412,7 @@ public final class Algorithms {
         }
         
         private U seed = null;
-        private BinaryFunction<U,T,U> function = null;
+        private BinaryFunction<? super U,? super T,? extends U> function = null;
     }
     
 }
