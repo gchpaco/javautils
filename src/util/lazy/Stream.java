@@ -1,6 +1,7 @@
 package util.lazy;
+import org.apache.commons.functor.*;
+import org.apache.commons.functor.core.Constant;
 
-import util.Closure;
 import util.Pair;
 
 abstract class StreamCell<T> {
@@ -38,7 +39,7 @@ final class Cons<T> extends StreamCell<T> {
 
 // BTW, yes, using this is horrible. I'm sorry.
 public class Stream<T> extends Promise<StreamCell<T>> {
-    protected Stream(Closure<StreamCell<T>> c) {
+    protected Stream(Function c) {
         super(c);
     }
 
@@ -46,8 +47,8 @@ public class Stream<T> extends Promise<StreamCell<T>> {
         final Pair<T, Stream<T>> p = t.uncons();
         if (p == null)
             return t;
-        return cons(p.first, new Closure<Stream<T>>() {
-            public Stream<T> apply() {
+        return cons(p.first, new Function() {
+            public Stream<T> evaluate() {
                 return p.second.concatenate(t);
             }
         });
@@ -59,8 +60,8 @@ public class Stream<T> extends Promise<StreamCell<T>> {
         final Pair<T, Stream<T>> p = uncons();
         if (p == null)
             return this;
-        return cons(p.first, new Closure<Stream<T>>() {
-            public Stream<T> apply() {
+        return cons(p.first, new Function() {
+            public Stream<T> evaluate () {
                 return p.second.take(n - 1);
             }
         });
@@ -115,52 +116,43 @@ public class Stream<T> extends Promise<StreamCell<T>> {
     }
 
     public static <T> Stream<T> cons(final T head, final Stream<T> rest) {
-        return delay(new Closure<StreamCell<T>>() {
-            @SuppressWarnings("unchecked")
-            public StreamCell<T> apply() {
-                return new Cons(head, rest);
+        return Stream.delayS(new Function() {
+            public StreamCell<T> evaluate() {
+                return new Cons<T>(head, rest);
             }
         });
     }
 
-    public static <T> Stream<T> cons(final Closure<T> head, final Stream<T> rest) {
-        return delay(new Closure<StreamCell<T>>() {
-            @SuppressWarnings("unchecked")
-            public StreamCell<T> apply() {
-                return new Cons(head.apply(), rest);
+    public static <T> Stream<T> cons(final Function head, final Stream<T> rest) {
+        return Stream.delayS(new Function () {
+            public StreamCell<T> evaluate () {
+                return new Cons<T>((T) head.evaluate (), rest);
             }
         });
     }
 
-    public static <T> Stream<T> cons(final T head, final Closure<Stream<T>> rest) {
-        return delay(new Closure<StreamCell<T>>() {
+    public static <T> Stream<T> cons(final T head, final Function rest) {
+        return Stream.delayS(new Function () {
             @SuppressWarnings("unchecked")
-            public StreamCell<T> apply() {
-                return new Cons(head, rest.apply());
+            public StreamCell<T> evaluate() {
+                return new Cons<T>(head, (Stream<T>) rest.evaluate());
             }
         });
     }
 
-    public static <T> Stream<T> cons(final Closure<T> head,
-            final Closure<Stream<T>> rest) {
-        return delay(new Closure<StreamCell<T>>() {
-            @SuppressWarnings("unchecked")
-            public StreamCell<T> apply() {
-                return new Cons(head.apply(), rest.apply());
+    public static <T> Stream<T> cons(final Function head, final Function rest) {
+        return Stream.delayS(new Function() {
+            public StreamCell<T> evaluate() {
+                return new Cons<T>((T) head.evaluate(), (Stream<T>) rest.evaluate());
             }
         });
     }
 
-    protected static <U> Stream<U> delay(Closure<StreamCell<U>> closure) {
+    protected static <U> Stream<U> delayS(Function closure) {
         return new Stream<U>(closure);
     }
 
-    private static Stream<?> empt = new Stream<Object>(new Closure<StreamCell<Object>>() {
-        @SuppressWarnings("unchecked")
-        public StreamCell<Object> apply() {
-            return Nil.nil;
-        }
-    });
+    private static Stream<?> empt = new Stream<Object>(Constant.instance(Nil.nil));
 
     @SuppressWarnings("unchecked")
     public static <U> Stream<U> empty() {

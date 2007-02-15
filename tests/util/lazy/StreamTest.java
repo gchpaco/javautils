@@ -1,5 +1,6 @@
 package util.lazy;
-import util.Closure;
+import org.apache.commons.functor.*;
+import org.apache.commons.functor.core.*;
 import util.Pair;
 
 import org.testng.annotations.Test;
@@ -28,13 +29,13 @@ public class StreamTest {
 	    fail("Shouldn't be able to take the head of an empty stream");
 	} catch (IllegalArgumentException e) {}
     }
-    static class Integers implements Closure<Stream<Integer>> {
+    static class Integers implements Function {
 	int current;
 	Integers(int i) { current = i; }
-	public Stream<Integer> apply() {
+	public Stream<Integer> evaluate() {
 	    return Stream.cons(current, new Integers(current+1));
 	}
-	static Stream<Integer> integers = new Integers(0).apply();
+	static Stream<Integer> integers = new Integers(0).evaluate();
     }
     public void infinite() {
 	Stream<Integer> ints = Integers.integers;
@@ -55,13 +56,13 @@ public class StreamTest {
 	assertEquals((Integer)10, some.tail().tail().head());
 	assertTrue(some.tail().tail().tail().isEmpty());
     }
-    static class Fibonacci implements Closure<Stream<Integer>> {
+    static class Fibonacci implements Function {
 	int last, current;
 	Fibonacci(int i, int j) { last = i; current = j; }
-	public Stream<Integer> apply() {
+	public Stream<Integer> evaluate() {
 	    return Stream.cons(current, new Fibonacci(current, current+last));
 	}
-	static Stream<Integer> fibonacci = new Fibonacci(1,0).apply();
+	static Stream<Integer> fibonacci = new Fibonacci(1,0).evaluate();
     }
     public void fibonacci() {
 	Stream<Integer> s = Fibonacci.fibonacci;

@@ -1,20 +1,24 @@
 package util.lazy;
-import util.Closure;
+import org.apache.commons.functor.*;
 
-public class Promise<T>
+public class Promise<T> implements Function
 {
-    private Closure<T> c;
+    private Function c;
     private T value;
 
-    protected Promise(Closure<T> closure) { c = closure; value = null; }
+    protected Promise(Function closure) { c = closure; value = null; }
     public T force()
     {
 	if (value == null)
-	    value = c.apply();
+	    value = (T) c.evaluate ();
 	return value;
     }
-    public static <T> Promise<T> delay(Closure<T> closure)
+    public T evaluate ()
     {
-	return new Promise<T>(closure);
+	return force ();
+    }
+    public static Promise delay(Function closure)
+    {
+	return new Promise(closure);
     }
 }
