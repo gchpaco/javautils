@@ -61,7 +61,7 @@ public interface Generator<T> {
      */
     public abstract <U> U to(UnaryFunction<Generator<? extends T>,U> transformer);
     /** Same as to(new CollectionTransformer(collection)). */
-    public abstract Collection<T> to(Collection<T> collection);
+    public abstract Collection<? super T> to(Collection<? super T> collection);
     /** Same as to(new CollectionTransformer()). */
     public abstract Collection<T> toCollection();
 }

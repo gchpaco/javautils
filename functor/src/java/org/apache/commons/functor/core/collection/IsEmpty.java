@@ -26,11 +26,16 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IsEmpty implements UnaryPredicate, Serializable {
+public final class IsEmpty implements UnaryPredicate<Object>, Serializable {
 
     // constructor
     // ------------------------------------------------------------------------
     
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 3750731793485471069L;
+
     public IsEmpty() { }
 
     // instance methods
@@ -55,6 +60,7 @@ public final class IsEmpty implements UnaryPredicate, Serializable {
     /**
      * @see java.lang.Object#equals(Object)
      */
+    @Override
     public boolean equals(Object that) {
         return that instanceof IsEmpty;
     }
@@ -62,6 +68,7 @@ public final class IsEmpty implements UnaryPredicate, Serializable {
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return "IsEmpty".hashCode();
     }
@@ -69,15 +76,16 @@ public final class IsEmpty implements UnaryPredicate, Serializable {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return "IsEmpty()";
     }
 
-    private boolean testCollection(Collection col) {
+    private boolean testCollection(Collection<?> col) {
         return col.isEmpty();
     }
     
-    private boolean testMap(Map map) {
+    private boolean testMap(Map<?, ?> map) {
         return map.isEmpty();
     }
     

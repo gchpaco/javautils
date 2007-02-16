@@ -28,7 +28,7 @@ import org.apache.commons.functor.generator.BaseGenerator;
  * @author Jason Horman (jason@jhorman.org)
  * @author Rodney Waldhoff
  */
-public final class IntegerRange extends BaseGenerator {
+public final class IntegerRange extends BaseGenerator<Integer> {
 
     // constructors
     //---------------------------------------------------------------
@@ -48,17 +48,17 @@ public final class IntegerRange extends BaseGenerator {
     public IntegerRange(int from, int to, int step) {
         if(from != to && signOf(step) != signOf(to-from)) {
             throw new IllegalArgumentException("Will never reach " + to + " from " + from + " using step " + step);
-        } else {
-            this.from = from;
-            this.to = to;
-            this.step = step;
         }
+        this.from = from;
+        this.to = to;
+        this.step = step;
     }
 
     // methods
     //---------------------------------------------------------------
 
-    public void run(UnaryProcedure proc) {
+    @Override
+    public void run(UnaryProcedure<? super Integer> proc) {
         if(signOf(step) == -1) {
             for(int i=from; i > to; i += step) {
                 proc.run(new Integer(i));
@@ -70,19 +70,21 @@ public final class IntegerRange extends BaseGenerator {
         }
     }
 
+    @Override
     public String toString() {
         return "IntegerRange<" + from + "," + to + "," + step + ">";
     }
 
+    @Override
     public boolean equals(Object obj) {
         if(obj instanceof IntegerRange) {
             IntegerRange that = (IntegerRange)obj;
             return this.from == that.from && this.to == that.to && this.step == that.step;
-        } else {
-            return false;
         }
+        return false;
     }
 
+    @Override
     public int hashCode() {
         int hash = "IntegerRange".hashCode();
         hash <<= 2;
@@ -110,9 +112,8 @@ public final class IntegerRange extends BaseGenerator {
     private static int defaultStep(int from, int to) {
         if(from > to) {
             return -1;
-        } else {
-            return 1;
         }
+        return 1;
     }
 
     // attributes

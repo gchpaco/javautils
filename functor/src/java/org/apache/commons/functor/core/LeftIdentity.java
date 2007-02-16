@@ -32,8 +32,13 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class LeftIdentity implements BinaryPredicate, BinaryFunction, Serializable {
+public final class LeftIdentity<T> implements BinaryPredicate<T,Object>, BinaryFunction<T,Object,T>, Serializable {
     
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -4396340668951698062L;
+
     // constructor
     // ------------------------------------------------------------------------
     public LeftIdentity() {
@@ -42,11 +47,11 @@ public final class LeftIdentity implements BinaryPredicate, BinaryFunction, Seri
     // functor interface
     // ------------------------------------------------------------------------
 
-    public Object evaluate(Object left, Object right) {
+    public T evaluate(T left, Object right) {
         return left;
     }
 
-    public boolean test(Object left, Object right) {
+    public boolean test(T left, Object right) {
         return test((Boolean)left);
     }
 
@@ -54,25 +59,29 @@ public final class LeftIdentity implements BinaryPredicate, BinaryFunction, Seri
         return bool.booleanValue();
     }
 
+    @Override
     public boolean equals(Object that) {
         return (that instanceof LeftIdentity);
     }
     
+    @Override
     public int hashCode() {
         return "LeftIdentity".hashCode();
     }
     
+    @Override
     public String toString() {
         return "LeftIdentity";
     }
     
     // static methods
     // ------------------------------------------------------------------------
-    public static LeftIdentity instance() {
-        return INSTANCE;
+    @SuppressWarnings("unchecked")
+    public static <T> LeftIdentity<T> instance() {
+        return (LeftIdentity<T>) INSTANCE;
     }
     
     // static attributes
     // ------------------------------------------------------------------------
-    private static final LeftIdentity INSTANCE = new LeftIdentity();
+    private static final LeftIdentity<?> INSTANCE = new LeftIdentity<Object>();
 }

@@ -28,11 +28,16 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IsInstanceOf implements UnaryPredicate, Serializable {
+public final class IsInstanceOf implements UnaryPredicate<Object>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 9149342063375483705L;
 
     // constructor
     // ------------------------------------------------------------------------
-    public IsInstanceOf(Class klass) {
+    public IsInstanceOf(Class<?> klass) {
         this.klass = klass;
     }
  
@@ -43,18 +48,19 @@ public final class IsInstanceOf implements UnaryPredicate, Serializable {
         return klass.isInstance(obj);
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof IsInstanceOf) {
             return equals((IsInstanceOf)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
     public boolean equals(IsInstanceOf that) {
         return (null != that && (null == this.klass ? null == that.klass : this.klass.equals(that.klass)));
     }
     
+    @Override
     public int hashCode() {
         int hash = "IsInstanceOf".hashCode();
         if(null != klass) {
@@ -63,12 +69,13 @@ public final class IsInstanceOf implements UnaryPredicate, Serializable {
         return hash;
     }
     
+    @Override
     public String toString() {
         return "IsInstanceOf<" + klass + ">";
     }
     
     // attributes
     // ------------------------------------------------------------------------
-    private Class klass;
+    private Class<?> klass;
 
 }

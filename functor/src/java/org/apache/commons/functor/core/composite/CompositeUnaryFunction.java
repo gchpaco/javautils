@@ -49,57 +49,67 @@ import org.apache.commons.functor.UnaryFunction;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public class CompositeUnaryFunction implements UnaryFunction, Serializable {
+public class CompositeUnaryFunction<T,U> implements UnaryFunction<T,U>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 241333691274674779L;
+
 
     // constructor
     // ------------------------------------------------------------------------
     public CompositeUnaryFunction() {
     }
 
-    public CompositeUnaryFunction(UnaryFunction f) {
-        of(f);
+    public CompositeUnaryFunction(UnaryFunction<? super T, ? extends U> f) {
+      list.add (f);
     }
 
-    public CompositeUnaryFunction(UnaryFunction f, UnaryFunction g) {
-        of(f);
-        of(g);
+    public <V> CompositeUnaryFunction(UnaryFunction<? super T, ? extends V> f, UnaryFunction<? super V, ? extends U> g) {
+      list.add (f);
+      list.add (g);
     }
 
     // modifiers
     // ------------------------------------------------------------------------ 
-    public CompositeUnaryFunction of(UnaryFunction f) {
+    @SuppressWarnings("unchecked")
+    public <V> CompositeUnaryFunction<T,V> of(UnaryFunction<? super U, ? extends V> f) {
         list.add(f);
-        return this;
+        return (CompositeUnaryFunction<T, V>) this;
     }
  
     // predicate interface
     // ------------------------------------------------------------------------
-    public Object evaluate(Object obj) {        
+    @SuppressWarnings("unchecked")
+    public U evaluate(T obj) {        
         Object result = obj;
-        for(ListIterator iter = list.listIterator(list.size()); iter.hasPrevious();) {
+        for(ListIterator<UnaryFunction<?,?>> iter = list.listIterator(list.size()); iter.hasPrevious();) {
             result = ((UnaryFunction)iter.previous()).evaluate(result);
         }
-        return result;
+        return (U) result;
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof CompositeUnaryFunction) {
             return equals((CompositeUnaryFunction)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
-    public boolean equals(CompositeUnaryFunction that) {
+    public boolean equals(CompositeUnaryFunction<?, ?> that) {
         // by construction, list is never null
         return null != that && list.equals(that.list);
     }
     
+    @Override
     public int hashCode() {
         // by construction, list is never null
         return "CompositeUnaryFunction".hashCode() ^ list.hashCode();
     }
     
+    @Override
     public String toString() {
         return "CompositeUnaryFunction<" + list + ">";
     }
@@ -107,6 +117,6 @@ public class CompositeUnaryFunction implements UnaryFunction, Serializable {
     
     // attributes
     // ------------------------------------------------------------------------
-    private List list = new ArrayList();
+    private List<UnaryFunction<?,?>> list = new ArrayList<UnaryFunction<?, ?>>();
 
 }

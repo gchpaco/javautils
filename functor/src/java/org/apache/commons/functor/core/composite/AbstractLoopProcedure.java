@@ -35,33 +35,36 @@ public abstract class AbstractLoopProcedure implements Procedure, Serializable {
         this.action=action;
     }
 
-	public boolean equals(Object object) {
+	@Override
+  public boolean equals(Object object) {
 		if (object instanceof AbstractLoopProcedure) {			
 			AbstractLoopProcedure that = (AbstractLoopProcedure)object;
 			return (null == getCondition() ? null == that.getCondition() : getCondition().equals(that.getCondition())) &&
 				(null == getAction() ? null == that.getAction() : getAction().equals(that.getAction())); 
-		} else {
-			return false;
 		}
+    return false;
 	}
 
-	public int hashCode() {
+	@Override
+  public int hashCode() {
 		return hashCode("AbstractLoopProcedure".hashCode());
 	}
 	
-	public String toString() {
+	@Override
+  public String toString() {
 		return getClass().getName() + "<" + getCondition() + "," + getAction() + ">";
 	}
 	protected int hashCode(int hash) {
-		hash <<= 4;
+          int h = hash;
+		h <<= 4;
 		if(null != getAction()) {
-			hash ^= getAction().hashCode();
+			h ^= getAction().hashCode();
 		}
-		hash <<= 4;
+		h <<= 4;
 		if(null != getCondition()) {
-			hash ^= getCondition().hashCode();
+			h ^= getCondition().hashCode();
 		}
-		return hash;
+		return h;
 	}
 
 

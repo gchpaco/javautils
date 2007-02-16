@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
  * @author Rodney Waldhoff
  * @deprecated BaseTransformer is going to be removed.
  */
+@Deprecated
 public class TestBaseTransformer extends TestCase {
 
     // Conventional
@@ -45,7 +46,7 @@ public class TestBaseTransformer extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testEvaluateDelegatesToTransform() {
-        Transformer t = new MockTransformer();
+        Transformer<Object, Integer> t = new MockTransformer<Object>();
         assertEquals(new Integer(1),t.evaluate(null));
         assertEquals(new Integer(2),t.evaluate(null));
         assertEquals(new Integer(3),t.evaluate(null));
@@ -54,8 +55,10 @@ public class TestBaseTransformer extends TestCase {
     // Classes
     // ------------------------------------------------------------------------
 
-    static class MockTransformer extends BaseTransformer {
-        public Object transform(Generator gen) {
+    @Deprecated
+    static class MockTransformer<T> extends BaseTransformer<T,Integer> {
+        @Override
+        public Integer transform(Generator<T> gen) {
             return new Integer(++timesCalled);
         }
         

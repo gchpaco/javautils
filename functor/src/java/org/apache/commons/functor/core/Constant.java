@@ -40,29 +40,28 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class Constant implements Function, UnaryFunction, BinaryFunction, Predicate, UnaryPredicate, BinaryPredicate, Serializable {
+public final class Constant<T> implements Function<T>, UnaryFunction<Object,T>, BinaryFunction<Object,Object,T>, Predicate, UnaryPredicate<Object>, BinaryPredicate<Object,Object>, Serializable {
 
-    // constructor
-    // ------------------------------------------------------------------------
-    public Constant(boolean value) {
-        this(new Boolean(value));
-    }
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -4347268151123086127L;
 
-    public Constant(Object value) {
+    public Constant(T value) {
         this.value = value;
     }
  
     // function interface
     // ------------------------------------------------------------------------
-    public Object evaluate() {
+    public T evaluate() {
         return value;
     }
 
-    public Object evaluate(Object obj) {
+    public T evaluate(Object obj) {
         return evaluate();
     }
 
-    public Object evaluate(Object left, Object right) {
+    public T evaluate(Object left, Object right) {
         return evaluate();
     }
 
@@ -78,18 +77,19 @@ public final class Constant implements Function, UnaryFunction, BinaryFunction, 
         return test();
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof Constant) {
-            return equals((Constant)that);
-        } else {
-            return false;
+            return equals((Constant<?>)that);
         }
+        return false;
     }
     
-    public boolean equals(Constant that) {
+    public boolean equals(Constant<?> that) {
         return (null != that && (null == this.value ? null == that.value : this.value.equals(that.value)));
     }
     
+    @Override
     public int hashCode() {
         int hash = "Constant".hashCode();
         if(null != value) {
@@ -98,13 +98,14 @@ public final class Constant implements Function, UnaryFunction, BinaryFunction, 
         return hash;
     }
     
+    @Override
     public String toString() {
         return "Constant<" + String.valueOf(value) + ">";
     }
     
     // attributes
     // ------------------------------------------------------------------------
-    private Object value;
+    private T value;
 
     // static methods
     // ------------------------------------------------------------------------
@@ -115,7 +116,7 @@ public final class Constant implements Function, UnaryFunction, BinaryFunction, 
      * @return a <code>Constant</code> that always
      *         returns <code>true</code>
      */
-    public static Constant truePredicate() {
+    public static Constant<Boolean> truePredicate() {
         return TRUE_PREDICATE;
     }
 
@@ -125,7 +126,7 @@ public final class Constant implements Function, UnaryFunction, BinaryFunction, 
      * @return a <code>Constant</code> that always
      *         returns <code>false</code>
      */
-    public static Constant falsePredicate() {
+    public static Constant<Boolean> falsePredicate() {
         return FALSE_PREDICATE;
     }
     
@@ -136,16 +137,16 @@ public final class Constant implements Function, UnaryFunction, BinaryFunction, 
      * @return a <code>Constant</code> that always
      *         returns <i>value</i>
      */
-    public static Constant predicate(boolean value) {
+    public static Constant<Boolean> predicate(boolean value) {
         return value ? TRUE_PREDICATE : FALSE_PREDICATE;
     }
 
-    public static Constant instance(Object value) {
-        return new Constant(value);
+    public static <T> Constant<T> instance(T value) {
+        return new Constant<T>(value);
     }
     
     // static attributes
     // ------------------------------------------------------------------------
-    private static final Constant TRUE_PREDICATE = new Constant(true);
-    private static final Constant FALSE_PREDICATE = new Constant(false);
+    private static final Constant<Boolean> TRUE_PREDICATE = new Constant<Boolean>(true);
+    private static final Constant<Boolean> FALSE_PREDICATE = new Constant<Boolean>(false);
 }

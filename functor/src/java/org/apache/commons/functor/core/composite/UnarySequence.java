@@ -39,55 +39,63 @@ import org.apache.commons.functor.UnaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public class UnarySequence implements UnaryProcedure, Serializable {
+public class UnarySequence<T> implements UnaryProcedure<T>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 9182944988148717317L;
+
 
     // constructor
     // ------------------------------------------------------------------------
     public UnarySequence() {
     }
 
-    public UnarySequence(UnaryProcedure p) {
+    public UnarySequence(UnaryProcedure<? super T> p) {
         then(p);
     }
 
-    public UnarySequence(UnaryProcedure p, UnaryProcedure q) {
+    public UnarySequence(UnaryProcedure<? super T> p, UnaryProcedure<? super T> q) {
         then(p);
         then(q);
     }
 
     // modifiers
     // ------------------------------------------------------------------------ 
-    public UnarySequence then(UnaryProcedure p) {
+    public UnarySequence<T> then(UnaryProcedure<? super T> p) {
         list.add(p);
         return this;
     }
  
     // predicate interface
     // ------------------------------------------------------------------------
-    public void run(Object obj) {        
-        for(ListIterator iter = list.listIterator(list.size()); iter.hasPrevious();) {
-            ((UnaryProcedure)iter.previous()).run(obj);
+    public void run(T obj) {        
+        for(ListIterator<UnaryProcedure<? super T>> iter = list.listIterator(list.size()); iter.hasPrevious();) {
+            iter.previous().run(obj);
         }
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof UnarySequence) {
             return equals((UnarySequence)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
-    public boolean equals(UnarySequence that) {
+    public boolean equals(UnarySequence<?> that) {
         // by construction, list is never null
         return null != that && list.equals(that.list);
     }
     
+    @Override
     public int hashCode() {
         // by construction, list is never null
         return "UnarySequence".hashCode() ^ list.hashCode();
     }
     
+    @Override
     public String toString() {
         return "UnarySequence<" + list + ">";
     }
@@ -95,6 +103,6 @@ public class UnarySequence implements UnaryProcedure, Serializable {
     
     // attributes
     // ------------------------------------------------------------------------
-    private List list = new ArrayList();
+    private List<UnaryProcedure<? super T>> list = new ArrayList<UnaryProcedure<? super T>>();
 
 }

@@ -37,29 +37,33 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class LeftBoundPredicate implements UnaryPredicate, Serializable {
+public final class LeftBoundPredicate<T,U> implements UnaryPredicate<U>, Serializable {
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -8979125873100604406L;
     /**
      * @param predicate the predicate to adapt
      * @param arg the constant argument to use
      */
-    public LeftBoundPredicate(BinaryPredicate predicate, Object arg) {
+    public LeftBoundPredicate(BinaryPredicate<T,U> predicate, T arg) {
         this.predicate = predicate;
         this.param = arg;
     }
  
-    public boolean test(Object obj) {
+    public boolean test(U obj) {
         return predicate.test(param,obj);
     }   
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof LeftBoundPredicate) {
             return equals((LeftBoundPredicate)that);
-        } else {
-            return false;
         }
+        return false;
     }
         
-    public boolean equals(LeftBoundPredicate that) {
+    public boolean equals(LeftBoundPredicate<?, ?> that) {
         return that == this || ( 
                 (null != that) && 
                 (null == predicate ? null == that.predicate : predicate.equals(that.predicate)) &&
@@ -67,6 +71,7 @@ public final class LeftBoundPredicate implements UnaryPredicate, Serializable {
                 
     }
     
+    @Override
     public int hashCode() {
         int hash = "LeftBoundPredicate".hashCode();
         if(null != predicate) {
@@ -80,16 +85,17 @@ public final class LeftBoundPredicate implements UnaryPredicate, Serializable {
         return hash;
     }
     
+    @Override
     public String toString() {
         return "LeftBoundPredicate<" + predicate + "(" + param + ",?)>";
     }
 
-    public static LeftBoundPredicate bind(BinaryPredicate predicate, Object arg) {
-        return null == predicate ? null : new LeftBoundPredicate(predicate,arg);
+    public static <T,U> LeftBoundPredicate<T,U> bind(BinaryPredicate<T,U> predicate, T arg) {
+        return null == predicate ? null : new LeftBoundPredicate<T,U>(predicate,arg);
     }
 
     /** The {@link BinaryPredicate BinaryPredicate} I'm wrapping. */
-    private BinaryPredicate predicate = null;
+    private BinaryPredicate<T,U> predicate = null;
     /** The parameter to pass to that predicate. */
-    private Object param = null;
+    private T param = null;
 }

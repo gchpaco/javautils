@@ -41,6 +41,12 @@ import org.apache.commons.functor.Procedure;
  */
 public class Sequence implements Procedure, Serializable {
 
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -7274930988088714961L;
+
+
     // constructor
     // ------------------------------------------------------------------------
     public Sequence() {
@@ -65,17 +71,17 @@ public class Sequence implements Procedure, Serializable {
     // predicate interface
     // ------------------------------------------------------------------------
     public void run() {        
-        for(ListIterator iter = list.listIterator(list.size()); iter.hasPrevious();) {
-            ((Procedure)iter.previous()).run();
+        for(ListIterator<Procedure> iter = list.listIterator(list.size()); iter.hasPrevious();) {
+            iter.previous().run();
         }
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof Sequence) {
             return equals((Sequence)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
     public boolean equals(Sequence that) {
@@ -83,11 +89,13 @@ public class Sequence implements Procedure, Serializable {
         return null != that && list.equals(that.list);
     }
     
+    @Override
     public int hashCode() {
         // by construction, list is never null
         return "Sequence".hashCode() ^ list.hashCode();
     }
     
+    @Override
     public String toString() {
         return "Sequence<" + list + ">";
     }
@@ -95,6 +103,6 @@ public class Sequence implements Procedure, Serializable {
     
     // attributes
     // ------------------------------------------------------------------------
-    private List list = new ArrayList();
+    private List<Procedure> list = new ArrayList<Procedure>();
 
 }

@@ -129,7 +129,8 @@ public final class Algorithms {
      */
     public static final <T,U> Generator<U> apply(final Generator<T> gen, final UnaryFunction<? super T,U> func) {
         return new BaseGenerator<U>(gen) {
-	    public void run(final UnaryProcedure<? super U> proc) {
+	    @Override
+      public void run(final UnaryProcedure<? super U> proc) {
             gen.run(
                 new UnaryProcedure<T>() {
                     public void run(T obj) {
@@ -188,9 +189,8 @@ public final class Algorithms {
         gen.run(finder);
         if(finder.wasFound()) {
             return finder.getFoundObject();
-        } else {
-            throw new NoSuchElementException("No element matching " + pred + " was found.");
         }
+        throw new NoSuchElementException("No element matching " + pred + " was found.");
     }
 
     /**
@@ -239,10 +239,11 @@ public final class Algorithms {
      * </pre>
      */
     public static final <T,U> U inject(Iterator<T> iter, U seed, BinaryFunction<? super U,? super T,? extends U> func) {
+      U result = seed;
         while(iter.hasNext()) {
-            seed = func.evaluate(seed,iter.next());
+          result = func.evaluate(result,iter.next());
         }
-        return seed;
+        return result;
     }
 
     /**
@@ -281,6 +282,7 @@ public final class Algorithms {
      */
     public static <T> Generator<T> reject(final Generator<T> gen, final UnaryPredicate<? super T> pred) {
         return new BaseGenerator<T>(gen) {
+            @Override
             public void run(final UnaryProcedure<? super T> proc) {
                 gen.run(new ConditionalUnaryProcedure<T>(pred,NoOp.instance(),proc));
             }
@@ -301,6 +303,7 @@ public final class Algorithms {
      */
     public static final <T> Generator<T> select(final Generator<T> gen, final UnaryPredicate<? super T> pred) {
         return new BaseGenerator<T>(gen) {
+            @Override
             public void run(final UnaryProcedure<? super T> proc) {
                 gen.run(new ConditionalUnaryProcedure<T>(pred,proc,NoOp.instance()));
             }
@@ -345,20 +348,21 @@ public final class Algorithms {
      * is executed. Functions are executed until a non function value or a
      * function of a different type is returned.
      */
+    @SuppressWarnings("unchecked")
     public static final <T> T recurse(Function<T> function) {
         T result = null;
-        Class recursiveFunctionClass = function.getClass();
+        Function<T> f = function;
+        Class<?> recursiveFunctionClass = function.getClass();
 
         // if the function returns another function, execute it. stop executing
         // when the function doesn't return another function of the same type.
         while(true) {
-            result = function.evaluate();
+            result = f.evaluate();
             if(recursiveFunctionClass.isInstance(result)) {
-                function = (Function<T>)result;
+                f = (Function<T>) result;
                 continue;
-            } else {
-                break;
             }
+            break;
         }
 
         return result;

@@ -37,6 +37,11 @@ import org.apache.commons.functor.Predicate;
  */
 public final class And extends BasePredicateList {
 
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -5693891777412161009L;
+
     // constructor
     // ------------------------------------------------------------------------
     public And() {
@@ -64,31 +69,34 @@ public final class And extends BasePredicateList {
  
     // predicate interface
     // ------------------------------------------------------------------------
+    @Override
     public boolean test() {
-        for(Iterator iter = getPredicateIterator(); iter.hasNext();) {
-            if(!((Predicate)iter.next()).test()) {
+        for(Iterator<Predicate> iter = getPredicateIterator(); iter.hasNext();) {
+            if(!iter.next().test()) {
                 return false;
             }
         }
         return true;
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof And) {
             return equals((And)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
     public boolean equals(And that) {
         return getPredicateListEquals(that);
     }
     
+    @Override
     public int hashCode() {
         return "And".hashCode() ^ getPredicateListHashCode();
     }
     
+    @Override
     public String toString() {
         return "And<" + getPredicateListToString() + ">";
     }

@@ -30,8 +30,12 @@ import org.apache.commons.functor.adapter.IgnoreRightPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IsNull implements UnaryPredicate, Serializable {
+public final class IsNull implements UnaryPredicate<Object>, Serializable {
 
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -783436560409864058L;
     // constructor
     // ------------------------------------------------------------------------
     public IsNull() {
@@ -44,14 +48,17 @@ public final class IsNull implements UnaryPredicate, Serializable {
         return (null == obj);
     }
 
+    @Override
     public boolean equals(Object that) {
         return that instanceof IsNull;
     }
     
+    @Override
     public int hashCode() {
         return "IsNull".hashCode();
     }
     
+    @Override
     public String toString() {
         return "IsNull";
     }
@@ -62,18 +69,18 @@ public final class IsNull implements UnaryPredicate, Serializable {
         return INSTANCE;
     }
     
-    public static BinaryPredicate left() {
+    public static BinaryPredicate<Object,Object> left() {
         return LEFT;
     }
 
-    public static BinaryPredicate right() {
+    public static BinaryPredicate<Object,Object> right() {
         return RIGHT;
     }
     
     // static attributes
     // ------------------------------------------------------------------------
     private static final IsNull INSTANCE = new IsNull();
-    private static final BinaryPredicate LEFT = IgnoreRightPredicate.adapt(instance());
-    private static final BinaryPredicate RIGHT = IgnoreLeftPredicate.adapt(instance());
+    private static final BinaryPredicate<Object,Object> LEFT = IgnoreRightPredicate.adapt(instance());
+    private static final BinaryPredicate<Object,Object> RIGHT = IgnoreLeftPredicate.adapt(instance());
 
 }

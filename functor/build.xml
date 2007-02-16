@@ -105,6 +105,7 @@
     <pathelement location="${build.home}/test-classes"/>
     <pathelement location="${test.home}"/>
     <pathelement location="${junit.jar}"/>
+    <pathelement location="../lib/commons-collections-3.1.jar"/>
   </path>
 
   <!-- Should all tests fail if one does? -->

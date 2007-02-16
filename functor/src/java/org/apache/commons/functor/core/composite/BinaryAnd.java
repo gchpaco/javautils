@@ -35,7 +35,12 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class BinaryAnd extends BaseBinaryPredicateList {
+public final class BinaryAnd<T,U> extends BaseBinaryPredicateList<T, U> {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 4973040556436736908L;
 
     // constructor
     // ------------------------------------------------------------------------
@@ -43,52 +48,55 @@ public final class BinaryAnd extends BaseBinaryPredicateList {
         super();
     }
 
-    public BinaryAnd(BinaryPredicate p) {
+    public BinaryAnd(BinaryPredicate<? super T,? super U> p) {
         super(p);
     }
 
-    public BinaryAnd(BinaryPredicate p, BinaryPredicate q) {
+    public BinaryAnd(BinaryPredicate<? super T,? super U> p, BinaryPredicate<? super T,? super U> q) {
         super(p,q);
     }
 
-    public BinaryAnd(BinaryPredicate p, BinaryPredicate q, BinaryPredicate r) {
+    public BinaryAnd(BinaryPredicate<? super T,? super U> p, BinaryPredicate<? super T,? super U> q, BinaryPredicate<? super T,? super U> r) {
         super(p,q,r);
     }
     
     // modifiers
     // ------------------------------------------------------------------------ 
-    public BinaryAnd and(BinaryPredicate p) {
+    public BinaryAnd<T, U> and(BinaryPredicate<? super T,? super U> p) {
         super.addBinaryPredicate(p);
         return this;
     }
  
     // predicate interface
     // ------------------------------------------------------------------------
-    public boolean test(Object a, Object b) {
-        for(Iterator iter = getBinaryPredicateIterator(); iter.hasNext();) {
-            if(!((BinaryPredicate)iter.next()).test(a,b)) {
+    @Override
+    public boolean test(T a, U b) {
+        for(Iterator<BinaryPredicate<? super T,? super U>> iter = getBinaryPredicateIterator(); iter.hasNext();) {
+            if(!iter.next().test(a,b)) {
                 return false;
             }
         }
         return true;
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof BinaryAnd) {
             return equals((BinaryAnd)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
-    public boolean equals(BinaryAnd that) {
+    public boolean equals(BinaryAnd<?, ?> that) {
         return getBinaryPredicateListEquals(that);
     }
     
+    @Override
     public int hashCode() {
         return "BinaryAnd".hashCode() ^ getBinaryPredicateListHashCode();
     }
     
+    @Override
     public String toString() {
         return "BinaryAnd<" + getBinaryPredicateListToString() + ">";
     }

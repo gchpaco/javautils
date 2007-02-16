@@ -18,6 +18,7 @@ package org.apache.commons.functor.core.comparator;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.functor.BinaryPredicate;
 import org.apache.commons.functor.UnaryPredicate;
 import org.apache.commons.functor.adapter.RightBoundPredicate;
@@ -32,7 +33,11 @@ import org.apache.commons.functor.adapter.RightBoundPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IsLessThan implements BinaryPredicate, Serializable {
+public final class IsLessThan<T> implements BinaryPredicate<T,T>, Serializable {
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -4093151374838275500L;
     /**
      * Construct a <code>IsLessThan</code> {@link BinaryPredicate predicate}
      * for {@link Comparable Comparable}s.
@@ -49,8 +54,9 @@ public final class IsLessThan implements BinaryPredicate, Serializable {
      *        a <code>Comparator</code> for {@link Comparable Comparable}s will
      *        be used.
      */
-    public IsLessThan(Comparator comparator) {
-        this.comparator = null == comparator ? ComparableComparator.instance() : comparator;
+    @SuppressWarnings("unchecked")
+    public IsLessThan(Comparator<T> comparator) {
+        this.comparator = null == comparator ? ComparableComparator.getInstance() : comparator;
     }
     
     /**
@@ -58,25 +64,26 @@ public final class IsLessThan implements BinaryPredicate, Serializable {
      * less than the <i>right</i> parameter under my current
      * {@link Comparator Comparator}.
      */
-    public boolean test(Object left, Object right) {
+    public boolean test(T left, T right) {
         return comparator.compare(left,right) < 0;
     }
 
     /**
      * @see java.lang.Object#equals(Object)
      */
+    @Override
     public boolean equals(Object that) {
         if(that instanceof IsLessThan) {
             return equals((IsLessThan)that);
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
      * @see #equals(Object)
      */
-    public boolean equals(IsLessThan that) {
+    @SuppressWarnings("null")
+    public boolean equals(IsLessThan<?> that) {
         return null != that && 
             null == comparator ? null == that.comparator : comparator.equals(that.comparator);
     }
@@ -84,6 +91,7 @@ public final class IsLessThan implements BinaryPredicate, Serializable {
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         int hash = "IsLessThan".hashCode();
         // by construction, comparator is never null
@@ -94,18 +102,21 @@ public final class IsLessThan implements BinaryPredicate, Serializable {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return "IsLessThan<" + comparator + ">";
     }
 
+    @SuppressWarnings("unchecked")
     public static final IsLessThan instance() {
         return COMPARABLE_INSTANCE;
     }
 
-    public static final UnaryPredicate instance(Comparable right) {
+    @SuppressWarnings("unchecked")
+    public static final <T extends Comparable<T>> UnaryPredicate<T> instance(T right) {
         return RightBoundPredicate.bind(instance(),right);
     }
     
-    private Comparator comparator = null;
-    private static final IsLessThan COMPARABLE_INSTANCE = new IsLessThan();
+    private Comparator<T> comparator = null;
+    private static final IsLessThan<?> COMPARABLE_INSTANCE = new IsLessThan<Object>();
 }

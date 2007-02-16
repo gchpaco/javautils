@@ -56,12 +56,13 @@ public class TestAlgorithms extends TestCase {
     // Lifecycle
     // ------------------------------------------------------------------------
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
-        list = new ArrayList();
-        evens = new ArrayList();
-        doubled = new ArrayList();
-        listWithDuplicates = new ArrayList();
+        list = new ArrayList<Integer>();
+        evens = new ArrayList<Integer>();
+        doubled = new ArrayList<Integer>();
+        listWithDuplicates = new ArrayList<Integer>();
         sum = 0;
         for(int i=0;i<10;i++) {
             list.add(new Integer(i));
@@ -75,6 +76,7 @@ public class TestAlgorithms extends TestCase {
         }
     }
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
         list = null;
@@ -87,26 +89,26 @@ public class TestAlgorithms extends TestCase {
     // ------------------------------------------------------------------------
 
     public void testCollect() {
-        Collection result = Algorithms.collect(list.iterator());
+        Collection<Integer> result = Algorithms.collect(list.iterator());
         assertNotNull(result);
         assertEquals(list.size(),result.size());
         assertEquals(list,result);
     }    
 
     public void testCollect2() {
-        Set set = new HashSet();
+        Set<Integer> set = new HashSet<Integer>();
         assertSame(set,Algorithms.collect(list.iterator(),set));
         assertEquals(list.size(),set.size());
-        for(Iterator iter = list.iterator(); iter.hasNext(); ) {
+        for(Iterator<Integer> iter = list.iterator(); iter.hasNext(); ) {
             assertTrue(set.contains(iter.next()));
         }
     }    
 
     public void testCollect3() {
-        Set set = new HashSet();
+        Set<Integer> set = new HashSet<Integer>();
         assertSame(set,Algorithms.collect(listWithDuplicates.iterator(),set));
         assertTrue(listWithDuplicates.size() > set.size());
-        for(Iterator iter = listWithDuplicates.iterator(); iter.hasNext(); ) {
+        for(Iterator<Integer> iter = listWithDuplicates.iterator(); iter.hasNext(); ) {
             assertTrue(set.contains(iter.next()));
         }
     }    
@@ -122,8 +124,8 @@ public class TestAlgorithms extends TestCase {
     }    
 
     public void testDetectIfNone() {
-        assertEquals(new Integer(3),Algorithms.detect(list.iterator(),equalsThree,"Xyzzy"));
-        assertEquals("Xyzzy",Algorithms.detect(list.iterator(),equalsTwentyThree,"Xyzzy"));
+        assertEquals(new Integer(3),Algorithms.detect(list.iterator(),equalsThree,-22));
+        assertEquals(new Integer(-22),Algorithms.detect(list.iterator(),equalsTwentyThree,-22));
     }    
 
     public void testForEach() {
@@ -133,25 +135,25 @@ public class TestAlgorithms extends TestCase {
     }    
 
     public void testSelect1() {
-        Collection result = Algorithms.collect(Algorithms.select(list.iterator(),isEven));
+        Collection<Integer> result = Algorithms.collect(Algorithms.select(list.iterator(),isEven));
         assertNotNull(result);
         assertEquals(evens,result);
     }    
 
     public void testSelect2() {
-        ArrayList result = new ArrayList();
+        ArrayList<Integer> result = new ArrayList<Integer>();
         assertSame(result,Algorithms.collect(Algorithms.select(list.iterator(),isEven),result));
         assertEquals(evens,result);
     }    
 
     public void testReject1() {
-        Collection result = Algorithms.collect(Algorithms.reject(list.iterator(),isOdd));
+        Collection<Integer> result = Algorithms.collect(Algorithms.reject(list.iterator(),isOdd));
         assertNotNull(result);
         assertEquals(evens,result);
     }    
 
     public void testReject2() {
-        ArrayList result = new ArrayList();
+        ArrayList<Integer> result = new ArrayList<Integer>();
         assertSame(result,Algorithms.collect(Algorithms.reject(list.iterator(),isOdd),result));
         assertEquals(evens,result);
     }    
@@ -169,8 +171,8 @@ public class TestAlgorithms extends TestCase {
     public void testTransform() {
         Algorithms.transform(
             list.listIterator(),
-            new UnaryFunction() {
-                public Object evaluate(Object obj) {
+            new UnaryFunction<Integer,Integer>() {
+                public Integer evaluate(Integer obj) {
                     return new Integer(((Number)obj).intValue()*2);
                 }
             }
@@ -184,7 +186,7 @@ public class TestAlgorithms extends TestCase {
     }
 
     public void testApplyToGenerator() {
-        Generator gen = new IntegerRange(1,5);
+        Generator<Integer> gen = new IntegerRange(1,5);
         Summer summer = new Summer();
                 
         Algorithms.apply(gen,new Doubler()).run(summer);
@@ -193,25 +195,25 @@ public class TestAlgorithms extends TestCase {
     }
 
     public void testApply() {
-        Collection result = IteratorToGeneratorAdapter.adapt(Algorithms.apply(list.iterator(),new Doubler())).toCollection();
+        Collection<Integer> result = IteratorToGeneratorAdapter.adapt(Algorithms.apply(list.iterator(),new Doubler())).toCollection();
         assertNotNull(result);
         assertEquals(doubled,result);
     }
 
     public void testApply2() {
-        Set set = new HashSet();
+        Set<Object> set = new HashSet<Object>();
         assertSame(set,IteratorToGeneratorAdapter.adapt(Algorithms.apply(list.iterator(),Identity.instance())).to(set));
         assertEquals(list.size(),set.size());
-        for(Iterator iter = list.iterator(); iter.hasNext(); ) {
+        for(Iterator<Integer> iter = list.iterator(); iter.hasNext(); ) {
             assertTrue(set.contains(iter.next()));
         }
     }
 
     public void testApply3() {
-        Set set = new HashSet();
+        Set<Object> set = new HashSet<Object>();
         assertSame(set,IteratorToGeneratorAdapter.adapt(Algorithms.apply(listWithDuplicates.iterator(),Identity.instance())).to(set));
         assertTrue(listWithDuplicates.size() > set.size());
-        for(Iterator iter = listWithDuplicates.iterator(); iter.hasNext(); ) {
+        for(Iterator<Integer> iter = listWithDuplicates.iterator(); iter.hasNext(); ) {
             assertTrue(set.contains(iter.next()));
         }
     }
@@ -225,8 +227,8 @@ public class TestAlgorithms extends TestCase {
         Object result = Algorithms.inject(
             list.iterator(),
             new Integer(0),
-            new BinaryFunction() {
-                public Object evaluate(Object a, Object b) {
+            new BinaryFunction<Integer,Integer,Integer>() {
+                public Integer evaluate(Integer a, Integer b) {
                     return new Integer(((Number)a).intValue() + ((Number)b).intValue());
                 }
             });
@@ -234,7 +236,7 @@ public class TestAlgorithms extends TestCase {
     }
 
     public void testLimit() {
-        Collection col = IteratorToGeneratorAdapter.adapt(Algorithms.until(list.iterator(), new Offset(2))).toCollection();
+        Collection<Integer> col = IteratorToGeneratorAdapter.adapt(Algorithms.until(list.iterator(), new Offset(2))).toCollection();
         assertEquals("[0, 1]", col.toString());
     }
 
@@ -274,12 +276,12 @@ public class TestAlgorithms extends TestCase {
 
         // this version will return a function. since it is not the same type
         // as RecFunc recursion will end.
-        Function func = (Function)Algorithms.recurse(new RecFunc(0, true));
+        Function<?> func = (Function<?>)Algorithms.recurse(new RecFunc(0, true));
         assertEquals(new Integer(5), func.evaluate());
     }
 
     /** Recursive function for test. */
-    class RecFunc implements Function {
+    class RecFunc implements Function<Object> {
         int times = 0; boolean returnFunc = false;
 
         public RecFunc(int times, boolean returnFunc) {
@@ -290,37 +292,35 @@ public class TestAlgorithms extends TestCase {
         public Object evaluate() {
             if (times < 5) {
                 return new RecFunc(++times, returnFunc);
-            } else {
-                if (returnFunc) {
-                    return new Function() {
-                        public Object evaluate() {
-                            return new Integer(times);
-                        }
-                    };
-                } else {
-                    return new Integer(times);
-                }
             }
+            if (returnFunc) {
+                return new Function<Object>() {
+                    public Object evaluate() {
+                        return new Integer(times);
+                    }
+                };
+            }
+            return new Integer(times);
         }
     }
 
     // Attributes
     // ------------------------------------------------------------------------
-    private List list = null;
-    private List doubled = null;
-    private List evens = null;
-    private List listWithDuplicates = null;
+    private List<Integer> list = null;
+    private List<Integer> doubled = null;
+    private List<Integer> evens = null;
+    private List<Integer> listWithDuplicates = null;
     private int sum = 0;
-    private UnaryPredicate equalsThree = LeftBoundPredicate.bind(IsEqual.instance(),new Integer(3));
-    private UnaryPredicate equalsTwentyThree = LeftBoundPredicate.bind(IsEqual.instance(),new Integer(23));
-    private UnaryPredicate isEven = new UnaryPredicate() {
-        public boolean test(Object obj) {
-            return ((Number)obj).intValue() % 2 == 0;
+    private UnaryPredicate<Object> equalsThree = LeftBoundPredicate.bind(IsEqual.instance(),new Integer(3));
+    private UnaryPredicate<Object> equalsTwentyThree = LeftBoundPredicate.bind(IsEqual.instance(),new Integer(23));
+    private UnaryPredicate<Integer> isEven = new UnaryPredicate<Integer>() {
+        public boolean test(Integer obj) {
+            return obj.intValue() % 2 == 0;
         }
     };
-    private UnaryPredicate isOdd = new UnaryPredicate() {
-        public boolean test(Object obj) {
-            return ((Number)obj).intValue() % 2 != 0;
+    private UnaryPredicate<Integer> isOdd = new UnaryPredicate<Integer>() {
+        public boolean test(Integer obj) {
+            return obj.intValue() % 2 != 0;
         }
     };
 
@@ -334,15 +334,15 @@ public class TestAlgorithms extends TestCase {
         public int count = 0;
     }
     
-    static class Summer implements UnaryProcedure {
-        public void run(Object that) {
+    static class Summer implements UnaryProcedure<Integer> {
+        public void run(Integer that) {
             sum += ((Number)that).intValue();
         }
         public int sum = 0;
     }
     
-    static class Doubler implements UnaryFunction {
-        public Object evaluate(Object obj) {
+    static class Doubler implements UnaryFunction<Integer,Integer> {
+        public Integer evaluate(Integer obj) {
             return new Integer(2*((Number)obj).intValue());
         }
     }

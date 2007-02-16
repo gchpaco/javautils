@@ -23,18 +23,17 @@ import org.apache.commons.functor.UnaryFunction;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class TransformedIterator implements Iterator {
+public final class TransformedIterator<T,U> implements Iterator<U> {
 
     // constructor
     // ------------------------------------------------------------------------
     
-    public TransformedIterator(Iterator iterator, UnaryFunction function) {
+    public TransformedIterator(Iterator<T> iterator, UnaryFunction<? super T,? extends U> function) {
         if(null == iterator || null == function) {
             throw new NullPointerException();
-        } else {
-            this.function = function;
-            this.iterator = iterator;
         }
+        this.function = function;
+        this.iterator = iterator;
     }
     
     // iterator methods
@@ -50,7 +49,7 @@ public final class TransformedIterator implements Iterator {
     /**
      * @see java.util.Iterator#next()
      */
-    public Object next() {
+    public U next() {
         return function.evaluate(iterator.next());
     }
 
@@ -61,15 +60,16 @@ public final class TransformedIterator implements Iterator {
         iterator.remove();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if(obj instanceof TransformedIterator) {
-            TransformedIterator that = (TransformedIterator)obj;
+            TransformedIterator<?,?> that = (TransformedIterator)obj;
             return function.equals(that.function) && iterator.equals(that.iterator);  
-        } else {
-            return false;
         }
+        return false;
     }
 
+    @Override
     public int hashCode() {
         int hash = "TransformedIterator".hashCode();
         hash <<= 2;
@@ -79,6 +79,7 @@ public final class TransformedIterator implements Iterator {
         return hash;
     }
 
+    @Override
     public String toString() {
         return "TransformedIterator<" + iterator + "," + function + ">";
     }
@@ -86,16 +87,19 @@ public final class TransformedIterator implements Iterator {
     // class methods
     // ------------------------------------------------------------------------
     
-    public static Iterator transform(Iterator iter, UnaryFunction func) {
-        return null == func ? iter : (null == iter ? null : new TransformedIterator(iter,func));
+    @SuppressWarnings("unchecked")
+    public static <T,U> Iterator<U> transform(Iterator<T> iter, UnaryFunction<? super T,? extends U> func) {
+      if (func == null) return (Iterator<U>) iter;
+      if (iter == null) return null;
+      return new TransformedIterator<T,U>(iter,func);
     }
  
  
     // attributes
     // ------------------------------------------------------------------------
     
-    private UnaryFunction function = null;
-    private Iterator iterator = null;
+    private UnaryFunction<? super T,? extends U> function = null;
+    private Iterator<T> iterator = null;
     
 
 }

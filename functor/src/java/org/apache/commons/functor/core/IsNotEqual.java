@@ -31,7 +31,12 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IsNotEqual implements BinaryPredicate, Serializable {
+public final class IsNotEqual implements BinaryPredicate<Object,Object>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -4072583676837868936L;
 
     // constructor
     // ------------------------------------------------------------------------
@@ -45,14 +50,17 @@ public final class IsNotEqual implements BinaryPredicate, Serializable {
         return (null == left ? null != right : !left.equals(right));
     }
 
+    @Override
     public boolean equals(Object that) {
         return that instanceof IsNotEqual;
     }
     
+    @Override
     public int hashCode() {
         return "IsNotEqual".hashCode();
     }
     
+    @Override
     public String toString() {
         return "IsNotEqual";
     }

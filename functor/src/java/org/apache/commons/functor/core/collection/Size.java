@@ -27,14 +27,19 @@ import org.apache.commons.functor.UnaryFunction;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class Size implements UnaryFunction, Serializable {
+public final class Size implements UnaryFunction<Object,Integer>, Serializable {
 
     // constructor
     // ------------------------------------------------------------------------
     
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -12374650738412129L;
+
     public Size() { }
     
-    public Object evaluate(Object obj) {
+    public Integer evaluate(Object obj) {
         if(obj instanceof Collection) {
             return evaluate((Collection)obj);
         } else if(obj instanceof String) {
@@ -51,6 +56,7 @@ public final class Size implements UnaryFunction, Serializable {
     /**
      * @see java.lang.Object#equals(Object)
      */
+    @Override
     public boolean equals(Object that) {
         return that instanceof Size;
     }
@@ -58,6 +64,7 @@ public final class Size implements UnaryFunction, Serializable {
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return "Size".hashCode();
     }
@@ -65,6 +72,7 @@ public final class Size implements UnaryFunction, Serializable {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return "Size()";
     }
@@ -73,15 +81,15 @@ public final class Size implements UnaryFunction, Serializable {
         return INSTANCE;
     }
 
-    private Object evaluate(Collection col) {
+    private Integer evaluate(Collection<?> col) {
         return new Integer(col.size());
     }
     
-    private Object evaluate(String str) {
+    private Integer evaluate(String str) {
         return new Integer(str.length());
     }
     
-    private Object evaluateArray(Object array) {
+    private Integer evaluateArray(Object array) {
         return new Integer(Array.getLength(array));
     }
     

@@ -60,8 +60,11 @@ abstract class BasePredicateList implements Predicate, Serializable {
     
     // abstract
     // ------------------------------------------------------------------------ 
+    @Override
     public abstract boolean equals(Object that);
+    @Override
     public abstract int hashCode();
+    @Override
     public abstract String toString();
     public abstract boolean test();
 
@@ -74,7 +77,7 @@ abstract class BasePredicateList implements Predicate, Serializable {
     // protected
     // ------------------------------------------------------------------------
 
-    protected Iterator getPredicateIterator() {
+    protected Iterator<Predicate> getPredicateIterator() {
         return list.iterator();
     }
     
@@ -92,6 +95,6 @@ abstract class BasePredicateList implements Predicate, Serializable {
     
     // attributes
     // ------------------------------------------------------------------------
-    private List list = new ArrayList();
+    private List<Predicate> list = new ArrayList<Predicate>();
 
 }

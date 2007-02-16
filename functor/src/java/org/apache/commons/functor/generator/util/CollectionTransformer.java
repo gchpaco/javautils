@@ -32,11 +32,11 @@ import org.apache.commons.functor.generator.Generator;
  * @author Jason Horman (jason@jhorman.org)
  */
 
-public class CollectionTransformer<T> implements UnaryFunction<Generator<? extends T>,Collection<T>> {
+public class CollectionTransformer<T> implements UnaryFunction<Generator<? extends T>,Collection<? super T>> {
 
 	// instance methods
 	//---------------------------------------------------
-    private Collection<T> toFill = null;
+    private Collection<? super T> toFill = null;
 
 	// constructors
 	//---------------------------------------------------
@@ -44,17 +44,18 @@ public class CollectionTransformer<T> implements UnaryFunction<Generator<? exten
         toFill = new ArrayList<T>();
     }
 
-    public CollectionTransformer(Collection<T> toFill) {
+    public CollectionTransformer(Collection<? super T> toFill) {
         this.toFill = toFill;
     }
 
 	// instance methods
 	//---------------------------------------------------
-	public Collection<T> evaluate(Object obj) {
-		return evaluate((Generator<T>)obj);
+	@SuppressWarnings("cast")
+  public Collection<? super T> evaluate(Object obj) {
+		return evaluate((Generator<?>)obj);
 	}
 
-    public Collection<T> evaluate(Generator<? extends T> generator) {
+    public Collection<? super T> evaluate(Generator<? extends T> generator) {
         generator.run(new UnaryProcedure<T>() {
             public void run(T obj) {
                 toFill.add(obj);

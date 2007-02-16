@@ -22,10 +22,12 @@ package org.apache.commons.functor.generator;
  * @author Rodney Waldhoff
  * @deprecated To be removed.
  */
+@Deprecated
 public abstract class BaseTransformer<T,U> implements Transformer<T,U> {
     public abstract U transform(Generator<T> gen);
 
-    public U evaluate(Generator<T> obj) {
-        return transform(obj);
+    public U evaluate (Generator<T> obj)
+    {
+      return transform(obj);
     }
 }

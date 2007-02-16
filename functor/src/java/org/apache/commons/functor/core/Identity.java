@@ -32,7 +32,12 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class Identity implements UnaryFunction, UnaryPredicate, Serializable {
+public final class Identity<T> implements UnaryFunction<T,T>, UnaryPredicate<T>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 7568532708952203064L;
 
     // constructor
     // ------------------------------------------------------------------------
@@ -41,11 +46,11 @@ public final class Identity implements UnaryFunction, UnaryPredicate, Serializab
  
     // function interface
     // ------------------------------------------------------------------------
-    public Object evaluate(Object obj) {
+    public T evaluate(T obj) {
         return obj;
     }
 
-    public boolean test(Object obj) {
+    public boolean test(T obj) {
         return test((Boolean)obj);
     }
 
@@ -53,25 +58,29 @@ public final class Identity implements UnaryFunction, UnaryPredicate, Serializab
         return bool.booleanValue();
     }
 
+    @Override
     public boolean equals(Object that) {
         return (that instanceof Identity);
     }
     
+    @Override
     public int hashCode() {
         return "Identity".hashCode();
     }
     
+    @Override
     public String toString() {
         return "Identity";
     }
     
     // static methods
     // ------------------------------------------------------------------------
-    public static Identity instance() {
-        return INSTANCE;
+    @SuppressWarnings("unchecked")
+    public static <T> Identity<T> instance() {
+        return (Identity<T>) INSTANCE;
     }
     
     // static attributes
     // ------------------------------------------------------------------------
-    private static final Identity INSTANCE = new Identity();
+    private static final Identity<?> INSTANCE = new Identity<Object>();
 }

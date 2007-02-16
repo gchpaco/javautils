@@ -28,6 +28,7 @@ import org.apache.commons.functor.UnaryFunction;
  * @deprecated Simply use UnaryFunction.
  */
 
+@Deprecated
 public interface Transformer<T,U> extends UnaryFunction<Generator<T>,U> {
     U transform(Generator<T> generator);
 }

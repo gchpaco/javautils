@@ -30,7 +30,7 @@ import org.apache.commons.functor.UnaryPredicate;
  * @author Rodney Waldhoff
  */
 
-public final class Limit implements Predicate, UnaryPredicate, BinaryPredicate {
+public final class Limit implements Predicate, UnaryPredicate<Object>, BinaryPredicate<Object,Object> {
 
     public Limit(int count) {
         if(count < 0) { 
@@ -44,9 +44,8 @@ public final class Limit implements Predicate, UnaryPredicate, BinaryPredicate {
         if(current < max) {
             current++;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public boolean test(Object obj) {
@@ -57,6 +56,7 @@ public final class Limit implements Predicate, UnaryPredicate, BinaryPredicate {
         return test();        
     }
 
+    @Override
     public String toString() {
         return "Limit<" + max + ">";
     }

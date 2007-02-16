@@ -32,8 +32,13 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class RightIdentity implements BinaryPredicate, BinaryFunction, Serializable {
+public final class RightIdentity<T> implements BinaryPredicate<Object,T>, BinaryFunction<Object,T,T>, Serializable {
     
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -8586988564415120418L;
+
     // constructor
     // ------------------------------------------------------------------------
     public RightIdentity() {
@@ -42,11 +47,11 @@ public final class RightIdentity implements BinaryPredicate, BinaryFunction, Ser
     // functor interface
     // ------------------------------------------------------------------------
 
-    public Object evaluate(Object left, Object right) {
+    public T evaluate(Object left, T right) {
         return right;
     }
 
-    public boolean test(Object left, Object right) {
+    public boolean test(Object left, T right) {
         return test((Boolean)right);
     }
 
@@ -54,25 +59,29 @@ public final class RightIdentity implements BinaryPredicate, BinaryFunction, Ser
         return bool.booleanValue();
     }
 
+    @Override
     public boolean equals(Object that) {
         return (that instanceof RightIdentity);
     }
     
+    @Override
     public int hashCode() {
         return "RightIdentity".hashCode();
     }
     
+    @Override
     public String toString() {
         return "RightIdentity";
     }
     
     // static methods
     // ------------------------------------------------------------------------
-    public static RightIdentity instance() {
-        return INSTANCE;
+    @SuppressWarnings("unchecked")
+    public static <T> RightIdentity<T> instance() {
+        return (RightIdentity<T>) INSTANCE;
     }
     
     // static attributes
     // ------------------------------------------------------------------------
-    private static final RightIdentity INSTANCE = new RightIdentity();
+    private static final RightIdentity<?> INSTANCE = new RightIdentity<Object>();
 }

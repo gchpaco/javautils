@@ -36,23 +36,23 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-abstract class BaseUnaryPredicateList implements UnaryPredicate, Serializable {
+abstract class BaseUnaryPredicateList<T> implements UnaryPredicate<T>, Serializable {
 
     // constructor
     // ------------------------------------------------------------------------
     protected BaseUnaryPredicateList() {
     }
 
-    protected BaseUnaryPredicateList(UnaryPredicate p) {
+    protected BaseUnaryPredicateList(UnaryPredicate<? super T> p) {
         addUnaryPredicate(p);
     }
 
-    protected BaseUnaryPredicateList(UnaryPredicate p, UnaryPredicate q) {
+    protected BaseUnaryPredicateList(UnaryPredicate<? super T> p, UnaryPredicate<? super T> q) {
         addUnaryPredicate(p);
         addUnaryPredicate(q);
     }
 
-    protected BaseUnaryPredicateList(UnaryPredicate p, UnaryPredicate q, UnaryPredicate r) {
+    protected BaseUnaryPredicateList(UnaryPredicate<? super T> p, UnaryPredicate<? super T> q, UnaryPredicate<? super T> r) {
         addUnaryPredicate(p);
         addUnaryPredicate(q);
         addUnaryPredicate(r);
@@ -60,25 +60,28 @@ abstract class BaseUnaryPredicateList implements UnaryPredicate, Serializable {
     
     // abstract
     // ------------------------------------------------------------------------ 
+    @Override
     public abstract boolean equals(Object that);
+    @Override
     public abstract int hashCode();
+    @Override
     public abstract String toString();
     public abstract boolean test(Object obj);
 
     // modifiers
     // ------------------------------------------------------------------------ 
-    protected void addUnaryPredicate(UnaryPredicate p) {
+    protected void addUnaryPredicate(UnaryPredicate<? super T> p) {
         list.add(p);
     }
  
     // protected
     // ------------------------------------------------------------------------
 
-    protected Iterator getUnaryPredicateIterator() {
+    protected Iterator<UnaryPredicate<? super T>> getUnaryPredicateIterator() {
         return list.iterator();
     }
     
-    protected boolean getUnaryPredicateListEquals(BaseUnaryPredicateList that) {
+    protected boolean getUnaryPredicateListEquals(BaseUnaryPredicateList<?> that) {
         return (null != that && this.list.equals(that.list));
     }
     
@@ -92,6 +95,6 @@ abstract class BaseUnaryPredicateList implements UnaryPredicate, Serializable {
     
     // attributes
     // ------------------------------------------------------------------------
-    private List list = new ArrayList();
+    private List<UnaryPredicate<? super T>> list = new ArrayList<UnaryPredicate<? super T>>();
 
 }

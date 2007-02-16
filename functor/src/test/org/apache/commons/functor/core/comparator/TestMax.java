@@ -20,6 +20,7 @@ import java.util.Collections;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.functor.BaseFunctorTest;
 
 /**

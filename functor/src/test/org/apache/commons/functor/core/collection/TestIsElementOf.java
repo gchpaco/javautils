@@ -45,6 +45,7 @@ public class TestIsElementOf extends BaseFunctorTest {
     // Functor Testing Framework
     // ------------------------------------------------------------------------
 
+    @Override
     protected Object makeFunctor() {
         return new IsElementOf();
     }
@@ -56,12 +57,12 @@ public class TestIsElementOf extends BaseFunctorTest {
     // ------------------------------------------------------------------------
 
     public void testTestCollection() throws Exception {
-        ArrayList list = new ArrayList();
+        ArrayList<Integer> list = new ArrayList<Integer>();
         list.add(new Integer(5));
         list.add(new Integer(10));
         list.add(new Integer(15));
 
-        UnaryPredicate p = IsElementOf.instance(list);
+        UnaryPredicate<Object> p = IsElementOf.instance(list);
         assertTrue(p.test(new Integer(5)));
         assertTrue(p.test(new Integer(10)));
         assertTrue(p.test(new Integer(15)));
@@ -74,7 +75,7 @@ public class TestIsElementOf extends BaseFunctorTest {
     public void testTestArray() throws Exception {
         int[] list = new int[] { 5, 10, 15 };
 
-        UnaryPredicate p = IsElementOf.instance(list);
+        UnaryPredicate<Object> p = IsElementOf.instance(list);
         assertTrue(p.test(new Integer(5)));
         assertTrue(p.test(new Integer(10)));
         assertTrue(p.test(new Integer(15)));

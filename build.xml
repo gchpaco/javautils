@@ -24,6 +24,7 @@
   <target name="functor">
     <ant antfile="build.xml" dir="functor" target="dist">
       <property name="junit.jar" location="lib/junit-3.8.1.jar"/>
+      <property name="classpath" value="value"/>
     </ant>
     <copy file="functor/dist/commons-functor.jar" todir="lib" />
   </target>

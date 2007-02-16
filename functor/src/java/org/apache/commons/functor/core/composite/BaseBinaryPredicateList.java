@@ -36,23 +36,23 @@ import org.apache.commons.functor.BinaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-abstract class BaseBinaryPredicateList implements BinaryPredicate, Serializable {
+abstract class BaseBinaryPredicateList<T,U> implements BinaryPredicate<T,U>, Serializable {
 
     // constructor
     // ------------------------------------------------------------------------
     protected BaseBinaryPredicateList() {
     }
 
-    protected BaseBinaryPredicateList(BinaryPredicate p) {
+    protected BaseBinaryPredicateList(BinaryPredicate<? super T,? super U> p) {
         addBinaryPredicate(p);
     }
 
-    protected BaseBinaryPredicateList(BinaryPredicate p, BinaryPredicate q) {
+    protected BaseBinaryPredicateList(BinaryPredicate<? super T,? super U> p, BinaryPredicate<? super T,? super U> q) {
         addBinaryPredicate(p);
         addBinaryPredicate(q);
     }
 
-    protected BaseBinaryPredicateList(BinaryPredicate p, BinaryPredicate q, BinaryPredicate r) {
+    protected BaseBinaryPredicateList(BinaryPredicate<? super T,? super U> p, BinaryPredicate<? super T,? super U> q, BinaryPredicate<? super T,? super U> r) {
         addBinaryPredicate(p);
         addBinaryPredicate(q);
         addBinaryPredicate(r);
@@ -60,25 +60,28 @@ abstract class BaseBinaryPredicateList implements BinaryPredicate, Serializable 
     
     // abstract
     // ------------------------------------------------------------------------ 
+    @Override
     public abstract boolean equals(Object that);
+    @Override
     public abstract int hashCode();
+    @Override
     public abstract String toString();
-    public abstract boolean test(Object left, Object right);
+    public abstract boolean test(T left, U right);
 
     // modifiers
     // ------------------------------------------------------------------------ 
-    protected void addBinaryPredicate(BinaryPredicate p) {
+    protected void addBinaryPredicate(BinaryPredicate<? super T,? super U> p) {
         list.add(p);
     }
  
     // protected
     // ------------------------------------------------------------------------
 
-    protected Iterator getBinaryPredicateIterator() {
+    protected Iterator<BinaryPredicate<? super T, ? super U>> getBinaryPredicateIterator() {
         return list.iterator();
     }
     
-    protected boolean getBinaryPredicateListEquals(BaseBinaryPredicateList that) {
+    protected boolean getBinaryPredicateListEquals(BaseBinaryPredicateList<?,?> that) {
         return (null != that && this.list.equals(that.list));
     }
     
@@ -92,6 +95,6 @@ abstract class BaseBinaryPredicateList implements BinaryPredicate, Serializable 
     
     // attributes
     // ------------------------------------------------------------------------
-    private List list = new ArrayList();
+    private List<BinaryPredicate<? super T,? super U>> list = new ArrayList<BinaryPredicate<? super T, ? super U>>();
 
 }

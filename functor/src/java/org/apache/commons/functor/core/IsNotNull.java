@@ -27,7 +27,12 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class IsNotNull implements UnaryPredicate, Serializable {
+public final class IsNotNull implements UnaryPredicate<Object>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 8808844410870513560L;
 
     // constructor
     // ------------------------------------------------------------------------
@@ -41,14 +46,17 @@ public final class IsNotNull implements UnaryPredicate, Serializable {
         return (null != obj);
     }
 
+    @Override
     public boolean equals(Object that) {
         return that instanceof IsNotNull;
     }
     
+    @Override
     public int hashCode() {
         return "IsNotNull".hashCode();
     }
     
+    @Override
     public String toString() {
         return "IsNotNull";
     }

@@ -30,7 +30,12 @@ import org.apache.commons.functor.UnaryProcedure;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class NoOp implements Procedure, UnaryProcedure, BinaryProcedure, Serializable {
+public final class NoOp implements Procedure, UnaryProcedure<Object>, BinaryProcedure<Object,Object>, Serializable {
+
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -4328997218605705330L;
 
     // constructor
     // ------------------------------------------------------------------------
@@ -48,14 +53,17 @@ public final class NoOp implements Procedure, UnaryProcedure, BinaryProcedure, S
     public void run(Object left, Object right) {
     }
 
+    @Override
     public boolean equals(Object that) {
         return (that instanceof NoOp);
     }
         
+    @Override
     public int hashCode() {
         return "NoOp".hashCode();
     }
     
+    @Override
     public String toString() {
         return "NoOp";
     }

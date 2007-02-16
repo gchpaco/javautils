@@ -33,33 +33,39 @@ import org.apache.commons.functor.UnaryPredicate;
  * @version $Revision: 155445 $ $Date: 2005-02-26 05:21:00 -0800 (Sat, 26 Feb 2005) $
  * @author Rodney Waldhoff
  */
-public final class UnaryNot implements UnaryPredicate, Serializable {
+public final class UnaryNot<T> implements UnaryPredicate<T>, Serializable {
 
     // constructor
     // ------------------------------------------------------------------------
 
-    public UnaryNot(UnaryPredicate p) {
+    /**
+   * 
+   */
+  private static final long serialVersionUID = -6054565739289894970L;
+
+    public UnaryNot(UnaryPredicate<? super T> p) {
         this.predicate = p;
     }
     
     // predicate interface
     // ------------------------------------------------------------------------
-    public boolean test(Object obj) {
+    public boolean test(T obj) {
         return !(predicate.test(obj));
     }
 
+    @Override
     public boolean equals(Object that) {
         if(that instanceof UnaryNot) {
             return equals((UnaryNot)that);
-        } else {
-            return false;
         }
+        return false;
     }
     
-    public boolean equals(UnaryNot that) {
+    public boolean equals(UnaryNot<?> that) {
         return null != that && (null == predicate ? null == that.predicate : predicate.equals(that.predicate));
     }
     
+    @Override
     public int hashCode() {
         int hash = "UnaryNot".hashCode();
         if(null != predicate) {
@@ -68,17 +74,18 @@ public final class UnaryNot implements UnaryPredicate, Serializable {
         return hash;
     }
     
+    @Override
     public String toString() {
         return "UnaryNot<" + predicate + ">";
     }
 
     // static
     // ------------------------------------------------------------------------
-    public static UnaryPredicate not(UnaryPredicate that) {
-        return null == that ? null : new UnaryNot(that);
+    public static <T> UnaryPredicate<T> not(UnaryPredicate<T> that) {
+        return null == that ? null : new UnaryNot<T> (that);
     }
     
     // attributes
     // ------------------------------------------------------------------------
-    private UnaryPredicate predicate = null;
+    private UnaryPredicate<? super T> predicate = null;
 }

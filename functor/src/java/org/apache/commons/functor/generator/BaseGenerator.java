@@ -48,7 +48,7 @@ public abstract class BaseGenerator<T> implements Generator<T> {
      * should use probably this constructor since doing so will cause the
      * {@link #stop} method to stop the wrapped generator as well.
      */
-    public BaseGenerator(Generator generator) {
+    public BaseGenerator(Generator<?> generator) {
         this.wrappedGenerator = generator;
     }
 
@@ -134,12 +134,13 @@ public abstract class BaseGenerator<T> implements Generator<T> {
     }
 
     /** Same as to(new CollectionTransformer(collection)). */
-    public final Collection<T> to(Collection<T> collection) {
+    public final Collection<? super T> to(Collection<? super T> collection) {
         return to(new CollectionTransformer<T>(collection));
     }
 
     /** Same as to(new CollectionTransformer()). */
+    @SuppressWarnings("unchecked")
     public final Collection<T> toCollection() {
-        return to(new CollectionTransformer<T>());
+        return (Collection<T>) to(new CollectionTransformer<T>());
     }
 }

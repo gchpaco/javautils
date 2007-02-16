@@ -31,7 +31,7 @@ import org.apache.commons.functor.UnaryPredicate;
  * @author Rodney Waldhoff
  */
 
-public final class Offset implements Predicate, UnaryPredicate, BinaryPredicate {
+public final class Offset implements Predicate, UnaryPredicate<Object>, BinaryPredicate<Object,Object> {
 
     public Offset(int count) {
         if(count < 0) { 
@@ -45,9 +45,8 @@ public final class Offset implements Predicate, UnaryPredicate, BinaryPredicate 
         if(current < min) {
             current++;
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     public boolean test(Object obj) {
@@ -58,6 +57,7 @@ public final class Offset implements Predicate, UnaryPredicate, BinaryPredicate 
         return test();        
     }
 
+    @Override
     public String toString() {
         return "Offset<" + min + ">";
     }

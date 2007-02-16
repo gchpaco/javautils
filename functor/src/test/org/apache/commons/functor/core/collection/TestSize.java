@@ -48,6 +48,7 @@ public class TestSize extends BaseFunctorTest {
     // Functor Testing Framework
     // ------------------------------------------------------------------------
 
+    @Override
     protected Object makeFunctor() {
         return new Size();
     }
@@ -55,10 +56,12 @@ public class TestSize extends BaseFunctorTest {
     // Lifecycle
     // ------------------------------------------------------------------------
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
     }
@@ -70,7 +73,7 @@ public class TestSize extends BaseFunctorTest {
         assertEquals(new Integer(0),Size.instance().evaluate(Collections.EMPTY_LIST));
         assertEquals(new Integer(0),Size.instance().evaluate(Collections.EMPTY_SET));
         {
-            List list = new ArrayList();
+            List<Integer> list = new ArrayList<Integer>();
             assertEquals(new Integer(0),Size.instance().evaluate(list));
             for(int i=0;i<2;i++) {
                 assertEquals(new Integer(i),Size.instance().evaluate(list));                
@@ -79,7 +82,7 @@ public class TestSize extends BaseFunctorTest {
             }
         }
         {
-            Set set = new HashSet();
+            Set<Integer> set = new HashSet<Integer>();
             assertEquals(new Integer(0),Size.instance().evaluate(set));
             for(int i=0;i<2;i++) {
                 assertEquals(new Integer(i),Size.instance().evaluate(set));                
@@ -117,12 +120,12 @@ public class TestSize extends BaseFunctorTest {
     }
 
     public void testEquals() throws Exception {
-        UnaryFunction f = new Size();
+        UnaryFunction<?, ?> f = new Size();
         assertEquals(f,f);
         assertObjectsAreEqual(f,new Size());
         assertObjectsAreEqual(f,Size.instance());
         assertSame(Size.instance(),Size.instance());
-        assertObjectsAreNotEqual(f,new Constant(null));
+        assertObjectsAreNotEqual(f,Constant.instance (null));
         assertTrue(! f.equals((Size)null) );
     }
 

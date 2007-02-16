@@ -28,16 +28,20 @@ import org.apache.commons.functor.UnaryPredicate;
  * @author  Jason Horman (jason@jhorman.org)
  */
 
-public class IsWithinRange implements UnaryPredicate, Serializable {
+public class IsWithinRange<T extends Comparable<T>> implements UnaryPredicate<T>, Serializable {
 
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 1762127036975387003L;
     /***************************************************
      *  Instance variables
      ***************************************************/
 
     /** The minimum value of the range. */
-    private Comparable min = null;
+    private T min = null;
     /** The maximum value of the range. */
-    private Comparable max = null;
+    private T max = null;
     /** Hashcode of the name of this Predicate. */
     private static final int nameHashCode = "IsWithinRange".hashCode();
 
@@ -49,7 +53,7 @@ public class IsWithinRange implements UnaryPredicate, Serializable {
      * Constructor the object by passing in the range that will
      * be used in the {@link #test}.
      */
-    public IsWithinRange(Comparable min, Comparable max) {
+    public IsWithinRange(T min, T max) {
         if (min == null || max == null) {
             throw new IllegalArgumentException("min and max must not be null");
         }
@@ -69,24 +73,26 @@ public class IsWithinRange implements UnaryPredicate, Serializable {
     /**
      * Test if the passed in object is within the specified range.
      */
-    public boolean test(Object o) {
-        Comparable c = (Comparable)o;
-        return c.compareTo(min) >= 0 && c.compareTo(max) <= 0;
+    public boolean test(T o) {
+        return o.compareTo(min) >= 0 && o.compareTo(max) <= 0;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof IsWithinRange)) return false;
-        final IsWithinRange isWithinRange = (IsWithinRange) o;
+        final IsWithinRange<?> isWithinRange = (IsWithinRange) o;
         if (!max.equals(isWithinRange.max)) return false;
         if (!min.equals(isWithinRange.min)) return false;
         return true;
     }
 
+    @Override
     public int hashCode() {
         return 29 * min.hashCode() + max.hashCode() + nameHashCode;
     }
 
+    @Override
     public String toString() {
         return "IsBetween(" + min + ", " + max + ")";
     }

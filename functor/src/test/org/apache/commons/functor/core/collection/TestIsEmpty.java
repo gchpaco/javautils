@@ -51,6 +51,7 @@ public class TestIsEmpty extends BaseFunctorTest {
     // Functor Testing Framework
     // ------------------------------------------------------------------------
 
+    @Override
     protected Object makeFunctor() {
         return new IsEmpty();
     }
@@ -58,10 +59,12 @@ public class TestIsEmpty extends BaseFunctorTest {
     // Lifecycle
     // ------------------------------------------------------------------------
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
     }
@@ -73,13 +76,13 @@ public class TestIsEmpty extends BaseFunctorTest {
         assertTrue(IsEmpty.instance().test(Collections.EMPTY_LIST));
         assertTrue(IsEmpty.instance().test(Collections.EMPTY_SET));
         {
-            List list = new ArrayList();
+            List<String> list = new ArrayList<String>();
             assertTrue(IsEmpty.instance().test(list));
             list.add("Xyzzy");
             assertTrue(!IsEmpty.instance().test(list));
         }
         {
-            Set set = new HashSet();
+            Set<String> set = new HashSet<String>();
             assertTrue(IsEmpty.instance().test(set));
             set.add("Xyzzy");
             assertTrue(!IsEmpty.instance().test(set));
@@ -117,20 +120,20 @@ public class TestIsEmpty extends BaseFunctorTest {
     }
 
     public void testTestMap() throws Exception {
-        Map map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
         assertTrue(IsEmpty.instance().test(map));
         map.put("x","y");
         assertTrue(! IsEmpty.instance().test(map));
     }
 
     public void testEquals() throws Exception {
-        UnaryPredicate p = new IsEmpty();
+        UnaryPredicate<Object> p = new IsEmpty();
         assertEquals(p,p);
         assertObjectsAreEqual(p,new IsEmpty());
         assertObjectsAreEqual(p,IsEmpty.instance());
         assertSame(IsEmpty.instance(),IsEmpty.instance());
-        assertObjectsAreNotEqual(p,new Constant(true));
-        assertObjectsAreNotEqual(p,new UnaryNot(null));
+        assertObjectsAreNotEqual(p,Constant.truePredicate ());
+        assertObjectsAreNotEqual(p,new UnaryNot<Object>(null));
     }
 
 }

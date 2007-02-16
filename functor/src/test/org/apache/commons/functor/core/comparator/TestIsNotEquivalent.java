@@ -18,6 +18,7 @@ package org.apache.commons.functor.core.comparator;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.functor.core.Constant;
 
 /**

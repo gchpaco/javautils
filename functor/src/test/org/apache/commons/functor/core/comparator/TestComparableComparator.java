@@ -15,6 +15,8 @@
  */
 package org.apache.commons.functor.core.comparator;
 
+import org.apache.commons.collections.comparators.ComparableComparator;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -51,16 +53,16 @@ public class TestComparableComparator extends TestCase {
     // ------------------------------------------------------------------------
     
     public void testCompareIntegers() {
-        assertTrue(ComparableComparator.instance().compare(new Integer(Integer.MIN_VALUE),new Integer(Integer.MIN_VALUE)) == 0);
-        assertTrue(ComparableComparator.instance().compare(new Integer(-1),new Integer(-1)) == 0);
-        assertTrue(ComparableComparator.instance().compare(new Integer(0),new Integer(0)) == 0);
-        assertTrue(ComparableComparator.instance().compare(new Integer(Integer.MAX_VALUE),new Integer(Integer.MAX_VALUE)) == 0);
-        assertTrue(ComparableComparator.instance().compare(new Integer(1),new Integer(1)) == 0);
+        assertTrue(ComparableComparator.getInstance().compare(new Integer(Integer.MIN_VALUE),new Integer(Integer.MIN_VALUE)) == 0);
+        assertTrue(ComparableComparator.getInstance().compare(new Integer(-1),new Integer(-1)) == 0);
+        assertTrue(ComparableComparator.getInstance().compare(new Integer(0),new Integer(0)) == 0);
+        assertTrue(ComparableComparator.getInstance().compare(new Integer(Integer.MAX_VALUE),new Integer(Integer.MAX_VALUE)) == 0);
+        assertTrue(ComparableComparator.getInstance().compare(new Integer(1),new Integer(1)) == 0);
     }
 
     public void testCompareIncomparable() {
         try {
-            ComparableComparator.instance().compare(new Object(),new Integer(2));
+            ComparableComparator.getInstance().compare(new Object(),new Integer(2));
             fail("Expected ClassCastException");
         } catch(ClassCastException e) {
             // expected
@@ -69,7 +71,7 @@ public class TestComparableComparator extends TestCase {
 
     public void testCompareNull() {
         try {
-            ComparableComparator.instance().compare(null,new Integer(2));
+            ComparableComparator.getInstance().compare(null,new Integer(2));
             fail("Expected NullPointerException");
         } catch(NullPointerException e) {
             // expected
