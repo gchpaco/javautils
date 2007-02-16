@@ -15,30 +15,13 @@
  */
 package org.apache.commons.functor.example;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import junit.framework.*;
 
-import org.apache.commons.functor.BinaryFunction;
-import org.apache.commons.functor.BinaryProcedure;
-import org.apache.commons.functor.Function;
-import org.apache.commons.functor.Procedure;
-import org.apache.commons.functor.UnaryFunction;
-import org.apache.commons.functor.UnaryProcedure;
+import org.apache.commons.functor.*;
 import org.apache.commons.functor.adapter.IgnoreLeftFunction;
-import org.apache.commons.functor.core.Constant;
-import org.apache.commons.functor.core.Identity;
-import org.apache.commons.functor.core.IsInstanceOf;
-import org.apache.commons.functor.core.IsNull;
-import org.apache.commons.functor.core.RightIdentity;
+import org.apache.commons.functor.core.*;
 import org.apache.commons.functor.core.composite.Conditional;
 
 /*
@@ -89,9 +72,9 @@ public class FlexiMapExample extends TestCase {
      */
     public void testBasicMap() {
         /* (We'll define these make*Map functions below.) */
-        Map map = makeBasicMap(); 
-        Object key = "key";
-        Object value = new Integer(3);
+        Map<Object, Object> map = makeBasicMap(); 
+        String key = "key";
+        Integer value = new Integer(3);
         map.put(key,value);
         assertEquals(value, map.get(key) );
     }    
@@ -101,7 +84,7 @@ public class FlexiMapExample extends TestCase {
      * the basic Map will return null for that key:
      */
     public void testBasicMapReturnsNullForMissingKey() {
-        Map map = makeBasicMap();
+        Map<Object, Object> map = makeBasicMap();
         assertNull( map.get("key") );
     }    
 
@@ -110,7 +93,7 @@ public class FlexiMapExample extends TestCase {
      * some key: 
      */
     public void testBasicMapAllowsNull() {
-        Map map = makeBasicMap();
+        Map<Object, Object> map = makeBasicMap();
         Object key = "key";
         Object value = null;
         map.put(key,value);
@@ -122,7 +105,7 @@ public class FlexiMapExample extends TestCase {
      * and values of multiple or differing types:
      */
     public void testBasicMapAllowsMultipleTypes() {
-        Map map = makeBasicMap();
+        Map<Object, Object> map = makeBasicMap();
         map.put("key-1","value-1");
         map.put(new Integer(2),"value-2");
         map.put("key-3",new Integer(3));
@@ -140,7 +123,7 @@ public class FlexiMapExample extends TestCase {
      * stores the most recently put value for each key: 
      */
     public void testBasicMapStoresOnlyOneValuePerKey() {
-        Map map = makeBasicMap();
+        Map<Object, Object> map = makeBasicMap();
 
         assertNull( map.put("key","value-1") );
         assertEquals("value-1", map.get("key") );
@@ -157,7 +140,7 @@ public class FlexiMapExample extends TestCase {
      * like our old friend Hashtable: 
      */
     public void testForbidNull() {
-        Map map = makeNullForbiddenMap();
+        Map<Object, Object> map = makeNullForbiddenMap();
         
         map.put("key","value");
         map.put("key2", new Integer(2) );
@@ -177,7 +160,7 @@ public class FlexiMapExample extends TestCase {
      * want to treat it as zero.):  
      */
     public void testNullDefaultsToZero() {
-        Map map = makeDefaultValueForNullMap(new Integer(0));        
+        Map<Object, Object> map = makeDefaultValueForNullMap(new Integer(0));        
         /*
          * We expect 0 when no value has been associated with "key".
          */
@@ -194,7 +177,7 @@ public class FlexiMapExample extends TestCase {
      * that may be stored in the Map:
      */
 	public void testIntegerValuesOnly() {
-		Map map = makeTypeConstrainedMap(Integer.class);
+		Map<Object, Object> map = makeTypeConstrainedMap(Integer.class);
 		map.put("key", new Integer(2));        
 		assertEquals( new Integer(2), map.get("key") );
 		try {
@@ -215,12 +198,12 @@ public class FlexiMapExample extends TestCase {
      * previous value: 
      */
 	public void testMultiMap() {
-		Map map = makeMultiMap();
+		Map<Object, Object> map = makeMultiMap();
 
 		map.put("key", "value 1");
 		
 		{
-			Collection result = (Collection)(map.get("key"));
+			Collection<?> result = (Collection)(map.get("key"));
 			assertEquals(1,result.size());
 			assertEquals("value 1", result.iterator().next());
 		}
@@ -228,9 +211,9 @@ public class FlexiMapExample extends TestCase {
 		map.put("key", "value 2");
 
 		{
-			Collection result = (Collection)(map.get("key"));
+			Collection<?> result = (Collection)(map.get("key"));
 			assertEquals(2,result.size());
-			Iterator iter = result.iterator();
+			Iterator<?> iter = result.iterator();
 			assertEquals("value 1", iter.next());
 			assertEquals("value 2", iter.next());
 		}
@@ -238,9 +221,9 @@ public class FlexiMapExample extends TestCase {
 		map.put("key", "value 3");
 
 		{
-			Collection result = (Collection)(map.get("key"));
+			Collection<?> result = (Collection)(map.get("key"));
 			assertEquals(3,result.size());
-			Iterator iter = result.iterator();
+			Iterator<?> iter = result.iterator();
 			assertEquals("value 1", iter.next());
 			assertEquals("value 2", iter.next());
 			assertEquals("value 3", iter.next());
@@ -256,7 +239,7 @@ public class FlexiMapExample extends TestCase {
      * ExtendedProperties type.): 
      */
 	public void testStringConcatMap() {
-		Map map = makeStringConcatMap();
+		Map<Object, Object> map = makeStringConcatMap();
 		map.put("key", "value 1");
 		assertEquals("value 1",map.get("key"));
 		map.put("key", "value 2");
@@ -279,7 +262,7 @@ public class FlexiMapExample extends TestCase {
      * primary Map.put and Map.get methods here, although the remaining
      * Map methods could be handled similiarly.    
      */
-    static class FlexiMap implements Map {
+    static class FlexiMap<K,V> implements Map<K,V> {
 
         /*
          * Our FlexiMap will accept two BinaryFunctions, one 
@@ -287,10 +270,11 @@ public class FlexiMapExample extends TestCase {
          * and one that's used to transforms objects being retrieved 
          * from the map.
          */
-        public FlexiMap(BinaryFunction putfn, BinaryFunction getfn) {
+        @SuppressWarnings("unchecked")
+        public FlexiMap(BinaryFunction<Object,Object,V> putfn, BinaryFunction<Object,Object,V> getfn) {
             onPut = null == putfn ? RightIdentity.instance() : putfn;
             onGet = null == getfn ? RightIdentity.instance() : getfn;
-            proxiedMap = new HashMap();
+            proxiedMap = new HashMap<K,V>();
         }        
 
         
@@ -300,7 +284,7 @@ public class FlexiMapExample extends TestCase {
          * underlying Map.  We'll return whatever the function
          * returns.
          */
-        public Object get(Object key) {
+        public V get(Object key) {
             return onGet.evaluate( key, proxiedMap.get(key) );
         }
 
@@ -312,9 +296,10 @@ public class FlexiMapExample extends TestCase {
          * Since put returns the previously associated value, 
          * we'll invoke onGet here as well. 
          */
-        public Object put(Object key, Object value) {
+        @SuppressWarnings("unchecked")
+        public V put(Object key, Object value) {
             Object oldvalue = proxiedMap.get(key);
-            proxiedMap.put(key, onPut.evaluate(oldvalue, value));
+            proxiedMap.put((K) key, onPut.evaluate(oldvalue, value));
             return onGet.evaluate(key,oldvalue);
         }
 
@@ -334,7 +319,7 @@ public class FlexiMapExample extends TestCase {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
-        public Set entrySet() {
+        public Set<Entry<K, V>> entrySet() {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
@@ -342,15 +327,15 @@ public class FlexiMapExample extends TestCase {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
-        public Set keySet() {
+        public Set<K> keySet() {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
-        public void putAll(Map t) {
+        public void putAll(Map<? extends K, ? extends V> t) {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
-        public Object remove(Object key) {
+        public V remove(Object key) {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
@@ -358,13 +343,13 @@ public class FlexiMapExample extends TestCase {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
-        public Collection values() {
+        public Collection<V> values() {
             throw new UnsupportedOperationException("Left as an exercise for the reader.");
         }
 
-        private BinaryFunction onPut = null;
-        private BinaryFunction onGet = null;
-        private Map proxiedMap = null;
+        private BinaryFunction<Object,Object,V> onPut = null;
+        private BinaryFunction<Object,Object,V> onGet = null;
+        private Map<K,V> proxiedMap = null;
     }
 
     /*
@@ -378,16 +363,17 @@ public class FlexiMapExample extends TestCase {
      * Note that using a RightIdentity for onPut and onGet
      * would yield the same behavior. 
      */
-    private Map makeBasicMap() {
-        return new HashMap();
+    private Map<Object,Object> makeBasicMap() {
+        return new HashMap<Object,Object>();
     }
     
     /*
      * To prohibit null values, we'll only need to 
      * provide an onPut function.
      */
-    private Map makeNullForbiddenMap() {
-        return new FlexiMap(
+    @SuppressWarnings("unchecked")
+    private Map<Object, Object> makeNullForbiddenMap() {
+        return new FlexiMap<Object,Object>(
             /*
              * We simply ignore the left-hand argument,
              */
@@ -400,10 +386,7 @@ public class FlexiMapExample extends TestCase {
                      * we'll test for null,
                      */      
                     IsNull.instance(),
-                    /*
-                     * throwing a NullPointerException when the value is null,
-                     */      
-                    (UnaryFunction)throwNPE,
+                    throwNPE,
                     /*
                      * and passing through all non-null values.
                      */      
@@ -419,8 +402,9 @@ public class FlexiMapExample extends TestCase {
      * provide an onGet function, simliar to the onPut method used
      * above.
      */
-	private Map makeDefaultValueForNullMap(Object defaultValue) {
-		return new FlexiMap(
+	@SuppressWarnings("unchecked")
+  private Map<Object, Object> makeDefaultValueForNullMap(Object defaultValue) {
+		return new FlexiMap<Object, Object>(
             null,
             /*
              * We ignore the left-hand argument,
@@ -451,7 +435,8 @@ public class FlexiMapExample extends TestCase {
      * To constrain the value types, we'll 
      * provide an onPut function,
      */
-	private Map makeTypeConstrainedMap(Class clazz) {
+	@SuppressWarnings("unchecked")
+  private Map<Object, Object> makeTypeConstrainedMap(Class clazz) {
 		return new FlexiMap(
             /*
              * ignore the left-hand argument,
@@ -466,10 +451,7 @@ public class FlexiMapExample extends TestCase {
                      * and either pass the given value through,
                      */      
 					Identity.instance(),
-                    /*
-                     * or throw a ClassCastException.
-                     */      
-					(UnaryFunction)throwCCE
+                    throwCCE
 				)
 			),
 			null
@@ -481,13 +463,14 @@ public class FlexiMapExample extends TestCase {
      * need to consider both the old and new values during
      * onPut:
      */
-	private Map makeMultiMap() {
-		return new FlexiMap(
-			new BinaryFunction() {
-				public Object evaluate(Object oldval, Object newval) {
-					List list = null;
+	private Map<Object, Object> makeMultiMap() {
+		return new FlexiMap<Object,Object>(
+			new BinaryFunction<Object, Object, Object>() {
+				@SuppressWarnings("unchecked")
+        public Object evaluate(Object oldval, Object newval) {
+					List<Object> list = null;
 					if(null == oldval) {
-						list = new ArrayList();
+						list = new ArrayList<Object>();
 					} else {
 						list = (List)oldval;
 					}
@@ -502,7 +485,8 @@ public class FlexiMapExample extends TestCase {
     /*
      * The StringConcatMap is more interesting still.
      */
-	private Map makeStringConcatMap() {
+	@SuppressWarnings("unchecked")
+  private Map<Object, Object> makeStringConcatMap() {
 		return new FlexiMap(
             /*
              * The onPut function looks similiar to the MultiMap
@@ -529,9 +513,8 @@ public class FlexiMapExample extends TestCase {
 				public Object evaluate(Object key, Object val) {
 					if(null == val) {
 						return null;
-					} else {
-						return ((StringBuffer)val).toString();
 					}
+          return ((StringBuffer)val).toString();
 				}
 			}
 		);
@@ -545,8 +528,8 @@ public class FlexiMapExample extends TestCase {
      */
      
     private abstract class UniversalFunctor implements 
-        Procedure, UnaryProcedure, BinaryProcedure, 
-        Function, UnaryFunction, BinaryFunction {
+        Procedure, UnaryProcedure<Object>, BinaryProcedure<Object, Object>, 
+        Function<Object>, UnaryFunction<Object, Object>, BinaryFunction<Object, Object, Object> {
         public abstract void run();
 
         public void run(Object obj) {
@@ -570,13 +553,15 @@ public class FlexiMapExample extends TestCase {
     }
 
 	private UniversalFunctor throwNPE = new UniversalFunctor() {
-		public void run() {
+		@Override
+    public void run() {
 			throw new NullPointerException();
 		}
 	};
     
 	private UniversalFunctor throwCCE = new UniversalFunctor() {
-		public void run() {
+		@Override
+    public void run() {
 			throw new ClassCastException();
 		}
 	};

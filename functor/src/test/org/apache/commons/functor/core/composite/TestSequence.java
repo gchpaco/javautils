@@ -45,6 +45,7 @@ public class TestSequence extends BaseFunctorTest {
     // Functor Testing Framework
     // ------------------------------------------------------------------------
 
+    @Override
     protected Object makeFunctor() {
         return new Sequence(new NoOp(),new NoOp());
     }
@@ -52,10 +53,12 @@ public class TestSequence extends BaseFunctorTest {
     // Lifecycle
     // ------------------------------------------------------------------------
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
     }
@@ -87,7 +90,7 @@ public class TestSequence extends BaseFunctorTest {
     }
     
     public void testThen() throws Exception {
-        List list = new ArrayList();
+        List<RunCounter> list = new ArrayList<RunCounter>();
         Sequence seq = new Sequence();
         seq.run();        
         for(int i=0;i<10;i++) {
@@ -96,7 +99,7 @@ public class TestSequence extends BaseFunctorTest {
             list.add(counter);
             seq.run();
             for(int j=0;j<list.size();j++) {
-                assertEquals(list.size()-j,(((RunCounter)(list.get(j))).count));
+                assertEquals(list.size()-j,((list.get(j)).count));
             }
         }
     }

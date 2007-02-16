@@ -45,17 +45,20 @@ public class TestBinarySequence extends BaseFunctorTest {
     // Functor Testing Framework
     // ------------------------------------------------------------------------
 
+    @Override
     protected Object makeFunctor() {
-        return new BinarySequence(new NoOp(),new NoOp());
+        return new BinarySequence<Object, Object>(new NoOp(),new NoOp());
     }
 
     // Lifecycle
     // ------------------------------------------------------------------------
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     public void tearDown() throws Exception {
         super.tearDown();
     }
@@ -64,14 +67,14 @@ public class TestBinarySequence extends BaseFunctorTest {
     // ------------------------------------------------------------------------
     
     public void testRunZero() throws Exception {
-        BinarySequence seq = new BinarySequence();
+        BinarySequence<String, String> seq = new BinarySequence<String, String>();
         seq.run(null,null);
         seq.run("xyzzy","xyzzy");
     }
 
     public void testRunOne() throws Exception {
         RunCounter counter = new RunCounter();
-        BinarySequence seq = new BinarySequence(counter);
+        BinarySequence<String, String> seq = new BinarySequence<String, String>(counter);
         assertEquals(0,counter.count);
         seq.run(null,null);
         assertEquals(1,counter.count);
@@ -81,7 +84,7 @@ public class TestBinarySequence extends BaseFunctorTest {
 
     public void testRunTwo() throws Exception {
         RunCounter[] counter = { new RunCounter(), new RunCounter() };
-        BinarySequence seq = new BinarySequence(counter[0],counter[1]);
+        BinarySequence<Object, Object> seq = new BinarySequence<Object, Object>(counter[0],counter[1]);
         assertEquals(0,counter[0].count);
         assertEquals(0,counter[1].count);
         seq.run(null,null);
@@ -93,8 +96,8 @@ public class TestBinarySequence extends BaseFunctorTest {
     }
     
     public void testThen() throws Exception {
-        List list = new ArrayList();
-        BinarySequence seq = new BinarySequence();
+        List<RunCounter> list = new ArrayList<RunCounter>();
+        BinarySequence<Object, Object> seq = new BinarySequence<Object, Object>();
         seq.run(null,null);        
         for(int i=0;i<10;i++) {
             RunCounter counter = new RunCounter();
@@ -102,15 +105,15 @@ public class TestBinarySequence extends BaseFunctorTest {
             list.add(counter);
             seq.run("xyzzy","xyzzy");
             for(int j=0;j<list.size();j++) {
-                assertEquals(list.size()-j,(((RunCounter)(list.get(j))).count));
+                assertEquals(list.size()-j,((list.get(j)).count));
             }
         }
     }
     
     public void testEquals() throws Exception {
-        BinarySequence p = new BinarySequence();
+        BinarySequence<?,?> p = new BinarySequence<Object,Object>();
         assertEquals(p,p);
-        BinarySequence q = new BinarySequence();
+        BinarySequence<?,?> q = new BinarySequence<Object,Object>();
         assertObjectsAreEqual(p,q);
 
         for(int i=0;i<3;i++) {
@@ -118,9 +121,9 @@ public class TestBinarySequence extends BaseFunctorTest {
             assertObjectsAreNotEqual(p,q);
             q.then(new NoOp());
             assertObjectsAreEqual(p,q);
-            p.then(new BinarySequence(new NoOp(),new NoOp()));
+            p.then(new BinarySequence<Object,Object>(new NoOp(),new NoOp()));
             assertObjectsAreNotEqual(p,q);            
-            q.then(new BinarySequence(new NoOp(),new NoOp()));
+            q.then(new BinarySequence<Object,Object>(new NoOp(),new NoOp()));
             assertObjectsAreEqual(p,q);            
         }
                 
@@ -130,7 +133,7 @@ public class TestBinarySequence extends BaseFunctorTest {
     // Classes
     // ------------------------------------------------------------------------
     
-    static class RunCounter implements BinaryProcedure {        
+    static class RunCounter implements BinaryProcedure<Object,Object> {        
         public void run(Object a, Object b) {
             count++;    
         }        

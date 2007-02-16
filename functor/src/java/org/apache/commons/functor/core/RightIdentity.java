@@ -77,8 +77,8 @@ public final class RightIdentity<T> implements BinaryPredicate<Object,T>, Binary
     // static methods
     // ------------------------------------------------------------------------
     @SuppressWarnings("unchecked")
-    public static <T> RightIdentity<T> instance() {
-        return (RightIdentity<T>) INSTANCE;
+    public static RightIdentity instance() {
+        return INSTANCE;
     }
     
     // static attributes
