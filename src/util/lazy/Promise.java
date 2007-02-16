@@ -1,24 +1,24 @@
 package util.lazy;
 import org.apache.commons.functor.*;
 
-public class Promise<T> implements Function
+public class Promise<T> implements Function<T>
 {
-    private Function c;
+    private Function<? extends T> c;
     private T value;
 
-    protected Promise(Function closure) { c = closure; value = null; }
+    protected Promise(Function<? extends T> closure) { c = closure; value = null; }
     public T force()
     {
 	if (value == null)
-	    value = (T) c.evaluate ();
+	    value = c.evaluate ();
 	return value;
     }
     public T evaluate ()
     {
 	return force ();
     }
-    public static Promise delay(Function closure)
+    public static <T> Promise<T> delay(Function<? extends T> closure)
     {
-	return new Promise(closure);
+	return new Promise<T>(closure);
     }
 }

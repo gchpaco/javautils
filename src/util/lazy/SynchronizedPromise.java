@@ -3,12 +3,12 @@ import org.apache.commons.functor.*;
 
 public class SynchronizedPromise<T> extends Promise<T>
 {
-    protected SynchronizedPromise(Function closure) {super(closure);}
+    protected SynchronizedPromise(Function<? extends T> closure) {super(closure);}
     
     @Override
     public synchronized T force() { return super.force(); }
-    public static SynchronizedPromise delay(Function closure)
+    public static <T> SynchronizedPromise<T> delay(Function<? extends T> closure)
     {
-	return new SynchronizedPromise(closure);
+	return new SynchronizedPromise<T>(closure);
     }
 }

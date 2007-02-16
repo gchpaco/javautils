@@ -12,8 +12,7 @@ final class Nil<T> extends StreamCell<T> {
     private Nil() {
     }
 
-    @SuppressWarnings("unchecked")
-    static Nil nil = new Nil();
+    static Nil<Object> nil = new Nil<Object>();
 
     @Override
     public boolean isEmpty() {
@@ -39,7 +38,8 @@ final class Cons<T> extends StreamCell<T> {
 
 // BTW, yes, using this is horrible. I'm sorry.
 public class Stream<T> extends Promise<StreamCell<T>> {
-    protected Stream(Function c) {
+
+    protected Stream(Function<? extends StreamCell<T>> c) {
         super(c);
     }
 
@@ -47,7 +47,7 @@ public class Stream<T> extends Promise<StreamCell<T>> {
         final Pair<T, Stream<T>> p = t.uncons();
         if (p == null)
             return t;
-        return cons(p.first, new Function() {
+        return cons(p.first, new Function<Stream<T>>() {
             public Stream<T> evaluate() {
                 return p.second.concatenate(t);
             }
@@ -60,7 +60,7 @@ public class Stream<T> extends Promise<StreamCell<T>> {
         final Pair<T, Stream<T>> p = uncons();
         if (p == null)
             return this;
-        return cons(p.first, new Function() {
+        return cons(p.first, new Function<Stream<T>>() {
             public Stream<T> evaluate () {
                 return p.second.take(n - 1);
             }
@@ -116,39 +116,39 @@ public class Stream<T> extends Promise<StreamCell<T>> {
     }
 
     public static <T> Stream<T> cons(final T head, final Stream<T> rest) {
-        return Stream.delayS(new Function() {
+        return Stream.delayS(new Function<StreamCell<T>>() {
             public StreamCell<T> evaluate() {
                 return new Cons<T>(head, rest);
             }
         });
     }
 
-    public static <T> Stream<T> cons(final Function head, final Stream<T> rest) {
-        return Stream.delayS(new Function () {
+    public static <T> Stream<T> cons(final Function<T> head, final Stream<T> rest) {
+        return Stream.delayS(new Function<StreamCell<T>> () {
             public StreamCell<T> evaluate () {
-                return new Cons<T>((T) head.evaluate (), rest);
+                return new Cons<T>(head.evaluate (), rest);
             }
         });
     }
 
-    public static <T> Stream<T> cons(final T head, final Function rest) {
-        return Stream.delayS(new Function () {
+    public static <T> Stream<T> cons(final T head, final Function<Stream<T>> rest) {
+        return Stream.delayS(new Function<StreamCell<T>> () {
             @SuppressWarnings("unchecked")
             public StreamCell<T> evaluate() {
-                return new Cons<T>(head, (Stream<T>) rest.evaluate());
+                return new Cons<T>(head, rest.evaluate());
             }
         });
     }
 
-    public static <T> Stream<T> cons(final Function head, final Function rest) {
-        return Stream.delayS(new Function() {
+    public static <T> Stream<T> cons(final Function<T> head, final Function<Stream<T>> rest) {
+        return Stream.delayS(new Function<StreamCell<T>>() {
             public StreamCell<T> evaluate() {
-                return new Cons<T>((T) head.evaluate(), (Stream<T>) rest.evaluate());
+                return new Cons<T>(head.evaluate(), rest.evaluate());
             }
         });
     }
 
-    protected static <U> Stream<U> delayS(Function closure) {
+    protected static <U> Stream<U> delayS(Function<StreamCell<U>> closure) {
         return new Stream<U>(closure);
     }
 
