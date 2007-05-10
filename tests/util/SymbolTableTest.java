@@ -80,4 +80,22 @@ public class SymbolTableTest {
         map.put (1, 1); map.put (2, 2);
         table.putAll (map);
     }
+
+    @Test(expectedExceptions={IllegalStateException.class})
+    public void popBeforePush () {
+        table.pop ();
+    }
+
+    @Test(expectedExceptions={IllegalStateException.class})
+    public void popAfterClear () {
+        table.push ();
+        table.push ();
+        table.clear ();
+        table.pop ();
+    }
+
+    public void pushing () {
+        table.push ();
+        table.pop ();
+    }
 }

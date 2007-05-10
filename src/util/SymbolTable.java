@@ -4,6 +4,8 @@ import java.util.*;
 
 public class SymbolTable implements Map {
     HashMap base = new HashMap ();
+    int level = 0;
+
     public boolean isEmpty () { return base.isEmpty (); }
     public int size () { return base.size (); }
     public boolean containsKey(Object key) { return base.containsKey (key); }
@@ -17,6 +19,13 @@ public class SymbolTable implements Map {
     public void bind(Object key) {
         base.put (key, null);
     }
+    public void push () {
+        level++;
+    }
+    public void pop () {
+        if (level == 0)
+            throw new IllegalStateException ("too many pops");
+    }
     public Object remove(Object key) { return base.remove (key); }
     public void putAll(Map map) {
         for (Object o : map.entrySet ()) {
@@ -24,7 +33,7 @@ public class SymbolTable implements Map {
             put (entry.getKey (), entry.getValue ());
         }
     }
-    public void clear() { base.clear (); }
+    public void clear() { level = 0; base.clear (); }
     public Set keySet() { return base.keySet (); }
     public Collection values() { return base.values (); }
     public Set entrySet() { return base.entrySet (); }
