@@ -8,7 +8,7 @@ import static org.testng.AssertJUnit.*;
 @Test
 public class SymbolTableTest {
     SymbolTable table;
-    @BeforeTest
+    @BeforeMethod
     private void setUp () {
         table = new SymbolTable ();
     }
@@ -49,6 +49,14 @@ public class SymbolTableTest {
             };
         assertEquals (Collections.singleton (entry), table.entrySet ());
         table.remove (key);
+        emptyTable ();
+    }
+
+    public void multiples () {
+        table.bind (1); table.bind (2);
+        table.put (1, 1); table.put (2, 2);
+        assertEquals (2, table.size ());
+        table.clear ();
         emptyTable ();
     }
 }

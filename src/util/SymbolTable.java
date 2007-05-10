@@ -13,7 +13,7 @@ public class SymbolTable implements Map {
     public void bind(Object key) {}
     public Object remove(Object key) { return base.remove (key); }
     public void putAll(Map map) {}
-    public void clear() {}
+    public void clear() { base.clear (); }
     public Set keySet() { return base.keySet (); }
     public Collection values() { return base.values (); }
     public Set entrySet() { return base.entrySet (); }
