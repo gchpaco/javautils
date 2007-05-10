@@ -19,5 +19,9 @@ public class SymbolTableTest {
         assertEquals (0, table.size ());
         assertNotNull (table.keySet ());
         assertTrue (table.keySet ().isEmpty ());
+        assertNotNull (table.values ());
+        assertTrue (table.values ().isEmpty ());
+        assertNotNull (table.entrySet ());
+        assertTrue (table.entrySet ().isEmpty ());
     }
 }

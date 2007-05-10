@@ -13,6 +13,6 @@ public class SymbolTable implements Map {
     public void putAll(Map map) {}
     public void clear() {}
     public Set keySet() { return Collections.emptySet (); }
-    public Collection values() { return null; }
-    public Set entrySet() { return null; }
+    public Collection values() { return Collections.emptySet (); }
+    public Set entrySet() { return Collections.emptySet (); }
 }
