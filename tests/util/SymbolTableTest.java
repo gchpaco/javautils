@@ -17,5 +17,7 @@ public class SymbolTableTest {
         assertTrue (table instanceof Map);
         assertTrue (table.isEmpty ());
         assertEquals (0, table.size ());
+        assertNotNull (table.keySet ());
+        assertTrue (table.keySet ().isEmpty ());
     }
 }
