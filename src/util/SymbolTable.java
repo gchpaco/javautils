@@ -9,10 +9,21 @@ public class SymbolTable implements Map {
     public boolean containsKey(Object key) { return base.containsKey (key); }
     public boolean containsValue(Object value) { return base.containsValue (value); }
     public Object get(Object key) { return base.get (key); }
-    public Object put(Object key, Object value) { return base.put (key, value); }
-    public void bind(Object key) {}
+    public Object put(Object key, Object value) {
+        if (!containsKey (key))
+            throw new IllegalArgumentException ("unbound key");
+        return base.put (key, value);
+    }
+    public void bind(Object key) {
+        base.put (key, null);
+    }
     public Object remove(Object key) { return base.remove (key); }
-    public void putAll(Map map) { base.putAll (map); }
+    public void putAll(Map map) {
+        for (Object o : map.entrySet ()) {
+            Map.Entry entry = (Map.Entry) o;
+            put (entry.getKey (), entry.getValue ());
+        }
+    }
     public void clear() { base.clear (); }
     public Set keySet() { return base.keySet (); }
     public Collection values() { return base.values (); }

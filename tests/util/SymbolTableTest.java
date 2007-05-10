@@ -61,9 +61,23 @@ public class SymbolTableTest {
     }
 
     public void putAll () {
+        table.bind (1); table.bind (2);
         Map map = new TreeMap ();
         map.put (1, 1); map.put (2, 2);
         table.putAll (map);
         assertEquals (2, table.size ());
+    }
+
+    @Test(expectedExceptions={IllegalArgumentException.class})
+    public void putBeforeBind () {
+        table.put (1, 1);
+    }
+
+    @Test(expectedExceptions={IllegalArgumentException.class})
+    public void putAllBeforeBind () {
+        table.bind (1); // 2 not bound
+        Map map = new TreeMap ();
+        map.put (1, 1); map.put (2, 2);
+        table.putAll (map);
     }
 }
