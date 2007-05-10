@@ -59,4 +59,11 @@ public class SymbolTableTest {
         table.clear ();
         emptyTable ();
     }
+
+    public void putAll () {
+        Map map = new TreeMap ();
+        map.put (1, 1); map.put (2, 2);
+        table.putAll (map);
+        assertEquals (2, table.size ());
+    }
 }
