@@ -3,16 +3,18 @@ package util;
 import java.util.*;
 
 public class SymbolTable implements Map {
-    public boolean isEmpty () { return true; }
-    public int size () { return 0; }
-    public boolean containsKey(Object key) { return false; }
-    public boolean containsValue(Object value) { return false; }
-    public Object get(Object key) { return null; }
-    public Object put(Object key, Object value) { return null; }
-    public Object remove(Object key) { return null; }
+    HashMap base = new HashMap ();
+    public boolean isEmpty () { return base.isEmpty (); }
+    public int size () { return base.size (); }
+    public boolean containsKey(Object key) { return base.containsKey (key); }
+    public boolean containsValue(Object value) { return base.containsValue (value); }
+    public Object get(Object key) { return base.get (key); }
+    public Object put(Object key, Object value) { return base.put (key, value); }
+    public void bind(Object key) {}
+    public Object remove(Object key) { return base.remove (key); }
     public void putAll(Map map) {}
     public void clear() {}
-    public Set keySet() { return Collections.emptySet (); }
-    public Collection values() { return Collections.emptySet (); }
-    public Set entrySet() { return Collections.emptySet (); }
+    public Set keySet() { return base.keySet (); }
+    public Collection values() { return base.values (); }
+    public Set entrySet() { return base.entrySet (); }
 }
