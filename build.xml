@@ -21,7 +21,15 @@
     <delete dir="${build}" />
   </target>
 
-  <target name="functor">
+  <target name="functor.flag">
+    <uptodate property="build.functor.notRequired"
+              targetfile="lib/commons-functor.jar">
+      <srcfiles dir="functor" includes="**/*.java"/>
+    </uptodate>
+  </target>
+
+  <target name="functor" depends="functor.flag"
+          unless="build.functor.notRequired">
     <ant antfile="build.xml" dir="functor" target="dist">
       <property name="junit.jar" location="lib/junit-3.8.1.jar"/>
       <property name="classpath" value="value"/>
@@ -48,8 +56,8 @@
   <target name="dist" depends="compile">
     <jar destfile="${build}/javautils.jar">
       <fileset dir="${build}">
-	<exclude name="**/*Test*"/>
-	<exclude name="**/javautils.jar"/>
+        <exclude name="**/*Test*"/>
+        <exclude name="**/javautils.jar"/>
       </fileset>
     </jar>
     <copy todir="${build}">
