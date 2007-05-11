@@ -98,4 +98,28 @@ public class SymbolTableTest {
         table.push ();
         table.pop ();
     }
+
+    public void previousBindingsRetained () {
+        table.bind (1);
+        table.put (1, 2);
+        table.push ();
+        assertFalse (table.isEmpty ());
+        assertEquals (2, table.get (1));
+        table.put (1, 4);
+        assertEquals (4, table.get (1));
+        table.pop ();
+        assertEquals (4, table.get (1));
+    }
+
+    public void rebindingsNotPropagated () {
+        table.bind (1);
+        table.put (1, 2);
+        table.push ();
+        table.bind (1);
+        assertEquals (null, table.get (1));
+        table.put (1, 4);
+        assertEquals (4, table.get (1));
+        table.pop ();
+        assertEquals (2, table.get (1));
+    }
 }
