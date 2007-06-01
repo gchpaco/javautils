@@ -28,9 +28,9 @@ public class Parser<NT, T>
         public ParseException (Throwable cause)
           {
             super (cause);
-          } 
+          }
       }
-    
+
     Table<NT, T, List<?>> table;
     LinkedList<Object> stack;
     NT start;
@@ -62,10 +62,10 @@ public class Parser<NT, T>
     public void tossUntil (T token)
       {
         while (!stack.isEmpty () && !stack.peek ().equals (token))
-	  stack.removeFirst ();
-	if (!stack.isEmpty ()) stack.removeFirst ();
+          stack.removeFirst ();
+        if (!stack.isEmpty ()) stack.removeFirst ();
       }
-    
+
     @SuppressWarnings("unchecked")
     public void witness (T token)
       {
@@ -87,24 +87,30 @@ public class Parser<NT, T>
                 continue;
               }
             NT top = (NT) obj;
-            Collection<Pair<SemanticPredicate, List<?>>> possibilities = table.get (top, token);
-            List<?> candidate = null;
-            for (Pair<SemanticPredicate, List<?>> possibility : possibilities)
-              {
-                if (possibility.first == null || possibility.first.apply ())
-                  {
-                    if (candidate != null)
-                      throw new ParseException ("Ambiguous parse for " + token + " in state " + top);
-                    candidate = possibility.second;
-                  }
-              }
-            if (candidate == null)
-              throw new ParseException ("No legal parse for " + token + " in state " + top);
-            stack.addAll (0, candidate);
+            stack.addAll (0, choosePossibility (table.get (top, token),
+                                                token, top));
           }
         stack.removeFirst ();
       }
-    
+
+    protected List<?> choosePossibility (Collection<Pair<SemanticPredicate,
+                                         List<?>>> possibilities, T token,
+                                         NT top)
+    {
+        List<?> candidate = null;
+        for (Pair<SemanticPredicate, List<?>> possibility : possibilities)
+            if (possibility.first == null || possibility.first.apply ()) {
+                if (candidate != null)
+                    throw new ParseException ("Ambiguous parse for " + token +
+                                              " in state " + top);
+                candidate = possibility.second;
+            }
+        if (candidate == null)
+            throw new ParseException ("No legal parse for " + token +
+                                      " in state " + top);
+        return candidate;
+    }
+
     public void witness (T... tokens)
       {
         for (T token : tokens)
