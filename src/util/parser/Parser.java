@@ -72,26 +72,29 @@ public class Parser<NT, T>
         while (!stack.peek ().equals (token))
           {
             Object obj = stack.removeFirst ();
-            if (obj instanceof SemanticPredicate)
-              {
-                // real belt-and-suspenders stuff here, in theory this should already have been checked, but can't hurt to be sure
-                SemanticPredicate pred = (SemanticPredicate) obj;
-                if (pred.apply ())
-                  continue;
-                throw new ParseException ("Semantic predicate " + pred + " failed during execution");
-              }
-            else if (obj instanceof Closure)
-              {
+            if (obj instanceof SemanticPredicate) {
+                if (checkPredicate ((SemanticPredicate) obj))
+                    continue;
+                else
+                    throw new ParseException ("Semantic predicate " + obj +
+                                              " failed during execution");
+            } else if (obj instanceof Closure) {
                 Closure cls = (Closure) obj;
                 cls.apply ();
                 continue;
-              }
-            NT top = (NT) obj;
-            stack.addAll (0, choosePossibility (table.get (top, token),
-                                                token, top));
+            } else {
+                NT top = (NT) obj;
+                stack.addAll (0, choosePossibility (table.get (top, token),
+                                                    token, top));
+            }
           }
         stack.removeFirst ();
       }
+
+    protected boolean checkPredicate (SemanticPredicate pred)
+    {
+        return pred.apply ();
+    }
 
     protected List<?> choosePossibility (Collection<Pair<SemanticPredicate,
                                          List<?>>> possibilities, T token,
