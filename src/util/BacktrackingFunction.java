@@ -3,6 +3,9 @@
  */
 package util;
 
-public interface BacktrackingFunction<T, U> extends Function<T, Pair<T, U>> {
-	public T empty ();
+import net.sf.jga.fn.BinaryFunctor;
+
+public abstract class BacktrackingFunction<T, U> extends BinaryFunctor<T, U, T>
+{
+  public abstract T empty ();
 }

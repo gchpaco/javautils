@@ -1,7 +1,7 @@
 package util.parser;
 
-import util.Closure;
+import net.sf.jga.fn.Generator;
 
-public interface SemanticPredicate extends Closure<Boolean>
-  {
-  }
+public abstract class SemanticPredicate extends Generator<Boolean>
+{
+}

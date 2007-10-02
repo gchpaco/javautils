@@ -2,15 +2,18 @@ package util.purefun;
 
 import java.util.Collection;
 
-import util.*;
+import net.sf.jga.fn.BinaryFunctor;
+import net.sf.jga.fn.UnaryFunctor;
+import util.Pair;
+import util.TernaryFunctor;
 
-public abstract class AbstractAssociation<T,U> implements Association<T,U>
-  {
+public abstract class AbstractAssociation<T, U> implements Association<T, U>
+{
 
-  public Association<T, U> adjust (Function<U, U> f, T t)
+  public Association<T, U> adjust (UnaryFunctor<U, U> f, T t)
     {
       U u = lookup (t);
-      return delete (t).insert (t, f.apply (u));
+      return delete (t).insert (t, f.fn (u));
     }
 
   public Association<T, U> delete (T... ts)
@@ -21,27 +24,37 @@ public abstract class AbstractAssociation<T,U> implements Association<T,U>
       return value;
     }
 
-  public Association<T, U> filter (final Function<Boolean, U> f)
+  public Association<T, U> filter (final UnaryFunctor<U, Boolean> f)
     {
-      return foldKeysValues (new Function<Association<T,U>, Triple<T, U, Association<T,U>>> () {
-        public Association<T, U> apply (Triple<T, U, Association<T, U>> arg)
-          {
-            if (f.apply (arg.second))
-              return arg.third.insert (arg.first, arg.second);
-            return arg.third;
-          }
-      }, empty ());
+      return foldKeysValues (
+                             new TernaryFunctor<T, U, Association<T, U>, Association<T, U>> ()
+                               {
+                                 @SuppressWarnings ("unchecked")
+                                 @Override
+                                 public Association<T, U> fn (
+                                                              T t,
+                                                              U u,
+                                                              Association<T, U> a)
+                                   {
+                                     if (f.fn (u)) return a.insert (t, u);
+                                     return a;
+                                   }
+                               }, empty ());
     }
-  
-  public <V> V fold (final Function<V, Pair<U, V>> f, V start)
-  {
-    return foldKeysValues (new Function<V, Triple<T, U, V>> () {
-      public V apply (Triple<T, U, V> arg)
+
+  public <V> V fold (final BinaryFunctor<U, V, V> f, V start)
+    {
+      return foldKeysValues (new TernaryFunctor<T, U, V, V> ()
         {
-          return f.apply (Pair.make (arg.second, arg.third));
-        }
-    }, start);
-  }
+          @SuppressWarnings ("unchecked")
+          @Override
+          public V fn (@SuppressWarnings ("unused")
+          T t, U u, V v)
+            {
+              return f.fn (u, v);
+            }
+        }, start);
+    }
 
   public Association<T, U> insert (Collection<Pair<T, U>> seq)
     {
@@ -70,16 +83,29 @@ public abstract class AbstractAssociation<T,U> implements Association<T,U>
       return u2 == null ? u : u2;
     }
 
-  public Pair<Association<T, U>, Association<T, U>> partition (final Function<Boolean, U> f)
+  public Pair<Association<T, U>, Association<T, U>> partition (
+                                                               final UnaryFunctor<U, Boolean> f)
     {
-      return foldKeysValues (new Function<Pair<Association<T, U>, Association<T, U>>, Triple<T, U, Pair<Association<T, U>, Association<T, U>>>> () {
-        public Pair<Association<T, U>, Association<T, U>> apply (Triple<T, U, Pair<Association<T, U>, Association<T, U>>> arg)
-          {
-            if (f.apply (arg.second))
-              return Pair.make (arg.third.first.insert (arg.first, arg.second),arg.third.second);
-            return Pair.make (arg.third.first,arg.third.second.insert (arg.first, arg.second));
-          }
-      }, Pair.make (empty (), empty ()));
+      return foldKeysValues (
+                             new TernaryFunctor<T, U, Pair<Association<T, U>, Association<T, U>>, Pair<Association<T, U>, Association<T, U>>> ()
+                               {
+                                 @Override
+                                 public Pair<Association<T, U>, Association<T, U>> fn (
+                                                                                       T t,
+                                                                                       U u,
+                                                                                       Pair<Association<T, U>, Association<T, U>> pair)
+                                   {
+                                     if (f.fn (u))
+                                       return Pair.make (pair.first.insert (t,
+                                                                            u),
+                                                         pair.second);
+                                     return Pair
+                                                .make (
+                                                       pair.first,
+                                                       pair.second
+                                                                  .insert (t, u));
+                                   }
+                               }, Pair.make (empty (), empty ()));
     }
 
   public Association<T, U> unionWith (Association<T, U>... seq)
@@ -100,8 +126,7 @@ public abstract class AbstractAssociation<T,U> implements Association<T,U>
 
   public int count (T t)
     {
-      if (lookup (t) != null)
-        return 1;
+      if (lookup (t) != null) return 1;
       return 0;
     }
-  }
+}
