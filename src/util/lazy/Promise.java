@@ -1,24 +1,33 @@
 package util.lazy;
-import org.apache.commons.functor.*;
 
-public class Promise<T> implements Function<T>
+import net.sf.jga.fn.Generator;
+
+public class Promise<T> extends Generator<T>
 {
-    private Function<? extends T> c;
-    private T value;
+  private static final long serialVersionUID = 1L;
+  private final Generator<? extends T> c;
+  private T value;
 
-    protected Promise(Function<? extends T> closure) { c = closure; value = null; }
-    public T force()
+  protected Promise (Generator<? extends T> closure)
     {
-	if (value == null)
-	    value = c.evaluate ();
-	return value;
+      c = closure;
+      value = null;
     }
-    public T evaluate ()
+
+  public T force ()
     {
-	return force ();
+      if (value == null) value = c.eval ();
+      return value;
     }
-    public static <T> Promise<T> delay(Function<? extends T> closure)
+
+  @Override
+  public T gen ()
     {
-	return new Promise<T>(closure);
+      return force ();
+    }
+
+  public static <T> Promise<T> delay (Generator<? extends T> closure)
+    {
+      return new Promise<T> (closure);
     }
 }
