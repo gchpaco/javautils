@@ -1,0 +1,120 @@
+JGA 0.7 Source Installation
+  using JavaCC 3.2
+
+(turn word-wrap on)
+
+
+
+Downloads
+---------
+Links to JGA downloads are at http://jga.sourceforge.net, the current SourceForge download page for the project is 
+https://sourceforge.net/project/showfiles.php?group_id=49942&package_id=43377&release_id=318321
+
+JavaCC is hosted on java.net at https://javacc.dev.java.net/
+
+	Files
+	-----
+	JGA source: jga-0.7-src.jar 
+	JavaCC binary: javacc-3.2.zip
+
+
+
+
+Unpack JGA source into a directory using a ZIP tool (WinZip) or from the command line,
+  jar xf jga-0.7-src.jar
+
+The location will be referred to as JGA_HOME in this doc.
+
+Unpack JavaCC into a separate directory; the location will be referred to as JAVACC_HOME in this doc.
+
+
+
+Ant Setup
+---------
+The JGA source download includes a build.xml file to build the project using Ant. 
+
+The build.xml file that ships with the source checks for a property called JAVACC_HOME which it uses to locate the JavaCC compiler. Near the top of the build file, you'll find
+<property name="javacc.home" value="${JAVACC_HOME}"/>
+
+which declares a local property, javacc.home, to point to a separate property, JAVACC_HOME. To make this easier, we'll add a line above that property declaration for our JavaCC home directory
+<property name="JAVACC_HOME" value="<path-to-javacc-3.2>"/>
+<property name="javacc.home" value="${JAVACC_HOME}"/>
+
+You don't need to do this if you already have JAVACC_HOME in your environment; you can also write a build.properties text file with this environment variable, and pull that into the Ant script.
+
+
+
+Building
+--------
+From the command line, switch to the JGA_HOME directory and type
+ant build
+
+To build the jars, use
+ant jar
+
+
+
+NetBeans
+--------
+You can load JGA as a NetBeans project. Following are the instructions for setting this up with NetBeans 4.1.
+
+Install JGA 0.7, as described above.
+1) Open NetBeans 4.1 and from the File menu, choose New Project
+2) Pick the General category in the Categories list then choose "Java Project with Existing Ant Script" from the Projects list.
+3) Click Next
+4) In the Location field, enter the absolute path to your JGA_HOME directory; click browse to open a file browser
+5) After entering the location, the build script (build.xml in JGA_HOME), project name and project folder will be automatically filled in
+6) Click Next. 
+7) The build file will be scanned and the targets associated with NetBeans commands (build, clean, etc.) Check out the mappings, they should be OK.
+8) Click Next
+9) Next to Source Package Folders, click Add Folder. Add the following folders:
+   - source
+   - parser
+   - tools
+   - examples
+
+   Leave the test packages alone (CORRECT_ME).
+
+10) Click Next.
+11) You can add classpath entries here--none are necessary. 
+12) Click Finish.
+
+You're almost done, but need to add the output directories.
+   Right-click on the project menu, and choose Properties. 
+   Under Categories, click Output. 
+   Click the Add JAR/Folder button.
+   Drill down to JGA_HOME/build/classes
+   Click OK
+
+You can also mount JavaDoc output.
+   Run the JavaDoc target first. That will create the doc/javadoc directory.
+   Right-click on the project menu, and choose Properties. 
+   Under Categories, click Output. 
+   Click the Browse button next to the JavaDoc Output field.
+   Drill down to JGA_HOME/doc/javadoc
+   Click OK
+
+To close the Properties window, click OK.
+
+Your project is now set up. In the Project view, you can right-click on the jga project and choose to build, clean, etc. 
+
+To create the JGA project jar, right-click on the build.xml file, choose Run Target, then jar. You can add this to your project context menu as follows
+  - Right-click the jga project, and choose Properties from the context menu
+  - Click Build and Run
+  - Click the Add button. A new row is added in the custom targets table.
+  - In the Ant Target column, type "jar" (no quotes :))
+  - in the Label column, type "Build distribution JAR"--or whatever; this appears in the context menu
+  - Click OK
+
+The "Build distribution JAR" now appears in the project's context menu.
+
+You can look through the build.xml file and add other custom targets the same way.
+
+
+Debugging with NetBeans 4.1
+---------------------------
+
+
+
+
+

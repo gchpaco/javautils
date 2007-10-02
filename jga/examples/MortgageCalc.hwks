@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<hacksheet vers="0.1.0" rows="4" cols="2">
+<cell row="3" col="0" type="java.lang.String" editable="true">
+<formula>"Payment Amount"</formula>
+</cell>
+<cell row="1" col="0" type="java.lang.String" editable="true">
+<formula>"APR"</formula>
+</cell>
+<cell id="Principle" row="0" col="1" type="java.lang.Double" editable="true">
+<formula>1000.00D</formula>
+</cell>
+<cell id="Interest" row="1" col="1" type="java.lang.Double" editable="true">
+<formula>0.06</formula>
+</cell>
+<cell id="Payments" row="2" col="1" type="java.lang.Double" editable="true">
+<formula>2.0</formula>
+</cell>
+<cell row="3" col="1" type="java.lang.Double" editable="true">
+<formula>cell("Interest") / 12.0 * cell("Principle") / (1.0 - Math.pow(1.0+cell("Interest")/12.0,(-cell("Payments") * 12.0)))</formula>
+</cell>
+<cell row="2" col="0" type="java.lang.String" editable="true">
+<formula>"#Years"</formula>
+</cell>
+<cell row="0" col="0" type="java.lang.String" editable="true">
+<formula>"Loan Amount"</formula>
+</cell>
+</hacksheet>

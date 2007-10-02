@@ -1,0 +1,610 @@
+Generic Algorithms for Java (tm) change log
+===========================================
+
+changes from 0.7 to 0.8
+
+1) License Changes
+
+   JGA is now distributed under two licenses: the CDDL and the LGPL.
+   Included in the distribution is a new pair of binary jars, that
+   are distributable under each license separately.
+
+2) Reorganizing net.sf.jga.util package
+
+   The three classes (Algorithms, Iterators, Iterables) in the util 
+   package that provided the algorithm facades are being recorgainzed
+   to make sure that 1) new users can more easily find the functionality
+   that is available; and 2) coverage of multiple types of data storage is
+   complete and consistent.
+
+   Now, functionality is organized by the type of algorithm(s) being 
+   supplied, and not by the structure of the input.
+
+   The old facade class methods have been deprecated and will be removed in a 
+   future release.  Functionality that has not been moved in time for 
+   the 0.8 release may be moved in the future; if so, those methods will be
+   deprecated in a future release but retained until 0.9.
+
+3) Added static builder methods for nearly all of the functors
+
+   Many of the functors in the adaptor package were already available via   
+   convenient composition methods in the Generator, UnaryFunctor, and
+   BinaryFunctor base classes -- these functors do not have static builders.
+
+   Nearly every other functor can now be built using a static method.  These
+   methods are collected into a single static class per package to make it
+   convenient for static imports to pull in cohesive collections of similar
+   functors.
+
+   In some cases, there are additional flavors over and above the existing
+   constructors.  BinaryFunctors in the arithmetic and comparison packages
+   generally define a unary flavor that takes an argument:
+
+   In some cases, it is necessary to pass a class object to allow the compiler
+   to infer one of the generic types to be built: in those cases, the class
+   argument is generally named 'hint'.  Note that many of the functors 
+   (particularly those in the arithmetic and property packages) take class
+   arguments in their constructors -- in those cases, the static builder also
+   takes class arguments, but they are essential to the functor and not just
+   hints to the compiler.
+
+4) Refactored FunctorParser
+
+   The FunctorParser is being restructured.  In the future, the name
+   'FunctorParser' will be used for an interface for all parsers that
+   produce functors.  The existing parser has been renamed JFXGParser.
+   For the 0.8 release, the name of the interface is IParser.  After
+   0.8, the IParser name will be renamed FunctorParser.
+
+   The reason for this is that there are already several extended
+   parsers as well as several wrappers, and having a common interface
+   increases their interoperability.
+
+5) General purpose FunctorProxy: allows functors to be registered 
+   with arbitary listener interfaces.
+
+6) Support in the Hacker's Worksheet for putting arbitrary JComponents
+   in the cells of a table
+
+7) New Functors
+
+   net.sf.jga.fn.adaptor.CompoundBinary
+   net.sf.jga.fn.adaptor.CompoundGenerator
+   net.sf.jga.fn.adaptor.CompoundUnary
+   net.sf.jga.fn.arithmetic.Average
+
+8) New Utilities
+
+   FilterIterable   
+   MergeIterable
+   TransformIterable (in 3 flavors)
+   UniqueIterable
+   NullComparator
+
+
+changes from 0.6 to 0.7
+
+1) FunctorParser
+
+   A class that parses an expression language, and returns a Functor
+   that embodies the desired functionality.  The language that is 
+   parsed is as yet unnamed: it's syntax is drawn from the expression
+   grammar in Java 1.5.  Essentially, anything that you can use on the
+   right hand side of a Java assignment expression is supported, except
+   for arrays, assignments, pre- and post- increment/decrement
+   operators, and anonymous class creation. 
+
+   There is also a Generified version of the parser, presented as a
+   subclass called GenericParser.  The major difference is that the
+   GenericParser checks that the return type of the generated functor
+   is what the user expects.
+
+2) Java Hacker's Worksheet
+
+   An application of the FunctorParser, and an outgrowth of the old 
+   Spreadsheet control.  This application/widget will very likely be
+   separated out into its own project in a future release.  The
+   spreadsheet uses the FunctorParser to compile expressions to 
+   functors which are then used to represent the contents of the 
+   various cells.  There are three minor extensions to the expression
+   language for handling spreadsheet-specific functionality: cell 
+   references and relative addressing.  For more information, see
+   
+   http://jga.sf.net/docs/Hacksheet/HacksheetDemo.shtml
+
+   The old spreadsheet widget has been moved to a new package, and will
+   be moved along with the Hacker's Worksheet code.  It is deprecated in
+   this release in its old location.   
+
+3) new Functors
+
+   net.sf.jga.fn.adaptor.AndBinary
+   net.sf.jga.fn.adaptor.AndGenerator
+   net.sf.jga.fn.adaptor.AndUnary
+   net.sf.jga.fn.adaptor.ApplyBinary
+   net.sf.jga.fn.adaptor.ApplyGenerator
+   net.sf.jga.fn.adaptor.ApplyUnary
+   net.sf.jga.fn.adaptor.Bind
+   net.sf.jga.fn.adaptor.ConditionalBinary
+   net.sf.jga.fn.adaptor.ConditionalGenerator
+   net.sf.jga.fn.adaptor.ConditionalUnary
+   net.sf.jga.fn.adaptor.OrBinary
+   net.sf.jga.fn.adaptor.OrGenerator
+   net.sf.jga.fn.adaptor.OrUnary
+   net.sf.jga.fn.arithmetic.BitwiseAnd
+   net.sf.jga.fn.arithmetic.BitwiseNot
+   net.sf.jga.fn.arithmetic.BitwiseOr
+   net.sf.jga.fn.arithmetic.BitwiseXor
+   net.sf.jga.fn.arithmetic.ShiftLeft
+   net.sf.jga.fn.arithmetic.ShiftRight
+   net.sf.jga.fn.arithmetic.UnsignedShiftRight
+   net.sf.jga.fn.property.GetField
+   net.sf.jga.fn.property.SetField
+
+   Notes -- all of these functors were added in order to implement the 
+   java expression grammar: the ApplyX series are used in the implementation
+   of method/constructor calls, and most of the others are in support of
+   specific java operators.
+
+   The naming convention in the adaptor package uses the suffixes
+   'Generator', 'Unary', and 'Binary' to denote both the type of functor that 
+   results and the type of the functor(s) which are being combined.  For 
+   example, OrBinary is a BinaryFunctor that combines two boolean BinaryFunctors
+   using a short-circuiting logical or operation.
+
+   The old form of Conditional has been deprecated, replaced with 
+   ConditionalUnary
+
+4) added support for shift and bitwise operations to the IntegerArithmetic
+   interface, in support of those operations within the FunctorParser.
+   
+5) more builder methods: now all of the builder methods that apply to 
+   BinaryFunctors support passing either one or two arguments, and 
+   UnaryFunctor has support for most operations as well.
+
+6) completed the reorganization of the comparison package that was begun
+   in the previous release -- the deprecated classes and methods have been
+   removed in favor of the new forms in which a Comparator is required by the
+   base comparison classes and a nested class defines a default constructor
+   for use with classes that extend Comparable.
+
+7) The existing LogicalAnd and LogicalOr classes cannot implement the 
+   shortcircuiting behaviour consistently as a user might expect.  Those
+   two now explicitely state that in their contracts.  For short-circuiting
+   and & or operations, use the AndX & OrX functors added to the adaptor
+   package in this release.
+
+8) The Iterables facade has grown support for Arrays
+
+9) miscellaneous
+
+   net.sf.jga.swing.GenericAction
+   net.sf.jga.util.ArrayIterator
+   net.sf.jga.util.Arrays
+
+
+changes from 0.5 to 0.6
+
+1) Support for the 2nd JDK1.5 beta release, and more support for the final
+   Java 2 Version 5 language features in general.  There are at this point a
+   couple of exceptions where old syntax is supported in order to continue to
+   provide support for java 1.4 compilers, but these will not be present in
+   the 1.0 release.
+
+2) SpreadsheetTableModel is now Spreadsheet, an extension of JTable.  JTable is
+   designed with the assumption that all cells in a given column can share a
+   single editor and renderer, and this is not necessarily true for many
+   spreadsheets.  Extending JTable was necessary to change the renderer/editor
+   logic to take row and column into account when getting and setting editors
+   and renderers.
+
+   Spreadsheet is somewhat functional in this release: formulas can be set up
+   programatically, constant values may be entered at runtime into cells, and
+   cells are individually formattable.
+
+3) GenericCellEditor, GenericListCellRenderer, and GenericTableCellRenderer now
+   include default (or Class<T> arg) constructors that form drop-in replacements
+   for the swing classes that they extend.  By default, these classes 
+   reimplement the standard behaviour of the base classes.
+
+4) GenericTableModel and GenericColumn now support formatting and parsing
+   functors: these are used to build editors and renderers that support the 
+   given formats.
+
+5) new Functors
+
+   net.sf.jga.fn.adaptor.GenerateBinary
+   net.sf.jga.fn.adaptor.GenerateUnary
+   net.sf.jga.fn.arithmetic.ValueOf
+   net.sf.jga.fn.property.Cast
+   net.sf.jga.fn.property.InstanceOf
+   net.sf.jga.fn.string.DefaultFormat
+
+6) Added generate(gen1,gen2) method to BinaryFunctor, which turns a 
+   BinaryFunctor into a Generator by passing the values of the two argument
+   generators to the BinaryFunctor.  Before, this took two steps: 
+   fn.generate1st(gen1).generate(gen2).
+
+7) Still considering deprecating the Predicates.  Internally, the implementation
+   no longer depends on the fn() methods defined in the Predicate roots: now 
+   the p() method is defined in the Predicate root classes and derived classes
+   must provide the fn() method.
+
+8) Changed the names of the state methods of many functors in the adaptor 
+   package.  The old names will be supported for one more release -- the new
+   names are more consistent across the package.
+
+changes from 0.4.0 to 0.5
+
+1) Simplified the roots of the unary and binary functor class trees: with the
+   adaptor methods in place, the old interfaces listed a number of methods that
+   the abstract class provided that could never be overridden.  The main reason
+   that I'd left the interfaces in place was to allow a class to implement both
+   Unary and Binary forms -- in practice, only two classes did so, and they
+   had to clone the implementation of the Unary adaptor methods.  Rather than
+   live with the cut and paste coding, I separated the unary and binary 
+   implementations into separate classes.  I then combined the interfaces and
+   the abstract classes  under the shorter interface name.  As always, I've
+   deprecated the name that will be removed in the next release.
+
+   There is one unfortunate side effect of this: the Constant functor was one
+   that implemented both UnaryFunctor and BinaryFunctor interfaces.  It was
+   no longer possible for it to be used as both, so I added ConstantUnary and
+   ConstantBinary functors.  Normally, I would keep the old name around with
+   a deprecation tag (as I have in the past and in this release with the old
+   abstract base classes), but another development (see #2) changed my mind
+   in this case.
+
+2) Generators.  Functors that take no arguments and return a value.  There are
+   four implementations: Random, ConstructDefault, Generate, and Constant.  
+
+   To continue the discussion started in #1, Constant made too much sense as
+   a Generator to keep the name around as a deprecated UnaryFunctor.  This one
+   time, I chose the path that might actually break code.  Since the recovery
+   is a fairly simple search and replace, hopefully the impact won't be too 
+   bad.
+
+3) Adapted the Iterators in the net.sf.jga.util package to the new forloop 
+   syntax (in the 0.5b version only).  All of the iterators implement
+   Iterable.  Also, a new facade, Iterables, allows easy use of selected
+   Iterators with the new syntax.  Specifically, those iterators whose
+   functional value is delivered in the standard hasNext()/next() sequence:
+   (Filter, Merge, Unique, Transform, TransformAdjacent).  The other 
+   iterators add methods to the iterator interface (LookAhead, Caching, and
+   Find), and would not be of value within a for loop unless a reference to
+   the iterator was available.  For compatability with 1.4, a package private 
+   Iterable interface is defined in the 0.5a version of jga.  
+
+4) The functions included in this batch are:
+
+   STL Function name         Facade method name  functor
+   =======================   ==================  ========================
+   merge                     merge               Merge
+   adjacentDiff              adjacentDiff        TransformAdjacent(Minus)
+
+5) new Functors
+
+   net.sf.jga.fn.adaptor.Constant (rewritten: it is now a Generator)
+   net.sf.jga.fn.adaptor.ConstantUnary (replaces the UnaryFunctor Constant form)
+   net.sf.jga.fn.adaptor.ConstantBinary (replaeces the BinaryFunctor Constant)
+   net.sf.jga.fn.adaptor.Generate
+   net.sf.jga.fn.adaptor.Generate1st
+   net.sf.jga.fn.adaptor.Generate2nd
+   net.sf.jga.fn.adaptor.Random
+   net.sf.jga.fn.algorithm.Merge
+   net.sf.jga.fn.algorithm.RemoveAll
+   net.sf.jga.fn.algorithm.ReplaceAll
+   net.sf.jga.fn.algorithm.TransformAdjacent
+   net.sf.jga.fn.algorithm.Unique
+   net.sf.jga.fn.property.ArrayBinary
+   net.sf.jga.fn.property.ArrayUnary
+   net.sf.jga.fn.property.Construct
+   net.sf.jga.fn.property.ConstructDefault
+   net.sf.jga.fn.property.InvokeMethod
+   net.sf.jga.fn.property.InvokeNoArgMethod
+
+6) The GenericTableModel is much more complete and easier to use.  There are now
+   methods that hide the complexity of building the most common functors 
+   (GetProperty/SetProperty pairs) as columns are added to the model.
+
+7) Added Generic Table Cell Editors & Renderer.  The editors take a pair of
+   functors - one to parse and one to format a value. The Renderer takes a
+   single functor that formats a value.  In all cases, there is a convenience
+   method that takes a Format and builds the associated functor.
+
+8) Added NumberCellEditor.  Derived from GenericCellEditor, this class uses the
+   Arithmetic interface to generate values of the correct type (standard java
+   tends not to support all of the Number derivitives (missing those in the 
+   java.math package, generally)).
+
+9) Added GenericActionListener and GenericItemListener.  Event listeners that
+   execute a functor when an event fires.  These have builder methods that 
+   handle common cases (invoke a no-arg method, pass the event to a one-arg
+   method).  Obviously, there's a large number of listener interfaces that can
+   be added.
+
+10) Improved the type-safety of the property functors: the preferred constructor
+   takes a Class<T> parameter that ensures that the class on which we reflect
+   to get the correct method is the same as the class used to parameterize the
+   functor.
+
+11) Verified in the test framework that all of the functors are serializable.
+   There were a few minor issues: the property functors now lazily load 
+   constructors and methods (non-serializable), and a number of functors will
+   be serializable iff one of the generic parms/constructor arguments are
+   serializable.  Restrictions on the tyes of such parms are documented in the
+   javadoc for the affected functors.
+
+changes from 0.3.0 to 0.4.0
+
+1) Added more algorithm implementations.  The additional methods are those that
+   can modify the input collection or a specified output collection.  In 
+   figuring out how to implement these methods, I chose to continue working with
+   iterators.  Since the only iterator that can be used to update existing
+   elements is a ListIterator, the methods that can modify the existing 
+   collection are restricted to working with Lists.
+
+   The other major difference between this implementation and STL is that the 
+   copy versions of the various methods will append values to the output 
+   collection, almost certainly changing its size (in STL, the size of the 
+   output collection will not be changed without specific structures in place).
+   The mechanism used is the new addAll(Collection,Iterator) method (see below).
+
+   The functions included in this batch are:
+
+   STL Function name         Facade method name  functor
+   =======================   ==================  =====================
+   transform (unary form)    transformCopy       TransformUnary
+   transform (binary form)   transformCopy       TransformUnary
+   replace()                 replaceAll          n/a   
+   replace_if()              replaceAll          TransformUnary
+                                                   (w/ Conditional.replaceAll)
+   replace_copy()            replaceAllCopy      TransformUnary
+   replace_copy_if()         replaceAllCopy      TransformUnary   
+   remove()                  removeAll           n/a
+   remove_if()               removeAll           FilterIterator
+   remove_copy()             removeAllCopy       FilterIterator 
+   remove_copy_if()          removeAllCopy       FilterIterator
+   unique()                  unique              n/a
+   unique_copy()             uniqueCopy          UniqueIterator
+
+2) Additional methods 
+
+   addAll -- adds all elements from an iterator to a collection
+   transform -- replaces elements in a list with the results of a functor
+
+3) New functors
+
+   net.sf.jga.fn.adaptor.ChainBinary 
+   net.sf.jga.fn.adaptor.Conditional
+   net.sf.jga.fn.adaptor.Distribute
+   net.sf.jga.fn.algorithm.TransformUnary
+   net.sf.jga.fn.algorithm.TransformBinary
+   net.sf.jga.fn.comparison.Between
+   net.sf.jga.fn.comparison.BetweenComp
+   net.sf.jga.fn.property.ConstructUnary
+   net.sf.jga.fn.string.FormatValue
+   net.sf.jga.fn.string.Match
+   net.sf.jga.fn.string.ParseFormat
+
+4) Swing package
+
+   First set of examples where functors are applied to application level 
+   functionality.  The basic idea is that boilerplate implementations can
+   be aggregated with existing classes instead of creating a new class.
+
+5) Support for the 2.2 version of the pre-release compiler and runtime.
+
+   I've added support for covariance and contravariance where it seems to make
+   sense.  Generally, this affected the Algorithms and Iterators facades, the
+   various Iterator implementations in the util package, and the functors in 
+   the algorithms package.
+
+
+changes from 0.2.1 to 0.3.0
+
+1) Added the first batch of algorithm implementations.  Algorithms are packaged
+   in the form of Functors in the net.sf.jga.fn.algorithm package.  In addition
+   to the functors, there are two Facade classes in the net.sf.jga.util package
+   that present this functionality in the more traditional form.
+
+   The functions included in this batch are:
+
+   STL Function name           Facade method name     functor
+   =========================   =====================  =====================
+   accumulate()                accumulate()           Accumulate 
+   adjacent_find()             findAdjacent()         FindAdjacent
+   count()                     count()                Count
+   count_if()                  count()                Count
+   equal()                     equal()                varies based on form 
+   find()                      find()                 Find
+   find_end()                  n/a                    n/a 
+   find_first_of()             findElement()          FindElement
+   find_if()                   find()                 Find
+   for_each()                  forEach()              ForEach 
+   lexicographical_compare()   lessThan()             varies based on form 
+   max()                       maximum()              Find,MaxValue 
+   max_element()               maximumValue()         MaxValue [collection]
+                                                      Accumulate [iteration]
+   min()                       minimum()              Find,MinValue 
+   min_element()               minimumValue()         MaxValue [collection]
+                                                      Accumulate [iteration]
+   mismatch()                  mismatch()             FindMismatch
+   search()                    match()                FindSequence
+   search_n()                  findRepeated()         FindRepeated
+
+
+2) Added abstract base classes for Unary and Binary Functors and Predicates.
+   This was primarily done to provide a home for the new factory methods, but
+   it also has the happy benefit of reducing the boilerplate code in all 
+   predicate implementations.
+
+   One of the reactions that I've seen to the use of the typical set of functors
+   was that the method of combining functors into complex expressions wasn't 
+   terribly straightforward.  For example, by itself, LogicalAnd isn't terribly
+   useful as a functor.  To build a predicate that returns true if a given 
+   integer is between 0 and 10, (assuming that there is no 'Between' predicate),
+   you would generally write:
+
+    public UnaryFunctor<Integer,Boolean> uf1 =
+        new ComposeUnary<Integer,Boolean,Boolean,Boolean> (
+            new Bind2nd(ZERO, new Greater<Integer>()),
+            new Bind2nd(TEN,  new Less<Integer>()),
+            new LogicalAnd());
+
+   Depending on your formatting habits, you would of course rearrange this to
+   suit you, but there's no getting around the fact that the three predicates
+   that the programmer really cares about ( > 0, < 10, And ) are buried within
+   a fairly complicated outer constructor call.
+
+   I think the natural reaction to a constructor call like this (and they can
+   get far, far worse) is 'GAAACK!'.  It's not that hard to deal with once you
+   get used to it, but it'll never really be good this way.
+
+   One way to get past this is to not combine it into a single ctor call:
+
+        Bind2nd<Integer,Integer,Boolean> a = 
+            new Bind2nd( ZERO, new Greater<Integer>());
+        Bind2nd<Integer,Integer,Boolean> b =
+            new Bind2nd( TEN,  new Less<Integer>());
+        LogicalAnd c = new LogicalAnd();
+        UnaryFunctor<Integer,Boolean< uf2 = 
+            new ComposeUnary<Integer,Boolean,Boolean,Boolean>(a,b,c);
+
+    which scales better, but still has the disadvantage of burying the code's
+    intent inside the distracting structural stuff.  There's even more verbage
+    describing the structural parts, so in some ways, the important stuff is
+    even harder to get to.
+
+    It isn't hard once you get used to it, but I've also seen this exact code
+    being used as the justification for rejecting the use of predicates, due 
+    to the perception that the learning curve is so high that it just isn't
+    worth the trouble.  I'd like to see if we can lower that bar a little bit, 
+    so I added factory methods that 'hide' the adaptor functors behind method
+    names, so that the programmer only needs to declare the functors that 
+    implement the desired functionality.
+    
+    public UnaryFunctor<Integer,Boolean> uf0 =
+        new LogicalAnd().compose(new Greater<Integer>().bind2nd(ZERO),
+                                 new Less<Integer>().bind2nd(TEN));
+
+    This can also be broken out into separate declarations, and probably would
+    be for more complicated examples.  The structural aspects are now hidden
+    inside the 'compose' and 'bind2nd' methods: you can see that _something_
+    is going on but you don't necessarily need to know the gory details, unless
+    you really want to.
+
+    (BTW: this was inspired by an excellent discussion of a java 
+     implementaiton of blocks at  http://c2.com/cgi/wiki?BlocksInJava )
+
+
+3) Added several utility iterators:
+
+   FindIterator
+   LookAheadIterator
+   EmptyIterator
+   SingletonIterator
+   EnumerationIterator
+
+4) Renamed BinaryCompose and UnaryCompose.  I've preserved those names
+   so that any existing code won't break, but those names are deprecated
+   in favor of ComposeUnary and ChainUnary.
+
+   The names were a little misleading: BinaryCompose was a
+   UnaryFunctor.  When I added the new ComposeBinay (which is a
+   BinaryFunctor), it was difficult to come up with a name that was
+   distinct enough from BinaryCompose.  The best I could come up with was
+   BinaryBinaryCompose or BinaryComposeBinary, neither of which was all
+   that appealing.
+
+   The classnames BinaryCompose and UnaryCompose will not be included in the
+   production release.  I don't know when I'll remove them, but I will
+   keep them around for at least one more release.
+
+5) A real javadoc tool has been released that handles generics far
+   better than the ad hackery that I'd thrown together in previous
+   releases.  For this release, the javadoc was cut using SinjDoc, 
+   which is available at
+
+   http://cscott.net/Project/GJ/
+
+
+
+changes from 0.2.0 to 0.2.1
+---------------------------
+
+1) Added a jar containing a non-genericized copy of the test framework source.
+
+2) Added Min, Max, MinComp, and MaxCopy functors to the comparison package.
+
+
+
+changes from 0.1.0 to 0.2.0
+---------------------------
+
+At this point, I believe that the functors are fairly robust.
+
+1) Added arithmetic functors
+
+   Plus, Minus, Multiplies, Divides, Negate
+
+2) Completed STL Adaptor functors
+
+   Bind1st, Bind2nd, Constant, Identity
+
+3) Miscellaneous
+
+   Any functor
+
+   Allowed construction of All (and Any) using collection.  Pending 
+   a performance evaluation, I may take this back out (unless there's
+   demand for it).  My concern is that using a collection may impose
+   a performance penalty.  I intend to benchmark the current 
+   implementation against an implementation that eliminates the loop
+   by building one large composite predicate containing all the 
+   branches.
+
+4) Reorganized the package hierarchy
+
+   The old hierarchy put all of the functors taken from C++ in one package
+   and java-specific functors in another.  I decided that most users don't
+   necessarily care where the functors came from, and users unfamiliar with
+   STL won't know where to look for the functors that are available.
+
+   The new scheme puts all functor related interfaces in the 'net.sf.jga.fn' 
+   package, and the implementations are organized by category: adaptor, 
+   arithmetic, comparison, logical, and property.
+
+5) Filled out the javadoc.
+
+6) Removed public members and bogus default constructors. 
+
+   I figured that there would be legitimate criticism of using public members
+   in many of the functors.  I'd like them to be considered immutable, but 
+   that clashed with other design goals.
+
+   I had wanted to use predicates as the primary key object of EJB's with
+   BMP.  I had done some work last spring on that topic and included it in
+   my JavaOne BOF.  This was based on the original work I did with predicates
+   while working for a former employer.
+
+   We had used predicates as primary keys, and it enabled us to completely
+   separate the client development from the back-end development.  I built 
+   a complete set of test objects in a memory resident set of collections and 
+   built the entire UI before work ever began on the database.  Later, we
+   went back and built the entire back end database, and filled in a different
+   persistence layer without having to disturb the front end.  At the time,
+   EJB's were very immature (CMP didn't really exist, and JQL and JDO were
+   years away).  It gave me the idea that predicates made a great unit of
+   exchange for both primary key and for secondary finder methods.
+
+   Fast forward a few years, and it seems that many of the problems that I
+   solved years ago using predicates have been somewhat solved with a patchwork
+   of approaches. I'm not sure that I like the way that PrimaryKeys are 
+   implemented in J2EE -- the restrictions on what can be a primary key are
+   a little uncomfortable for me.
+
+   I think that Sun is looking at adding a mechanism for describing an object
+   as immutable.  Perhaps when that's done, I'll try again with the whole
+   Functor as primary bean key idea.
+

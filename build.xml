@@ -16,28 +16,14 @@
   </target>
 
   <target name="clean">
-    <ant antfile="build.xml" dir="functor" target="clean"/>
-    <delete file="functor/dist/commons-functor.jar" />
     <delete dir="${build}" />
   </target>
 
-  <target name="functor.flag">
-    <uptodate property="build.functor.notRequired"
-              targetfile="lib/commons-functor.jar">
-      <srcfiles dir="functor" includes="**/*.java"/>
-    </uptodate>
+  <target name="jga">
+    <copy file="jga/jga-0.8.jar" todir="lib" />
   </target>
 
-  <target name="functor" depends="functor.flag"
-          unless="build.functor.notRequired">
-    <ant antfile="build.xml" dir="functor" target="dist">
-      <property name="junit.jar" location="lib/junit-3.8.1.jar"/>
-      <property name="classpath" value="value"/>
-    </ant>
-    <copy file="functor/dist/commons-functor.jar" todir="lib" />
-  </target>
-
-  <target name="compile" depends="init,functor">
+  <target name="compile" depends="init,jga">
     <javac destdir="${build}"
            classpathref="build.base"
            debug="true"

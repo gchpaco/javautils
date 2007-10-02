@@ -1,0 +1,6 @@
+Installation:
+
+jga can be used with either a 1.4 compiler or the 1.5-beta compiler.
+
+To use 1.4, put jga-0.6.jar on your classpath.  
+To use 1.5-beta, put jga-0.6-retro.jar on your classpath.

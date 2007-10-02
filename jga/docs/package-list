@@ -1,0 +1,13 @@
+net.sf.jga.algorithms
+net.sf.jga.fn
+net.sf.jga.fn.adaptor
+net.sf.jga.fn.algorithm
+net.sf.jga.fn.arithmetic
+net.sf.jga.fn.comparison
+net.sf.jga.fn.logical
+net.sf.jga.fn.property
+net.sf.jga.fn.string
+net.sf.jga.parser
+net.sf.jga.swing
+net.sf.jga.swing.spreadsheet
+net.sf.jga.util

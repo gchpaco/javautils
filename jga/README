@@ -1,0 +1,135 @@
+Welcome to the 0.8 release of jga.
+
+jga is a functors library: the intent is to explore and exploit
+functors as a design and implementation tool to reduce boilerplate
+coding.  A functor is an object that encapsulates a function or
+expression: it can take arguments and produce results, as can any
+method, expression, or function (in other languages that support
+functions).  Unlike an expression, as an object it can be passed as an
+argument without being executed; it can be persisted to a database or
+file; it can be serialized and passed from client to server (and
+back); and it can be instantiated at runtime based on information
+unavailable at compile-time.
+
+How many times have you...
+
+...found a method that does almost exactly what you want, except for
+   one or two lines?
+
+...created a new class in order to override one simple method, because
+   it is almost what you need?
+
+...written a boilerplate implementation of an interface that knows
+   about your specific business objects or your specific application?
+
+...copied an entire class to change the one line or method rather
+   than refactoring it?</li><br/>
+
+Functors provide a mechanism that can reduce all of the design
+problems: they allow you to (in effect) pass a line of code as an
+argument to a constructor or method, giving you a way to parameterize
+objects on simple behavour.
+
+jga borrows the functors from C++ STL library, and extends them with
+functors that are natural for java programmers.  jga also borrows the
+notion that basic functors implementing common operations can be
+profitably combined into compound structures to implement more useful
+logic.
+
+Compound functors of the type that jga promotes fall naturally into a
+tree structure.  Taking advantage of this yields a use of functors
+that may be relatively new to many: as a form of executable metadata
+that can be interpreted for the information embodied in the structure.
+To facilitate this, all jga functors provide support for a Visitor
+implementation.  
+
+The most natural application of a functor library is in the
+implementation of common algorithms, such as those defined in STL.
+jga provides a set of such algorithms that have been adapted to java
+conventions and idioms, as opposed to being a direct port of STL.
+
+An area that is rife with one line interfaces is event driven programming
+of the sort that is typified by Swing.  jga includes the beginnings of a
+set of tools for use in GUI coding that addresses the common problems
+described above: the continual reinvention of the same set of small
+wheels in the set of listeners, editors, renderers, and models that 
+accompany a typical Swing program.
+
+
+Requirements
+============
+
+ 1) Either the Java 1.4.x or 1.5.x JDKs.  The jga-0.8.jar supports 
+Generics and is used with the 1.5 JDK, while the jga-0.8-retro.jar supports
+development  with the Java 1.4.x JDK without generics.  Note that I have
+not tested jga with any release of Java 1.6.  There shouldn't be any 
+problems, but you never know until you try.
+
+ 2) [Optional] JUnit 3.8.1 and jfcUnit 1.0.3 (if you want to run the tests)
+
+
+Installation
+============
+
+At this point, installation is pretty simple.  Copy any of jga-0.8-*.jar files
+(depending on which compiler you use and your licensing needs) onto your 
+classpath and you're pretty much set.
+
+
+Building jga
+============
+
+To rebuild this version, you must use the 1.5.0 release of the Java JDK.
+
+1) Unpack src.jar
+
+2) To build the standard version, use the 'jar' target
+
+   $ ant jar
+
+To build the compatability version, use the 'retrojar' target
+
+   $ ant retrojar
+
+
+Testing jga-0.8-retro
+=====================
+
+The test suite used to ensure 1.4 compatability is built with the 2.2 version
+of the early access generic java compiler, which used to be available at
+
+http://developer.java.sun.com/developer/earlyAccess/adding_generics/
+
+However, the last version available through the early access program was 
+version 2.4, in which the command line option that I use to derive the test
+suite for 1.4 support was removed.  If you have the 2.2 version of the early
+access compiler, then you can derive the test suite via ant using the 
+enclosed build.xml -- that part of the build script is reasonably well 
+commented for what you need to do.  
+
+I've included the non-genericized source code for the test suite in the 
+complete distribution, so you can test the jga-0.8-retro jar using the 1.4 
+compiler.  If you have the 2.2 version of the early access compiler, then 
+you can derive this test suite yourself -- I've included notes in the 
+build.xml file to get you started.
+
+To test the 1.4 compatability verion, use a 1.4 compatable JVM and run
+ant
+
+   $ ant -f build-retro.xml test.retro
+
+Release Plans
+=============
+
+I still anticipate that at some point, continued development on the
+the 1.4 compatable jar will end -- the source code will diverge at
+that point, and no new features will be added to the 1.4 compatable
+jar.  Bugs found will be fixed in both jars, so there may be
+subsequent releases of the 1.4 compatable jar, but only as bugs are
+found and fixed.  
+
+I also still believe that the swing package will be broken out into a
+separate jar, named jga-swing-M.n.jar.  I will be focusing on swing
+development for a little while longer, possibly looking at ways in
+which jga can be incorporated into swinglabs.
+
