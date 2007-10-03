@@ -41,13 +41,19 @@ public class TableTest
     {
       List a = L.ist (1);
       List b = L.ist (2);
+      List c = L.ist (3);
       table.put (NT.A, T.X, null, a);
       assertEquals (S.et (Pair.make (null, a)), table.get (NT.A, T.X));
       emptyExceptFor (NT.A, T.X);
       table.put (NT.A, T.X, null, b);
       assertEquals (S.et (Pair.make (null, a), Pair.make (null, b)),
                     table.get (NT.A, T.X));
+      assertEquals (S.et (Pair.make (null, a), Pair.make (null, b)),
+                    table.getRow (NT.A));
       emptyExceptFor (NT.A, T.X);
+      table.put (NT.A, T.Y, null, c);
+      assertEquals (S.et (Pair.make (null, a), Pair.make (null, b),
+                          Pair.make (null, c)), table.getRow (NT.A));
     }
 
   @SuppressWarnings ("unchecked")

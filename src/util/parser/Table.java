@@ -121,14 +121,15 @@ public class Table<NT, T, V extends List<?>>
     {
       if (table.containsKey (a))
         {
-          ArrayList<Pair<SemanticPredicate, V>> row =
-              new ArrayList<Pair<SemanticPredicate, V>> ();
+          HashSet<Pair<SemanticPredicate, V>> row =
+              new HashSet<Pair<SemanticPredicate, V>> ();
           Map<T, Set<Pair<SemanticPredicate, V>>> map = table.get (a);
           Collection<Set<Pair<SemanticPredicate, V>>> values = map.values ();
           for (Set<Pair<SemanticPredicate, V>> set : values)
             {
               row.addAll (set);
             }
+          return row;
         }
       return Collections.emptySet ();
     }
