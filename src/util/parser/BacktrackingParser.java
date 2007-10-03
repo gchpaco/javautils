@@ -31,7 +31,6 @@ public class BacktrackingParser<NT, T> extends Parser<NT, T>
   protected List<?> choosePossibility (
                                        Collection<Pair<SemanticPredicate, List<?>>> possibilities,
                                        @SuppressWarnings ("unused")
-                                       T token, @SuppressWarnings ("unused")
                                        NT top)
     {
       List<List<?>> available = new ArrayList<List<?>> ();

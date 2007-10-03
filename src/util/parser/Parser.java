@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jga.fn.Generator;
+import net.sf.jga.fn.UnaryFunctor;
 import util.Pair;
 
 public class Parser<NT, T>
@@ -35,6 +36,7 @@ public class Parser<NT, T>
 
   Table<NT, T, List<?>> table;
   LinkedList<Object> stack;
+  LinkedList<T> lookahead;
   NT start;
   T eof;
 
@@ -61,6 +63,7 @@ public class Parser<NT, T>
       this.stack = new LinkedList<Object> ();
       stack.addLast (start);
       stack.addLast (eof);
+      this.lookahead = new LinkedList<T> ();
     }
 
   public void tossUntil (T token)
@@ -70,34 +73,71 @@ public class Parser<NT, T>
       if (!stack.isEmpty ()) stack.removeFirst ();
     }
 
-  @SuppressWarnings ("unchecked")
-  public void witness (T token)
+  public void witness (final T token)
     {
-      while (!stack.peek ().equals (token))
-        {
-          Object obj = stack.removeFirst ();
-          if (obj instanceof SemanticPredicate)
-            {
-              if (checkPredicate ((SemanticPredicate) obj))
-                continue;
-              else
-                throw new ParseException ("Semantic predicate " + obj +
-                                          " failed during execution");
-            }
-          else if (obj instanceof Generator)
-            {
-              Generator cls = (Generator) obj;
-              cls.fn ();
-              continue;
-            }
-          else
-            {
-              NT top = (NT) obj;
-              stack.addAll (0, choosePossibility (table.get (top, token),
-                                                  token, top));
-            }
-        }
+      lookahead.addFirst (token);
+      parserLoop (
+                  token,
+                  new UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> ()
+                    {
+                      @Override
+                      public Collection<Pair<SemanticPredicate, List<?>>> fn (
+                                                                              NT t)
+                        {
+                          return table.get (t, lookahead.getFirst ());
+                        }
+                    });
+      assert lookahead.getFirst () == token;
+      lookahead.removeFirst ();
+    }
+
+  public void waitFor (final T token)
+    {
+      parserLoop (
+                  token,
+                  new UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> ()
+                    {
+                      @Override
+                      public Collection<Pair<SemanticPredicate, List<?>>> fn (
+                                                                              NT t)
+                        {
+                          return table.getRow (t);
+                        }
+                    });
+    }
+
+  private void parserLoop (
+                           T stopAt,
+                           UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> unaryFunctor)
+    {
+      while (!stack.peek ().equals (stopAt))
+        parserGuts (unaryFunctor);
       stack.removeFirst ();
+    }
+
+  @SuppressWarnings ("unchecked")
+  private void parserGuts (
+                           UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> rowGenerator)
+    {
+      Object obj = stack.removeFirst ();
+      if (obj instanceof SemanticPredicate)
+        {
+          if (!checkPredicate ((SemanticPredicate) obj))
+            throw new ParseException ("Semantic predicate " + obj +
+                                      " failed during execution");
+        }
+      else if (obj instanceof Generator)
+        {
+          Generator<?> cls = (Generator<?>) obj;
+          cls.fn ();
+        }
+      else
+        {
+          NT top = (NT) obj;
+          Collection<Pair<SemanticPredicate, List<?>>> row =
+              rowGenerator.fn (top);
+          stack.addAll (0, choosePossibility (row, top));
+        }
     }
 
   protected boolean checkPredicate (SemanticPredicate pred)
@@ -107,20 +147,29 @@ public class Parser<NT, T>
 
   protected List<?> choosePossibility (
                                        Collection<Pair<SemanticPredicate, List<?>>> possibilities,
-                                       T token, NT top)
+                                       NT top)
     {
       List<?> candidate = null;
       for (Pair<SemanticPredicate, List<?>> possibility : possibilities)
         if (possibility.first == null || possibility.first.fn ())
           {
             if (candidate != null)
-              throw new ParseException ("Ambiguous parse for " + token +
-                                        " in state " + top);
+              if (lookahead.isEmpty ())
+                throw new ParseException ("Ambiguous parse in state " + top +
+                                          " (no lookahead)");
+              else
+                throw new ParseException ("Ambiguous parse for " +
+                                          lookahead.getFirst () + " in state " +
+                                          top);
             candidate = possibility.second;
           }
       if (candidate == null)
-        throw new ParseException ("No legal parse for " + token + " in state " +
-                                  top);
+        if (lookahead.isEmpty ())
+          throw new ParseException ("No legal parse in state " + top +
+                                    " (no lookahead)");
+        else
+          throw new ParseException ("No legal parse for " +
+                                    lookahead.getFirst () + " in state " + top);
       return candidate;
     }
 
