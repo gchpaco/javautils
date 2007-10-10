@@ -73,11 +73,9 @@ public class Parser<NT, T>
           {
             Object obj = stack.removeFirst ();
             if (obj instanceof SemanticPredicate) {
-                if (checkPredicate ((SemanticPredicate) obj))
-                    continue;
-                else
-                    throw new ParseException ("Semantic predicate " + obj +
-                                              " failed during execution");
+                checkPredicate ((SemanticPredicate) obj);
+            } else if (obj instanceof ChoicePredicate) {
+                checkChoice ((ChoicePredicate) obj);
             } else if (obj instanceof Closure) {
                 Closure cls = (Closure) obj;
                 cls.apply ();
@@ -91,17 +89,26 @@ public class Parser<NT, T>
         stack.removeFirst ();
       }
 
-    protected boolean checkPredicate (SemanticPredicate pred)
+    protected void checkPredicate (SemanticPredicate pred)
     {
-        return pred.apply ();
+	if (!pred.apply ())
+	    throw new ParseException ("Semantic predicate " + pred +
+				      " failed during execution");
     }
 
-    protected List<?> choosePossibility (Collection<Pair<SemanticPredicate,
+    protected void checkChoice (ChoicePredicate pred)
+    {
+	if (!pred.apply ())
+	    throw new ParseException ("Choice predicate " + pred +
+				      " failed during execution");
+    }
+
+    protected List<?> choosePossibility (Collection<Pair<ChoicePredicate,
                                          List<?>>> possibilities, T token,
                                          NT top)
     {
         List<?> candidate = null;
-        for (Pair<SemanticPredicate, List<?>> possibility : possibilities)
+        for (Pair<ChoicePredicate, List<?>> possibility : possibilities)
             if (possibility.first == null || possibility.first.apply ()) {
                 if (candidate != null)
                     throw new ParseException ("Ambiguous parse for " + token +
