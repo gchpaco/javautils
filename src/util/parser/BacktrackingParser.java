@@ -21,7 +21,7 @@ public class BacktrackingParser<NT, T> extends Parser<NT, T>
     }
 
   @Override
-  protected boolean checkPredicate (SemanticPredicate pred)
+  protected boolean checkChoice (ChoicePredicate pred)
     {
       Verify.ignoreIf (!pred.fn ());
       return true;
@@ -29,7 +29,7 @@ public class BacktrackingParser<NT, T> extends Parser<NT, T>
 
   @Override
   protected List<?> choosePossibility (
-                                       Collection<Pair<SemanticPredicate, List<?>>> possibilities,
+                                       Collection<Pair<ChoicePredicate, List<?>>> possibilities,
                                        @SuppressWarnings ("unused")
                                        NT top)
     {

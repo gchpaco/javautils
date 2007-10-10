@@ -16,11 +16,48 @@ import util.S;
 
 public class Grammar<NT, T>
 {
-  static public class ConversePredicate extends SemanticPredicate
+  static public class AdapterPredicate extends ChoicePredicate
   {
     SemanticPredicate pred;
+    public AdapterPredicate (SemanticPredicate sem)
+      {
+	pred = sem;
+      }
 
-    public ConversePredicate (SemanticPredicate sem)
+    @Boolean
+    public Boolean gen ()
+      {
+	return pred.fn ();
+      }
+
+    @Override
+    public int hashCode ()
+      {
+	return new HashCodeBuilder (337, 113).append (pred).toHashCode ();
+      }
+
+    @Override
+    public boolean equals (Object obj)
+      {                
+	if (obj instanceof AdapterPredicate == false)
+	    return false;
+	if (this == obj)
+	  return true;
+	AdapterPredicate rhs = (AdapterPredicate) obj;
+	return new EqualsBuilder ().append (pred, rhs.pred).isEquals ();
+      }
+
+    @Override
+    public String toString ()
+      {
+	return pred.toString ();
+      }
+  }
+  static public class ConversePredicate extends ChoicePredicate
+  {
+    ChoicePredicate pred;
+
+    public ConversePredicate (ChoicePredicate sem)
       {
         pred = sem;
       }
@@ -52,12 +89,11 @@ public class Grammar<NT, T>
         return "\u00AC" + pred.toString ();
       }
   }
-
-  static public class ConjunctionPredicate extends SemanticPredicate
+  static public class ConjunctionPredicate extends ChoicePredicate
   {
-    SemanticPredicate a, b;
+    ChoicePredicate a, b;
 
-    public ConjunctionPredicate (SemanticPredicate a, SemanticPredicate b)
+    public ConjunctionPredicate (ChoicePredicate a, ChoicePredicate b)
       {
         this.a = a;
         this.b = b;
@@ -102,9 +138,9 @@ public class Grammar<NT, T>
   @SuppressWarnings ("unchecked")
   private NT start;
   @SuppressWarnings ("unchecked")
-  private Map<Object, Set<Pair<SemanticPredicate, T>>> firstTable;
+  private Map<Object, Set<Pair<ChoicePredicate, T>>> firstTable;
   @SuppressWarnings ("unchecked")
-  private Map<Object, Set<Pair<SemanticPredicate, T>>> followTable;
+  private Map<Object, Set<Pair<ChoicePredicate, T>>> followTable;
   @SuppressWarnings ("unchecked")
   private Set terminals;
 
@@ -149,29 +185,32 @@ public class Grammar<NT, T>
     }
 
   @SuppressWarnings ("unchecked")
-  public Set<Pair<SemanticPredicate, T>> first (Object e)
+  public Set<Pair<ChoicePredicate, T>> first (Object e)
     {
       if (firstTable == null) initializeFirstTable ();
       if (firstTable.containsKey (e)) return firstTable.get (e);
       if (e instanceof SemanticPredicate)
-        return singleton (make ((SemanticPredicate) e, getEpsilonToken ()));
+	return singleton (make (adapt ((SemanticPredicate) e),
+				getEpsilonToken ()));
+      if (e instanceof ChoicePredicate)
+        return singleton (make ((ChoicePredicate) e, getEpsilonToken ()));
       if (e instanceof Generator)
-        return singleton (make ((SemanticPredicate) null, getEpsilonToken ()));
-      return singleton (make ((SemanticPredicate) null, (T) e));
+        return singleton (make ((ChoicePredicate) null, getEpsilonToken ()));
+      return singleton (make ((ChoicePredicate) null, (T) e));
     }
 
   @SuppressWarnings ("unchecked")
   private void initializeFirstTable ()
     {
-      firstTable = new HashMap<Object, Set<Pair<SemanticPredicate, T>>> ();
+      firstTable = new HashMap<Object, Set<Pair<ChoicePredicate, T>>> ();
       for (Map.Entry<NT, List<List<?>>> entry : map.entrySet ())
         {
           firstTable.put (entry.getKey (),
-                          new HashSet<Pair<SemanticPredicate, T>> ());
+                          new HashSet<Pair<ChoicePredicate, T>> ());
           for (List<?> rule : entry.getValue ())
-            firstTable.put (rule, new HashSet<Pair<SemanticPredicate, T>> ());
+            firstTable.put (rule, new HashSet<Pair<ChoicePredicate, T>> ());
         }
-      firstTable.put (L.ist (), singleton (make ((SemanticPredicate) null,
+      firstTable.put (L.ist (), singleton (make ((ChoicePredicate) null,
                                                  getEpsilonToken ())));
       boolean changed;
       do
@@ -181,7 +220,7 @@ public class Grammar<NT, T>
             for (List<?> rule : rules)
               {
                 if (rule.isEmpty ()) continue;
-                Set<Pair<SemanticPredicate, T>> s = firstTable.get (rule);
+                Set<Pair<ChoicePredicate, T>> s = firstTable.get (rule);
                 boolean diff = firstOfList (rule, s);
                 if (diff) changed = true;
               }
@@ -198,16 +237,25 @@ public class Grammar<NT, T>
     }
 
   @SuppressWarnings ("unchecked")
-  private boolean firstOfList (List<?> rule, Set<Pair<SemanticPredicate, T>> set)
+  private boolean firstOfList (List<?> rule, Set<Pair<ChoicePredicate, T>> set)
     {
       boolean changed = false;
-      SemanticPredicate currentPredicate = null;
+      ChoicePredicate currentPredicate = null;
       boolean done = false;
       for (Object o : rule)
         {
-          if (o instanceof SemanticPredicate)
+          if (o instanceof ChoicePredicate)
             {
-              SemanticPredicate p = (SemanticPredicate) o;
+              ChoicePredicate p = (ChoicePredicate) o;
+              if (currentPredicate == null)
+                currentPredicate = p;
+              else
+                currentPredicate = conjunction (currentPredicate, p);
+              continue;
+            }
+          else if (o instanceof SemanticPredicate)
+            {
+	      ChoicePredicate p = adapt ((SemanticPredicate) o);
               if (currentPredicate == null)
                 currentPredicate = p;
               else
@@ -218,11 +266,11 @@ public class Grammar<NT, T>
             continue;
           else if (map.containsKey (o))
             {
-              Set<Pair<SemanticPredicate, T>> target = firstTable.get (o);
+              Set<Pair<ChoicePredicate, T>> target = firstTable.get (o);
               if (hasToken (target, getEpsilonToken ()))
                 {
-                  Set<Pair<SemanticPredicate, T>> putative =
-                      new HashSet<Pair<SemanticPredicate, T>> (target);
+                  Set<Pair<ChoicePredicate, T>> putative =
+                      new HashSet<Pair<ChoicePredicate, T>> (target);
                   removeToken (putative, getEpsilonToken ());
                   if (set.equals (putative) || set.equals (target)) continue;
                   changed = true;
@@ -261,13 +309,13 @@ public class Grammar<NT, T>
       return changed;
     }
 
-  private <U> boolean removeToken (Set<Pair<SemanticPredicate, U>> set, U token)
+  private <U> boolean removeToken (Set<Pair<ChoicePredicate, U>> set, U token)
     {
       boolean changed = false;
-      for (Iterator<Pair<SemanticPredicate, U>> iter = set.iterator (); iter
-                                                                            .hasNext ();)
+      for (Iterator<Pair<ChoicePredicate, U>> iter = set.iterator ();
+	   iter.hasNext ();)
         {
-          Pair<SemanticPredicate, U> element = iter.next ();
+          Pair<ChoicePredicate, U> element = iter.next ();
           if (element.second.equals (token))
             {
               iter.remove ();
@@ -277,19 +325,19 @@ public class Grammar<NT, T>
       return changed;
     }
 
-  private <U> boolean hasToken (Set<Pair<SemanticPredicate, U>> set, U token)
+  private <U> boolean hasToken (Set<Pair<ChoicePredicate, U>> set, U token)
     {
-      for (Iterator<Pair<SemanticPredicate, U>> iter = set.iterator (); iter
-                                                                            .hasNext ();)
+      for (Iterator<Pair<ChoicePredicate, U>> iter = set.iterator ();
+	   iter.hasNext ();)
         {
-          Pair<SemanticPredicate, U> element = iter.next ();
+          Pair<ChoicePredicate, U> element = iter.next ();
           if (element.second.equals (token)) return true;
         }
       return false;
     }
 
   @SuppressWarnings ("unchecked")
-  public Set<Pair<SemanticPredicate, T>> follow (Object e)
+  public Set<Pair<ChoicePredicate, T>> follow (Object e)
     {
       if (followTable == null) initializeFollowTable ();
       if (followTable.containsKey (e)) return followTable.get (e);
@@ -299,11 +347,10 @@ public class Grammar<NT, T>
   @SuppressWarnings ("unchecked")
   private void initializeFollowTable ()
     {
-      followTable = new HashMap<Object, Set<Pair<SemanticPredicate, T>>> ();
+      followTable = new HashMap<Object, Set<Pair<ChoicePredicate, T>>> ();
       for (Object e : map.keySet ())
-        followTable.put (e, new HashSet<Pair<SemanticPredicate, T>> ());
-      followTable.get (start).add (
-                                   make ((SemanticPredicate) null,
+        followTable.put (e, new HashSet<Pair<ChoicePredicate, T>> ());
+      followTable.get (start).add (make ((ChoicePredicate) null,
                                          getEOFToken ()));
       // this is kind of inefficient. oh well.
       boolean changed;
@@ -318,17 +365,16 @@ public class Grammar<NT, T>
                   if (map.containsKey (o))
                     {
                       List<?> l = list.subList (i + 1, list.size ());
-                      Set<Pair<SemanticPredicate, T>> first =
-                          l.isEmpty () ? S.et (make ((SemanticPredicate) null,
+                      Set<Pair<ChoicePredicate, T>> first =
+                          l.isEmpty () ? S.et (make ((ChoicePredicate) null,
                                                      getEpsilonToken ()))
                                       : firstOf (l);
-                      Set<Pair<SemanticPredicate, T>> copy =
-                          new HashSet<Pair<SemanticPredicate, T>> (first);
-                      if (removeToken (copy, getEpsilonToken ())) // epsilon
-                        // was in
-                        // first
+                      Set<Pair<ChoicePredicate, T>> copy =
+                          new HashSet<Pair<ChoicePredicate, T>> (first);
+		      // if epsilon was in first, remove it and use follow
+                      if (removeToken (copy, getEpsilonToken ()))
                         copy.addAll (followTable.get (entry.getKey ()));
-                      Set<Pair<SemanticPredicate, T>> oldSet =
+                      Set<Pair<ChoicePredicate, T>> oldSet =
                           followTable.get (o);
                       if (oldSet.addAll (copy)) changed = true;
                     }
@@ -338,12 +384,12 @@ public class Grammar<NT, T>
     }
 
   @SuppressWarnings ("unchecked")
-  private Set<Pair<SemanticPredicate, T>> firstOf (List<?> l)
+  private Set<Pair<ChoicePredicate, T>> firstOf (List<?> l)
     {
       if (firstTable == null) initializeFirstTable ();
       if (firstTable.containsKey (l)) return firstTable.get (l);
-      Set<Pair<SemanticPredicate, T>> s =
-          new HashSet<Pair<SemanticPredicate, T>> ();
+      Set<Pair<ChoicePredicate, T>> s =
+          new HashSet<Pair<ChoicePredicate, T>> ();
       firstOfList (l, s);
       return s;
     }
@@ -403,14 +449,20 @@ public class Grammar<NT, T>
       return terminals;
     }
 
-  public static SemanticPredicate converse (SemanticPredicate sem)
+  public static ChoicePredicate adapt (ChoicePredicate sem)
+    {
+      // XXX: won't work if sem == null
+      return new AdapterPredicate (sem);
+    }
+
+  public static ChoicePredicate converse (ChoicePredicate sem)
     {
       // XXX: won't work if sem == null
       return new ConversePredicate (sem);
     }
 
-  public static SemanticPredicate conjunction (SemanticPredicate a,
-                                               SemanticPredicate b)
+  public static ChoicePredicate conjunction (ChoicePredicate a,
+					     ChoicePredicate b)
     {
       if (a == null) return b;
       if (b == null) return a;

@@ -11,22 +11,22 @@ import util.Triple;
 
 public class Table<NT, T, V extends List<?>>
                                              implements
-                                             Iterable<Triple<NT, T, Pair<SemanticPredicate, V>>>
+                                             Iterable<Triple<NT, T, Pair<ChoicePredicate, V>>>
 {
-  Map<NT, Map<T, Set<Pair<SemanticPredicate, V>>>> table;
-
+  Map<NT, Map<T, Set<Pair<ChoicePredicate, V>>>> table;
+  
   public Table ()
     {
-      table = new HashMap<NT, Map<T, Set<Pair<SemanticPredicate, V>>>> ();
+      table = new HashMap<NT, Map<T, Set<Pair<ChoicePredicate, V>>>> ();
     }
-
-  public Iterator<Triple<NT, T, Pair<SemanticPredicate, V>>> iterator ()
+  
+  public Iterator<Triple<NT, T, Pair<ChoicePredicate, V>>> iterator ()
     {
-      return new Iterator<Triple<NT, T, Pair<SemanticPredicate, V>>> ()
+      return new Iterator<Triple<NT,T,Pair<ChoicePredicate,V>>> ()
         {
           Iterator<NT> firstKeyIterator = table.keySet ().iterator ();
           Iterator<T> secondKeyIterator;
-          Iterator<Pair<SemanticPredicate, V>> lastIterator;
+          Iterator<Pair<ChoicePredicate,V>> lastIterator;
           NT nt;
           T t;
 
@@ -38,7 +38,7 @@ public class Table<NT, T, V extends List<?>>
               return true;
             }
 
-          public Triple<NT, T, Pair<SemanticPredicate, V>> next ()
+          public Triple<NT, T, Pair<ChoicePredicate, V>> next ()
             {
               if (lastIterator == null || !lastIterator.hasNext ())
                 {
@@ -61,12 +61,12 @@ public class Table<NT, T, V extends List<?>>
             }
         };
     }
-
-  public List<Triple<NT, T, Pair<SemanticPredicate, V>>> getLines ()
+  
+  public List<Triple<NT,T,Pair<ChoicePredicate,V>>> getLines ()
     {
-      List<Triple<NT, T, Pair<SemanticPredicate, V>>> result =
-          new ArrayList<Triple<NT, T, Pair<SemanticPredicate, V>>> ();
-      for (Triple<NT, T, Pair<SemanticPredicate, V>> t : this)
+      List<Triple<NT, T, Pair<ChoicePredicate, V>>> result =
+          new ArrayList<Triple<NT, T, Pair<ChoicePredicate, V>>> ();
+      for (Triple<NT, T, Pair<ChoicePredicate, V>> t : this)
         result.add (t);
       return result;
     }
@@ -74,58 +74,59 @@ public class Table<NT, T, V extends List<?>>
   @SuppressWarnings ("unchecked")
   public Table (Grammar<NT, T> grammar)
     {
-      table = new HashMap<NT, Map<T, Set<Pair<SemanticPredicate, V>>>> ();
+      table = new HashMap<NT, Map<T, Set<Pair<ChoicePredicate, V>>>> ();
       for (NT nt : grammar.getNonTerminals ())
         for (V v : (Collection<V>) grammar.rulesFor (nt))
           {
-            Set<Pair<SemanticPredicate, T>> first =
-                v.isEmpty () ? singleton (make ((SemanticPredicate) null,
+            Set<Pair<ChoicePredicate, T>> first =
+                v.isEmpty () ? singleton (make ((ChoicePredicate) null,
                                                 grammar.getEpsilonToken ()))
                             : grammar.first (v);
-            Set<Pair<SemanticPredicate, T>> follow = grammar.follow (nt);
+            Set<Pair<ChoicePredicate, T>> follow = grammar.follow (nt);
             for (T t : (Set<T>) grammar.getTerminals ())
               add (grammar, nt, v, first, follow, t);
             add (grammar, nt, v, first, follow, grammar.getEOFToken ());
           }
     }
-
-  public Table (Triple<NT, T, Pair<SemanticPredicate, V>>... rules)
+  
+  public Table (Triple<NT, T, Pair<ChoicePredicate,V>>... rules)
     {
-      table = new HashMap<NT, Map<T, Set<Pair<SemanticPredicate, V>>>> ();
-      for (Triple<NT, T, Pair<SemanticPredicate, V>> rule : rules)
+      table = new HashMap<NT, Map<T, Set<Pair<ChoicePredicate, V>>>> ();
+      for (Triple<NT, T, Pair<ChoicePredicate, V>> rule : rules)
         put (rule.first, rule.second, rule.third.first, rule.third.second);
     }
 
   private void add (Grammar<NT, T> grammar, NT nt, V v,
-                    Set<Pair<SemanticPredicate, T>> first,
-                    Set<Pair<SemanticPredicate, T>> follow, T t)
+                    Set<Pair<ChoicePredicate, T>> first,
+                    Set<Pair<ChoicePredicate, T>> follow, T t)
     {
-      for (Pair<SemanticPredicate, T> p : first)
+      for (Pair<ChoicePredicate,T> p : first)
         {
           if (p.second.equals (t)) put (nt, t, p.first, v);
           if (p.second.equals (grammar.getEpsilonToken ()))
-            for (Pair<SemanticPredicate, T> fp : follow)
+            for (Pair<ChoicePredicate,T> fp : follow)
               if (fp.second.equals (t))
                 put (nt, t, conjunction (p.first, fp.first), v);
         }
     }
 
-  public Collection<Pair<SemanticPredicate, V>> get (NT a, T x)
+  @SuppressWarnings("unchecked")
+  public Collection<Pair<ChoicePredicate, V>> get (NT a, T x)
     {
       if (table.containsKey (a) && table.get (a).containsKey (x))
         return table.get (a).get (x);
       return Collections.emptySet ();
     }
 
-  public Collection<Pair<SemanticPredicate, V>> getRow (NT a)
+  public Collection<Pair<ChoicePredicate, V>> getRow (NT a)
     {
       if (table.containsKey (a))
         {
-          HashSet<Pair<SemanticPredicate, V>> row =
-              new HashSet<Pair<SemanticPredicate, V>> ();
-          Map<T, Set<Pair<SemanticPredicate, V>>> map = table.get (a);
-          Collection<Set<Pair<SemanticPredicate, V>>> values = map.values ();
-          for (Set<Pair<SemanticPredicate, V>> set : values)
+          HashSet<Pair<ChoicePredicate, V>> row =
+              new HashSet<Pair<ChoicePredicate, V>> ();
+          Map<T, Set<Pair<ChoicePredicate, V>>> map = table.get (a);
+          Collection<Set<Pair<ChoicePredicate, V>>> values = map.values ();
+          for (Set<Pair<ChoicePredicate, V>> set : values)
             {
               row.addAll (set);
             }
@@ -134,12 +135,12 @@ public class Table<NT, T, V extends List<?>>
       return Collections.emptySet ();
     }
 
-  public void put (NT nt, T t, SemanticPredicate p, V v)
+  public void put (NT nt, T t, ChoicePredicate p, V v)
     {
       if (!table.containsKey (nt))
-        table.put (nt, new HashMap<T, Set<Pair<SemanticPredicate, V>>> ());
+        table.put (nt, new HashMap<T, Set<Pair<ChoicePredicate, V>>> ());
       if (!table.get (nt).containsKey (t))
-        table.get (nt).put (t, new HashSet<Pair<SemanticPredicate, V>> ());
+        table.get (nt).put (t, new HashSet<Pair<ChoicePredicate, V>> ());
       table.get (nt).get (t).add (make (p, v));
     }
 }

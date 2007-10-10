@@ -76,13 +76,13 @@ public class Parser<NT, T>
   public void witness (final T token)
     {
       lookahead.addFirst (token);
-      parserLoop (
-                  token,
-                  new UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> ()
+      parserLoop (token,
+                  new UnaryFunctor<NT, Collection<Pair<ChoicePredicate,
+		  List<?>>>> ()
                     {
                       @Override
-                      public Collection<Pair<SemanticPredicate, List<?>>> fn (
-                                                                              NT t)
+                      public Collection<Pair<ChoicePredicate, List<?>>> fn 
+			  (NT t)
                         {
                           return table.get (t, lookahead.getFirst ());
                         }
@@ -93,22 +93,22 @@ public class Parser<NT, T>
 
   public void waitFor (final T token)
     {
-      parserLoop (
-                  token,
-                  new UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> ()
+      parserLoop (token,
+                  new UnaryFunctor<NT, Collection<Pair<ChoicePredicate, 
+		  List<?>>>> ()
                     {
                       @Override
-                      public Collection<Pair<SemanticPredicate, List<?>>> fn (
-                                                                              NT t)
+                      public Collection<Pair<ChoicePredicate, List<?>>> fn 
+			  (NT t)
                         {
                           return table.getRow (t);
                         }
                     });
     }
 
-  private void parserLoop (
-                           T stopAt,
-                           UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> unaryFunctor)
+  private void parserLoop (T stopAt,
+                           UnaryFunctor<NT, Collection<Pair<ChoicePredicate, 
+			   List<?>>>> unaryFunctor)
     {
       while (!stack.peek ().equals (stopAt))
         parserGuts (unaryFunctor);
@@ -116,14 +116,20 @@ public class Parser<NT, T>
     }
 
   @SuppressWarnings ("unchecked")
-  private void parserGuts (
-                           UnaryFunctor<NT, Collection<Pair<SemanticPredicate, List<?>>>> rowGenerator)
+  private void parserGuts (UnaryFunctor<NT, Collection<Pair<ChoicePredicate,
+			   List<?>>>> rowGenerator)
     {
       Object obj = stack.removeFirst ();
       if (obj instanceof SemanticPredicate)
         {
           if (!checkPredicate ((SemanticPredicate) obj))
             throw new ParseException ("Semantic predicate " + obj +
+                                      " failed during execution");
+        }
+      if (obj instanceof ChoicePredicate)
+        {
+          if (!checkChoice ((ChoicePredicate) obj))
+            throw new ParseException ("Choice predicate " + obj +
                                       " failed during execution");
         }
       else if (obj instanceof Generator)
@@ -134,7 +140,7 @@ public class Parser<NT, T>
       else
         {
           NT top = (NT) obj;
-          Collection<Pair<SemanticPredicate, List<?>>> row =
+          Collection<Pair<ChoicePredicate, List<?>>> row =
               rowGenerator.fn (top);
           stack.addAll (0, choosePossibility (row, top));
         }
@@ -145,12 +151,17 @@ public class Parser<NT, T>
       return pred.fn ();
     }
 
-  protected List<?> choosePossibility (
-                                       Collection<Pair<SemanticPredicate, List<?>>> possibilities,
+  protected boolean checkChoice (ChoicePredicate pred)
+    {
+      return pred.fn ();
+    }
+
+  protected List<?> choosePossibility (Collection<Pair<ChoicePredicate,
+				       List<?>>> possibilities,
                                        NT top)
     {
       List<?> candidate = null;
-      for (Pair<SemanticPredicate, List<?>> possibility : possibilities)
+      for (Pair<ChoicePredicate, List<?>> possibility : possibilities)
         if (possibility.first == null || possibility.first.fn ())
           {
             if (candidate != null)
