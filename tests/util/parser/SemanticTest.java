@@ -78,7 +78,7 @@ public class SemanticTest
   public void semanticPredicate ()
     {
       final int i[] = { 0 };
-      SemanticPredicate sem = new SemanticPredicate ()
+      ChoicePredicate sem = new ChoicePredicate ()
         {
           @Override
           public Boolean gen ()
@@ -86,7 +86,7 @@ public class SemanticTest
               return i[0] > 0;
             }
         };
-      SemanticPredicate inv = Grammar.converse (sem);
+      ChoicePredicate inv = Grammar.converse (sem);
       Generator<Object> act = new Generator<Object> ()
         {
           @Override

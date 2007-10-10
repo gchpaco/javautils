@@ -24,7 +24,7 @@ public class Grammar<NT, T>
 	pred = sem;
       }
 
-    @Boolean
+    @Override
     public Boolean gen ()
       {
 	return pred.fn ();
@@ -449,7 +449,7 @@ public class Grammar<NT, T>
       return terminals;
     }
 
-  public static ChoicePredicate adapt (ChoicePredicate sem)
+  public static ChoicePredicate adapt (SemanticPredicate sem)
     {
       // XXX: won't work if sem == null
       return new AdapterPredicate (sem);

@@ -34,7 +34,7 @@ public class BacktrackingParser<NT, T> extends Parser<NT, T>
                                        NT top)
     {
       List<List<?>> available = new ArrayList<List<?>> ();
-      for (Pair<SemanticPredicate, List<?>> pair : possibilities)
+      for (Pair<ChoicePredicate, List<?>> pair : possibilities)
         {
           if (pair.first == null || pair.first.fn ())
             available.add (pair.second);

@@ -71,9 +71,9 @@ public class TableTest
     }
 
   @SuppressWarnings ("unchecked")
-  public void testMultipleSemanticPredicates ()
+  public void testMultipleChoicePredicates ()
     {
-      SemanticPredicate a1 = new SemanticPredicate ()
+      ChoicePredicate a1 = new ChoicePredicate ()
         {
           @Override
           public Boolean gen ()
