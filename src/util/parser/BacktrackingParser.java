@@ -40,6 +40,6 @@ public class BacktrackingParser<NT, T> extends Parser<NT, T>
             available.add (pair.second);
         }
       Verify.ignoreIf (available.isEmpty ());
-      return available.get (Verify.random (available.size ()));
+      return available.get (Verify.random (available.size () - 1));
     }
 }
