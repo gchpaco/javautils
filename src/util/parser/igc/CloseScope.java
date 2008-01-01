@@ -3,7 +3,7 @@ package util.parser.igc;
 import net.sf.jga.fn.Generator;
 import util.SymbolTable;
 
-public abstract class CloseScope extends Generator<Object>
+public class CloseScope extends Generator<Object>
 {
   SymbolTable symbols;
   public CloseScope (SymbolTable s) { symbols = s; }
