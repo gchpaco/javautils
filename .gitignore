@@ -3,3 +3,4 @@ TAGS
 *.class
 build/*
 test-output/*
+nbproject/*
