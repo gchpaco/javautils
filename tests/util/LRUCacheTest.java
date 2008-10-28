@@ -1,6 +1,7 @@
 package util;
 
 import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
 import org.testng.annotations.Test;
 
@@ -16,5 +17,8 @@ public class LRUCacheTest
       cache.put (2, 56);
       cache.put (4, 56);
       assertFalse (cache.containsKey (3));
+      assertTrue (cache.containsKey (1));
+      assertTrue (cache.containsKey (2));
+      assertTrue (cache.containsKey (4));
     }
 }
